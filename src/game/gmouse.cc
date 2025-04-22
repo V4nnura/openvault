@@ -1723,19 +1723,22 @@ int gmouse_3d_build_menu_frame(int x, int y, const int* menuItems, int menuItems
         }
     }
 
-    int fid = art_id(OBJ_TYPE_INTERFACE, gmouse_3d_mode_nums[GAME_MOUSE_MODE_ARROW], 0, 0, 0);
     CacheEntry* arrowFrmHandle;
-    Art* arrowFrm = art_ptr_lock(fid, &arrowFrmHandle);
+    int arrowFid = art_id(OBJ_TYPE_INTERFACE, gmouse_3d_mode_nums[GAME_MOUSE_MODE_ARROW], 0, 0, 0);
+    Art* arrowFrm = art_ptr_lock(arrowFid, &arrowFrmHandle);
     if (arrowFrm == NULL) {
-        // FIXME: Unlock arts.
+        for (int index = 0; index < menuItemsLength; index++) {
+            art_ptr_unlock(menuItemFrmHandles[index]);
+        }
         return -1;
     }
 
-    int arrowWidth = art_frame_width(arrowFrm, 0, 0);
-    int arrowHeight = art_frame_length(arrowFrm, 0, 0);
+    unsigned char* arrowFrmData = art_frame_data(arrowFrm, 0, 0);
+    int arrowFrmWidth = art_frame_width(arrowFrm, 0, 0);
+    int arrowFrmHeight = art_frame_length(arrowFrm, 0, 0);
 
-    int menuItemWidth = art_frame_width(menuItemFrms[0], 0, 0);
-    int menuItemHeight = art_frame_length(menuItemFrms[0], 0, 0);
+    int menuItemFrmWidth = art_frame_width(menuItemFrms[0], 0, 0);
+    int menuItemFrmHeight = art_frame_length(menuItemFrms[0], 0, 0);
 
     gmouse_3d_menu_frame_hot_x = 0;
     gmouse_3d_menu_frame_hot_y = 0;
@@ -1743,42 +1746,48 @@ int gmouse_3d_build_menu_frame(int x, int y, const int* menuItems, int menuItems
     gmouse_3d_menu_frame->xOffsets[0] = gmouse_3d_menu_frame_width / 2;
     gmouse_3d_menu_frame->yOffsets[0] = gmouse_3d_menu_frame_height - 1;
 
-    int v60 = y + menuItemsLength * menuItemHeight - 1;
-    int v24 = v60 - height + 2;
-    unsigned char* v22 = gmouse_3d_menu_frame_data;
-    unsigned char* v58 = v22;
+    int maxY = y + menuItemsLength * menuItemFrmHeight - 1;
+    int shiftY = maxY - height + 2;
+    unsigned char* arrowFrmDest = gmouse_3d_menu_frame_data;
+    unsigned char* menuItemFrmDest = arrowFrmDest;
 
-    unsigned char* arrowData;
-    if (x + arrowWidth + menuItemWidth - 1 < width) {
-        arrowData = art_frame_data(arrowFrm, 0, 0);
-        v58 = v22 + arrowWidth;
-        if (height <= v60) {
-            gmouse_3d_menu_frame_hot_y += v24;
-            v22 += gmouse_3d_menu_frame_width * v24;
-            gmouse_3d_menu_frame->yOffsets[0] -= v24;
+    if (x + arrowFrmWidth + menuItemFrmWidth - 1 < width) {
+        menuItemFrmDest += arrowFrmWidth;
+        if (height <= maxY) {
+            gmouse_3d_menu_frame_hot_y += shiftY;
+            arrowFrmDest += gmouse_3d_menu_frame_width * shiftY;
+            gmouse_3d_menu_frame->yOffsets[0] -= shiftY;
         }
     } else {
         // Mirrored arrow (from left to right).
-        fid = art_id(OBJ_TYPE_INTERFACE, 285, 0, 0, 0);
-        arrowFrm = art_ptr_lock(fid, &arrowFrmHandle);
-        arrowData = art_frame_data(arrowFrm, 0, 0);
+        art_ptr_unlock(arrowFrmHandle);
+
+        arrowFid = art_id(OBJ_TYPE_INTERFACE, 285, 0, 0, 0);
+        arrowFrm = art_ptr_lock(arrowFid, &arrowFrmHandle);
+        arrowFrmData = art_frame_data(arrowFrm, 0, 0);
+        arrowFrmDest += menuItemFrmWidth;
+
         gmouse_3d_menu_frame->xOffsets[0] = -gmouse_3d_menu_frame->xOffsets[0];
-        gmouse_3d_menu_frame_hot_x += menuItemWidth + arrowWidth;
-        if (v60 >= height) {
-            gmouse_3d_menu_frame_hot_y += v24;
-            gmouse_3d_menu_frame->yOffsets[0] -= v24;
-            v22 += gmouse_3d_menu_frame_width * v24;
+        gmouse_3d_menu_frame_hot_x += menuItemFrmWidth + arrowFrmWidth;
+
+        if (maxY >= height) {
+            gmouse_3d_menu_frame_hot_y += shiftY;
+            gmouse_3d_menu_frame->yOffsets[0] -= shiftY;
+            arrowFrmDest += gmouse_3d_menu_frame_width * shiftY;
         }
     }
 
     memset(gmouse_3d_menu_frame_data, 0, gmouse_3d_menu_frame_size);
-    buf_to_buf(arrowData, arrowWidth, arrowHeight, arrowWidth, v22, gmouse_3d_pick_frame_width);
+    buf_to_buf(arrowFrmData, arrowFrmWidth, arrowFrmHeight, arrowFrmWidth, arrowFrmDest, gmouse_3d_pick_frame_width);
 
-    unsigned char* v38 = v58;
+    memcpy(gmouse_3d_menu_frame_actions, menuItems, sizeof(*gmouse_3d_menu_frame_actions) * menuItemsLength);
+    gmouse_3d_menu_available_actions = menuItemsLength;
+    gmouse_3d_menu_actions_start = menuItemFrmDest;
+
     for (int index = 0; index < menuItemsLength; index++) {
         unsigned char* data = art_frame_data(menuItemFrms[index], 0, 0);
-        buf_to_buf(data, menuItemWidth, menuItemHeight, menuItemWidth, v38, gmouse_3d_pick_frame_width);
-        v38 += gmouse_3d_menu_frame_width * menuItemHeight;
+        buf_to_buf(data, menuItemFrmWidth, menuItemFrmHeight, menuItemFrmWidth, menuItemFrmDest, gmouse_3d_pick_frame_width);
+        menuItemFrmDest += gmouse_3d_menu_frame_width * menuItemFrmHeight;
     }
 
     art_ptr_unlock(arrowFrmHandle);
@@ -1786,10 +1795,6 @@ int gmouse_3d_build_menu_frame(int x, int y, const int* menuItems, int menuItems
     for (int index = 0; index < menuItemsLength; index++) {
         art_ptr_unlock(menuItemFrmHandles[index]);
     }
-
-    memcpy(gmouse_3d_menu_frame_actions, menuItems, sizeof(*gmouse_3d_menu_frame_actions) * menuItemsLength);
-    gmouse_3d_menu_available_actions = menuItemsLength;
-    gmouse_3d_menu_actions_start = v58;
 
     Sound* sound = gsound_load_sound("iaccuxx1", NULL);
     if (sound != NULL) {
