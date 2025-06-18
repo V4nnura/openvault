@@ -38,6 +38,7 @@ int main(int argc, char* argv[])
     if (GetLastError() != ERROR_SUCCESS) {
         return 0;
     }
+    SetProcessDPIAware();
 #endif
 
 #if __APPLE__ && TARGET_OS_IOS
