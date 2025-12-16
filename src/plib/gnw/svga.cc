@@ -66,17 +66,69 @@ void GNW95_SetPalette(unsigned char* palette)
 // 0x4CB850
 void GNW95_ShowRect(unsigned char* src, unsigned int srcPitch, unsigned int a3, unsigned int srcX, unsigned int srcY, unsigned int srcWidth, unsigned int srcHeight, unsigned int destX, unsigned int destY)
 {
-    buf_to_buf(src + srcPitch * srcY + srcX, srcWidth, srcHeight, srcPitch, (unsigned char*)gSdlSurface->pixels + gSdlSurface->pitch * destY + destX, gSdlSurface->pitch);
+    // Clip copy to the bounds of gSdlSurface to avoid out-of-bounds when logical
+    // resolution is smaller than interface assets (e.g. 512-wide surface vs 640-wide bar).
+    int copyX = static_cast<int>(destX);
+    int copyY = static_cast<int>(destY);
+    int copyW = static_cast<int>(srcWidth);
+    int copyH = static_cast<int>(srcHeight);
+    int srcOffsetX = static_cast<int>(srcX);
+    int srcOffsetY = static_cast<int>(srcY);
+
+    if (copyX < 0) {
+        srcOffsetX -= copyX;
+        copyW += copyX;
+        copyX = 0;
+    }
+    if (copyY < 0) {
+        srcOffsetY -= copyY;
+        copyH += copyY;
+        copyY = 0;
+    }
+    if (copyX + copyW > gSdlSurface->w) {
+        copyW = gSdlSurface->w - copyX;
+    }
+    if (copyY + copyH > gSdlSurface->h) {
+        copyH = gSdlSurface->h - copyY;
+    }
+
+    if (copyW <= 0 || copyH <= 0) {
+        return;
+    }
+
+    buf_to_buf(src + srcPitch * srcOffsetY + srcOffsetX,
+        copyW,
+        copyH,
+        srcPitch,
+        (unsigned char*)gSdlSurface->pixels + gSdlSurface->pitch * copyY + copyX,
+        gSdlSurface->pitch);
 
     SDL_Rect srcRect;
-    srcRect.x = destX;
-    srcRect.y = destY;
-    srcRect.w = srcWidth;
-    srcRect.h = srcHeight;
+    srcRect.x = copyX;
+    srcRect.y = copyY;
+    srcRect.w = copyW;
+    srcRect.h = copyH;
 
     SDL_Rect destRect;
-    destRect.x = destX;
-    destRect.y = destY;
+    destRect.x = copyX;
+    destRect.y = copyY;
+    destRect.w = copyW;
+    destRect.h = copyH;
+
+    // Also clip destination to texture surface bounds
+    if (destRect.x + destRect.w > gSdlTextureSurface->w) {
+        destRect.w = gSdlTextureSurface->w - destRect.x;
+        srcRect.w = destRect.w;
+    }
+    if (destRect.y + destRect.h > gSdlTextureSurface->h) {
+        destRect.h = gSdlTextureSurface->h - destRect.y;
+        srcRect.h = destRect.h;
+    }
+
+    if (destRect.w <= 0 || destRect.h <= 0) {
+        return;
+    }
+
     SDL_BlitSurface(gSdlSurface, &srcRect, gSdlTextureSurface, &destRect);
 }
 

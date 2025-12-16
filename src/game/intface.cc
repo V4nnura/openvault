@@ -399,10 +399,14 @@ int intface_init()
 
     insideInit = 1;
 
-    int interfaceBarWindowX = (screenGetWidth() - INTERFACE_BAR_WIDTH) / 2;
-    int interfaceBarWindowY = screenGetHeight() - INTERFACE_BAR_HEIGHT;
+    // Clamp interface window to screen size to avoid win_add failure when logical
+    // resolution is smaller than the interface art (e.g., 512-wide surface vs 640 bar).
+    int interfaceBarWidth = std::min(screenGetWidth(), INTERFACE_BAR_WIDTH);
+    int interfaceBarHeight = std::min(screenGetHeight(), INTERFACE_BAR_HEIGHT);
+    int interfaceBarWindowX = (screenGetWidth() - interfaceBarWidth) / 2;
+    int interfaceBarWindowY = screenGetHeight() - interfaceBarHeight;
 
-    interfaceWindow = win_add(interfaceBarWindowX, interfaceBarWindowY, INTERFACE_BAR_WIDTH, INTERFACE_BAR_HEIGHT, colorTable[0], WINDOW_HIDDEN);
+    interfaceWindow = win_add(interfaceBarWindowX, interfaceBarWindowY, interfaceBarWidth, interfaceBarHeight, colorTable[0], WINDOW_HIDDEN);
     if (interfaceWindow == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);
@@ -421,7 +425,8 @@ int intface_init()
         return intface_fatal_error(-1);
     }
 
-    buf_to_buf(backgroundFrmData, INTERFACE_BAR_WIDTH, INTERFACE_BAR_HEIGHT, INTERFACE_BAR_WIDTH, interfaceBuffer, 640);
+    // Copy background with clipping to the actual window width/height.
+    buf_to_buf(backgroundFrmData, interfaceBarWidth, interfaceBarHeight, INTERFACE_BAR_WIDTH, interfaceBuffer, interfaceBarWidth);
     art_ptr_unlock(backgroundFrmHandle);
 
     fid = art_id(OBJ_TYPE_INTERFACE, 47, 0, 0, 0);

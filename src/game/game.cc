@@ -172,6 +172,10 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
                 video_options.scale = scaleValue + 1;
                 video_options.width /= video_options.scale;
                 video_options.height /= video_options.scale;
+
+                // Keep logical surface large enough for 640px-wide interface assets.
+                video_options.width = std::max(video_options.width, 640);
+                video_options.height = std::max(video_options.height, 480);
             }
         }
         config_exit(&resolutionConfig);
