@@ -226,7 +226,7 @@ static int skilldex_start()
         return -1;
     }
 
-    int skilldexWindowX = (screenGetWidth() - INTERFACE_BAR_WIDTH) / 2 + INTERFACE_BAR_WIDTH - ginfo[SKILLDEX_FRM_BACKGROUND].width - SKILLDEX_WINDOW_RIGHT_MARGIN;
+    int skilldexWindowX = (screenGetWidth() - gInterfaceBarWidth) / 2 + gInterfaceBarWidth - ginfo[SKILLDEX_FRM_BACKGROUND].width - SKILLDEX_WINDOW_RIGHT_MARGIN;
     int skilldexWindowY = screenGetHeight() - INTERFACE_BAR_HEIGHT - 1 - ginfo[SKILLDEX_FRM_BACKGROUND].height - SKILLDEX_WINDOW_BOTTOM_MARGIN;
     skldxwin = win_add(skilldexWindowX,
         skilldexWindowY,

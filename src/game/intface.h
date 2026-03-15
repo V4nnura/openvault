@@ -30,6 +30,10 @@ typedef enum InterfaceItemAction {
 
 extern int interfaceWindow;
 extern int bar_window;
+extern int gInterfaceBarWidth;
+extern int gInterfaceBarContentOffset;
+extern int gInterfaceSidePanelsImageId;
+extern bool gInterfaceSidePanelsExtendFromScreenEdge;
 
 int intface_init();
 void intface_reset();

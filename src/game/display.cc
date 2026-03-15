@@ -27,7 +27,7 @@ namespace fallout {
 
 #define DISPLAY_MONITOR_X 23
 #define DISPLAY_MONITOR_Y 24
-#define DISPLAY_MONITOR_WIDTH 167
+#define DISPLAY_MONITOR_WIDTH (167 + gInterfaceBarContentOffset)
 #define DISPLAY_MONITOR_HEIGHT 60
 
 #define DISPLAY_MONITOR_HALF_HEIGHT (DISPLAY_MONITOR_HEIGHT / 2)
@@ -42,12 +42,7 @@ static bool disp_init = false;
 // The rectangle that display monitor occupies in the main interface window.
 //
 // 0x504F10
-static Rect disp_rect = {
-    DISPLAY_MONITOR_X,
-    DISPLAY_MONITOR_Y,
-    DISPLAY_MONITOR_X + DISPLAY_MONITOR_WIDTH - 1,
-    DISPLAY_MONITOR_Y + DISPLAY_MONITOR_HEIGHT - 1,
-};
+static Rect disp_rect;
 
 // 0x504F20
 static int dn_bid = -1;
@@ -83,6 +78,11 @@ static int disp_start;
 int display_init()
 {
     if (!disp_init) {
+        disp_rect.ulx = DISPLAY_MONITOR_X;
+        disp_rect.uly = DISPLAY_MONITOR_Y;
+        disp_rect.lrx = DISPLAY_MONITOR_X + DISPLAY_MONITOR_WIDTH - 1;
+        disp_rect.lry = DISPLAY_MONITOR_Y + DISPLAY_MONITOR_HEIGHT - 1;
+
         int oldFont = text_curr();
         text_font(DISPLAY_MONITOR_FONT);
 
@@ -97,24 +97,19 @@ int display_init()
             return -1;
         }
 
-        CacheEntry* backgroundFrmHandle;
-        int backgroundFid = art_id(OBJ_TYPE_INTERFACE, 16, 0, 0, 0);
-        Art* backgroundFrm = art_ptr_lock(backgroundFid, &backgroundFrmHandle);
-        if (backgroundFrm == NULL) {
+        unsigned char* interfaceBarBuffer = win_get_buf(interfaceWindow);
+        if (interfaceBarBuffer == NULL) {
             mem_free(disp_buf);
             return -1;
         }
 
-        unsigned char* backgroundFrmData = art_frame_data(backgroundFrm, 0, 0);
-        intface_full_wid = art_frame_width(backgroundFrm, 0, 0);
-        buf_to_buf(backgroundFrmData + intface_full_wid * DISPLAY_MONITOR_Y + DISPLAY_MONITOR_X,
+        intface_full_wid = gInterfaceBarWidth;
+        buf_to_buf(interfaceBarBuffer + intface_full_wid * DISPLAY_MONITOR_Y + DISPLAY_MONITOR_X,
             DISPLAY_MONITOR_WIDTH,
             DISPLAY_MONITOR_HEIGHT,
             intface_full_wid,
             disp_buf,
             DISPLAY_MONITOR_WIDTH);
-
-        art_ptr_unlock(backgroundFrmHandle);
 
         up_bid = win_register_button(interfaceWindow,
             DISPLAY_MONITOR_X,
