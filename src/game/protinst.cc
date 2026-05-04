@@ -391,7 +391,7 @@ int obj_examine_func(Object* critter, Object* target, void (*fn)(char* string))
                     exit(1);
                 }
 
-                debug_printf(hpMessageListItem.text);
+                debug_printf("%s", hpMessageListItem.text);
                 return 0;
             }
 
@@ -404,15 +404,11 @@ int obj_examine_func(Object* critter, Object* target, void (*fn)(char* string))
                     exit(1);
                 }
 
+                debug_printf("\nDEBUG: v66.text (msg %d): '%s'\n", v66.num, v66.text);
+                debug_printf("\nDEBUG: hpMessageListItem.text (msg %d): '%s'\n", hpMessageListItem.num, hpMessageListItem.text);
                 snprintf(formattedText, sizeof(formattedText), v66.text, hpMessageListItem.text);
             } else {
-                // %s %s
-                v66.num = 521 + v12;
-                if (!message_search(&proto_main_msg_file, &v66)) {
-                    debug_printf("\nError: Can't find msg num!");
-                    exit(1);
-                }
-
+                // He/She looks: %s (message 522/523 already contains the pronoun and format)
                 MessageListItem v63;
                 v63.num = 522 + stat_level(target, STAT_GENDER);
                 if (!message_search(&proto_main_msg_file, &v63)) {
@@ -420,7 +416,9 @@ int obj_examine_func(Object* critter, Object* target, void (*fn)(char* string))
                     exit(1);
                 }
 
-                snprintf(formattedText, sizeof(formattedText), v66.text, v63.text, hpMessageListItem.text);
+                debug_printf("\nDEBUG: v63.text (msg %d): '%s'\n", v63.num, v63.text);
+                debug_printf("\nDEBUG: hpMessageListItem.text (msg %d): '%s'\n", hpMessageListItem.num, hpMessageListItem.text);
+                snprintf(formattedText, sizeof(formattedText), v63.text, hpMessageListItem.text);
             }
         }
 
@@ -965,7 +963,7 @@ static int protinst_default_use_item(Object* a1, Object* a2, Object* item)
 
     messageListItem.num = 582;
     if (message_search(&proto_main_msg_file, &messageListItem)) {
-        snprintf(formattedText, sizeof(formattedText), messageListItem.text);
+        snprintf(formattedText, sizeof(formattedText), "%s", messageListItem.text);
         display_print(formattedText);
     }
     return -1;

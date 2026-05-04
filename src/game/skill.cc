@@ -481,7 +481,7 @@ int skill_use(Object* obj, Object* a2, int skill, int criticalChanceModifier)
             // 514: It's dead, get over it.
             messageListItem.num = 512 + roll_random(0, 2);
             if (message_search(&skill_message_file, &messageListItem)) {
-                debug_printf(messageListItem.text);
+                debug_printf("%s", messageListItem.text);
             }
 
             break;
@@ -760,7 +760,7 @@ int skill_use(Object* obj, Object* a2, int skill, int criticalChanceModifier)
         // skill_use: invalid skill used.
         messageListItem.num = 510;
         if (message_search(&skill_message_file, &messageListItem)) {
-            debug_printf(messageListItem.text);
+            debug_printf("%s", messageListItem.text);
         }
 
         return -1;

@@ -614,7 +614,7 @@ void gdialog_enter(Object* target, int a2)
                 if (a2) {
                     display_print(messageListItem.text);
                 } else {
-                    debug_printf(messageListItem.text);
+                    debug_printf("%s", messageListItem.text);
                 }
             } else {
                 debug_printf("\nError: gdialog: Can't find message!");
@@ -629,7 +629,7 @@ void gdialog_enter(Object* target, int a2)
                 if (a2) {
                     display_print(messageListItem.text);
                 } else {
-                    debug_printf(messageListItem.text);
+                    debug_printf("%s", messageListItem.text);
                 }
             } else {
                 debug_printf("\nError: gdialog: Can't find message!");

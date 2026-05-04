@@ -61,7 +61,7 @@ static unsigned int decodeRead(void* stream, void* buffer, unsigned int size)
 int audioOpen(const char* fname, int flags)
 {
     char path[80];
-    snprintf(path, sizeof(path), fname);
+    snprintf(path, sizeof(path), "%s", fname);
 
     int compression;
     if (queryCompressedFunc(path)) {
