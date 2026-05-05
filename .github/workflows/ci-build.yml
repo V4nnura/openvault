@@ -288,3 +288,75 @@ jobs:
           name: fallout-ce-windows-${{ matrix.arch }}
           path:  build/RelWithDebInfo/fallout-ce.exe
           retention-days: 7
+
+
+  release:
+    name: Experimental build
+    runs-on: ubuntu-latest
+    needs: [android, ios, linux, macos, windows]
+    permissions: write-all
+    steps:
+      - name: Search artifacts
+        if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        uses: actions/download-artifact@v4.1.7
+        with:
+          path: artifacts/
+
+      - name: Remove old version
+        if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        with:
+          delete_release: true
+          tag_name: main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Move unpacked artifacts to main folder
+        if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        run: |
+          ls -Rlah .
+          find .
+          cd artifacts/
+          for folder in *; do
+            if [[ -d "$folder" && "$folder" != "." ]]; then
+              echo "Processing $folder"
+              mv "$folder" "$folder.dir"
+              cd "$folder.dir"
+              for file in *; do
+                if [ -f "$file" ]; then
+                  if [ -f "../$file" ]; then
+                    echo "ERROR: Duplicate artifact file name $file"
+                    exit 1
+                  fi
+                  if [ -d "../$file" ]; then
+                    echo "ERROR: Duplicate artifact folder $file"
+                    exit 1
+                  fi
+
+                  echo "Moving $file"
+                  mv "$file" "../$file"
+                fi
+              done
+              cd ..
+              rm -rf "$folder.dir"
+            fi
+          done
+          ls -Rlah .
+          find .
+          cd ../
+
+      - name: Allow GitHub to remove release for an few seconds
+        if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        run: |
+          sleep 20s
+
+      - name: Upload new release
+        if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+        uses: softprops/action-gh-release@v0.1.15
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: artifacts/*
+          tag_name: main
+          draft: false
+          prerelease: true
+          name: OpenVault Experimental Build
