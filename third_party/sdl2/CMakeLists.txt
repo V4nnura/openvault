@@ -14,7 +14,7 @@ include(FetchContent)
 
 FetchContent_Declare(sdl2
     GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
-    GIT_TAG "release-2.29.3"
+    GIT_TAG "release-2.32.10"
 )
 
 FetchContent_GetProperties(sdl2)
