@@ -271,7 +271,7 @@ jobs:
         run: |
           cmake \
             -B build \
-            -G "Visual Studio 18 2026" \
+            -G "Visual Studio 16 2019" \
             -A ${{ matrix.generator-platform }} \
             # EOL
 
