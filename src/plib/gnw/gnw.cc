@@ -713,6 +713,10 @@ void win_show(int win)
         window[v3] = w;
         window_index[w->id] = v3;
         GNW_win_refresh(w, &(w->rect), NULL);
+    } else if ((w->flags & WINDOW_HIDDEN) == 0) {
+        // Match Fallout 2 CE's fix for DONT_MOVE_TOP windows that need an
+        // explicit redraw when shown from a hidden state.
+        GNW_win_refresh(w, &(w->rect), NULL);
     }
 }
 

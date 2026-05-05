@@ -116,6 +116,23 @@ static void reset_box_bar_win();
 static int bbox_comp(const void* a, const void* b);
 static void draw_bboxes(int count);
 static bool add_bar_box(int indicator);
+static void customInterfaceBarInit();
+static void customInterfaceBarExit();
+static void sidePanelsInit();
+static void sidePanelsExit();
+static void sidePanelsHide();
+static void sidePanelsShow();
+static void sidePanelsDraw(const char* path, int win, bool isLeading);
+
+int gInterfaceBarWidth = INTERFACE_BAR_WIDTH;
+int gInterfaceBarContentOffset = 0;
+static bool gInterfaceBarIsCustom = false;
+static Art* gCustomInterfaceBarBackground = NULL;
+
+int gInterfaceSidePanelsImageId = 0;
+bool gInterfaceSidePanelsExtendFromScreenEdge = false;
+static int gInterfaceSidePanelsLeadingWindow = -1;
+static int gInterfaceSidePanelsTrailingWindow = -1;
 
 // 0x505508
 static bool insideInit = false;
@@ -399,10 +416,16 @@ int intface_init()
 
     insideInit = 1;
 
-    int interfaceBarWindowX = (screenGetWidth() - INTERFACE_BAR_WIDTH) / 2;
+    customInterfaceBarInit();
+
+    itemButtonRect = { 267 + gInterfaceBarContentOffset, 26, 455 + gInterfaceBarContentOffset, 93 };
+    endWindowRect = { 580 + gInterfaceBarContentOffset, 38, 637 + gInterfaceBarContentOffset, 96 };
+    movePointRect = { 316 + gInterfaceBarContentOffset, 14, 406 + gInterfaceBarContentOffset, 19 };
+
+    int interfaceBarWindowX = (screenGetWidth() - gInterfaceBarWidth) / 2;
     int interfaceBarWindowY = screenGetHeight() - INTERFACE_BAR_HEIGHT;
 
-    interfaceWindow = win_add(interfaceBarWindowX, interfaceBarWindowY, INTERFACE_BAR_WIDTH, INTERFACE_BAR_HEIGHT, colorTable[0], WINDOW_HIDDEN);
+    interfaceWindow = win_add(interfaceBarWindowX, interfaceBarWindowY, gInterfaceBarWidth, INTERFACE_BAR_HEIGHT, colorTable[0], WINDOW_HIDDEN);
     if (interfaceWindow == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);
@@ -414,15 +437,31 @@ int intface_init()
         return intface_fatal_error(-1);
     }
 
-    fid = art_id(OBJ_TYPE_INTERFACE, 16, 0, 0, 0);
-    backgroundFrmData = art_ptr_lock_data(fid, 0, 0, &backgroundFrmHandle);
-    if (backgroundFrmData == NULL) {
-        // NOTE: Uninline.
-        return intface_fatal_error(-1);
-    }
+    if (gInterfaceBarIsCustom) {
+        backgroundFrmData = art_frame_data(gCustomInterfaceBarBackground, 0, 0);
+        if (backgroundFrmData == NULL) {
+            // NOTE: Uninline.
+            return intface_fatal_error(-1);
+        }
 
-    buf_to_buf(backgroundFrmData, INTERFACE_BAR_WIDTH, INTERFACE_BAR_HEIGHT, INTERFACE_BAR_WIDTH, interfaceBuffer, 640);
-    art_ptr_unlock(backgroundFrmHandle);
+        int backgroundImageHeight = std::min(art_frame_length(gCustomInterfaceBarBackground, 0, 0), INTERFACE_BAR_HEIGHT - 1);
+        if (backgroundImageHeight <= 0) {
+            // NOTE: Uninline.
+            return intface_fatal_error(-1);
+        }
+
+        buf_to_buf(backgroundFrmData, gInterfaceBarWidth, backgroundImageHeight, gInterfaceBarWidth, interfaceBuffer, gInterfaceBarWidth);
+    } else {
+        fid = art_id(OBJ_TYPE_INTERFACE, 16, 0, 0, 0);
+        backgroundFrmData = art_ptr_lock_data(fid, 0, 0, &backgroundFrmHandle);
+        if (backgroundFrmData == NULL) {
+            // NOTE: Uninline.
+            return intface_fatal_error(-1);
+        }
+
+        buf_to_buf(backgroundFrmData, gInterfaceBarWidth, INTERFACE_BAR_HEIGHT - 1, INTERFACE_BAR_WIDTH, interfaceBuffer, gInterfaceBarWidth);
+        art_ptr_unlock(backgroundFrmHandle);
+    }
 
     fid = art_id(OBJ_TYPE_INTERFACE, 47, 0, 0, 0);
     inventoryButtonUp = art_ptr_lock_data(fid, 0, 0, &inventoryButtonUpKey);
@@ -438,7 +477,7 @@ int intface_init()
         return intface_fatal_error(-1);
     }
 
-    inventoryButton = win_register_button(interfaceWindow, 211, 41, 32, 21, -1, -1, -1, KEY_LOWERCASE_I, inventoryButtonUp, inventoryButtonDown, NULL, 0);
+    inventoryButton = win_register_button(interfaceWindow, 211 + gInterfaceBarContentOffset, 41, 32, 21, -1, -1, -1, KEY_LOWERCASE_I, inventoryButtonUp, inventoryButtonDown, NULL, 0);
     if (inventoryButton == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);
@@ -460,7 +499,7 @@ int intface_init()
         return intface_fatal_error(-1);
     }
 
-    optionsButton = win_register_button(interfaceWindow, 210, 62, 34, 34, -1, -1, -1, KEY_LOWERCASE_O, optionsButtonUp, optionsButtonDown, NULL, 0);
+    optionsButton = win_register_button(interfaceWindow, 210 + gInterfaceBarContentOffset, 62, 34, 34, -1, -1, -1, KEY_LOWERCASE_O, optionsButtonUp, optionsButtonDown, NULL, 0);
     if (optionsButton == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);
@@ -489,7 +528,7 @@ int intface_init()
         return intface_fatal_error(-1);
     }
 
-    skilldexButton = win_register_button(interfaceWindow, 523, 7, 22, 21, -1, -1, -1, KEY_LOWERCASE_S, skilldexButtonUp, skilldexButtonDown, NULL, BUTTON_FLAG_TRANSPARENT);
+    skilldexButton = win_register_button(interfaceWindow, 523 + gInterfaceBarContentOffset, 7, 22, 21, -1, -1, -1, KEY_LOWERCASE_S, skilldexButtonUp, skilldexButtonDown, NULL, BUTTON_FLAG_TRANSPARENT);
     if (skilldexButton == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);
@@ -519,7 +558,7 @@ int intface_init()
         return intface_fatal_error(-1);
     }
 
-    automapButton = win_register_button(interfaceWindow, 526, 40, 41, 19, -1, -1, -1, KEY_TAB, automapButtonUp, automapButtonDown, NULL, BUTTON_FLAG_TRANSPARENT);
+    automapButton = win_register_button(interfaceWindow, 526 + gInterfaceBarContentOffset, 40, 41, 19, -1, -1, -1, KEY_TAB, automapButtonUp, automapButtonDown, NULL, BUTTON_FLAG_TRANSPARENT);
     if (automapButton == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);
@@ -542,7 +581,7 @@ int intface_init()
         return intface_fatal_error(-1);
     }
 
-    pipboyButton = win_register_button(interfaceWindow, 526, 78, 41, 19, -1, -1, -1, KEY_LOWERCASE_P, pipboyButtonUp, pipboyButtonDown, NULL, 0);
+    pipboyButton = win_register_button(interfaceWindow, 526 + gInterfaceBarContentOffset, 78, 41, 19, -1, -1, -1, KEY_LOWERCASE_P, pipboyButtonUp, pipboyButtonDown, NULL, 0);
     if (pipboyButton == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);
@@ -565,7 +604,7 @@ int intface_init()
         return intface_fatal_error(-1);
     }
 
-    characterButton = win_register_button(interfaceWindow, 526, 59, 41, 19, -1, -1, -1, KEY_LOWERCASE_C, characterButtonUp, characterButtonDown, NULL, 0);
+    characterButton = win_register_button(interfaceWindow, 526 + gInterfaceBarContentOffset, 59, 41, 19, -1, -1, -1, KEY_LOWERCASE_C, characterButtonUp, characterButtonDown, NULL, 0);
     if (characterButton == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);
@@ -598,7 +637,7 @@ int intface_init()
     memcpy(itemButtonUp, itemButtonUpBlank, sizeof(itemButtonUp));
     memcpy(itemButtonDown, itemButtonDownBlank, sizeof(itemButtonDown));
 
-    itemButton = win_register_button(interfaceWindow, 267, 26, 188, 67, -1, -1, -1, -20, itemButtonUp, itemButtonDown, NULL, BUTTON_FLAG_TRANSPARENT);
+    itemButton = win_register_button(interfaceWindow, 267 + gInterfaceBarContentOffset, 26, 188, 67, -1, -1, -1, -20, itemButtonUp, itemButtonDown, NULL, BUTTON_FLAG_TRANSPARENT);
     if (itemButton == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);
@@ -629,7 +668,7 @@ int intface_init()
     }
 
     // Swap hands button
-    toggleButton = win_register_button(interfaceWindow, 218, 6, 22, 21, -1, -1, -1, KEY_LOWERCASE_B, toggleButtonUp, toggleButtonDown, NULL, BUTTON_FLAG_TRANSPARENT);
+    toggleButton = win_register_button(interfaceWindow, 218 + gInterfaceBarContentOffset, 6, 22, 21, -1, -1, -1, KEY_LOWERCASE_B, toggleButtonUp, toggleButtonDown, NULL, BUTTON_FLAG_TRANSPARENT);
     if (toggleButton == -1) {
         // NOTE: Uninline.
         return intface_fatal_error(-1);
@@ -666,7 +705,7 @@ int intface_init()
         return intface_fatal_error(-1);
     }
 
-    buf_to_buf(interfaceBuffer + 640 * 14 + 316, 90, 5, 640, movePointBackground, 90);
+    buf_to_buf(interfaceBuffer + gInterfaceBarWidth * 14 + 316 + gInterfaceBarContentOffset, 90, 5, gInterfaceBarWidth, movePointBackground, 90);
 
     if (construct_box_bar_win() == -1) {
         // NOTE: Uninline.
@@ -683,6 +722,8 @@ int intface_init()
     intfaceEnabled = true;
     insideInit = false;
     intfaceHidden = 1;
+
+    sidePanelsInit();
 
     return 0;
 }
@@ -895,6 +936,8 @@ void intface_exit()
         }
     }
 
+    sidePanelsExit();
+    customInterfaceBarExit();
     deconstruct_box_bar_win();
 }
 
@@ -977,6 +1020,7 @@ void intface_hide()
     if (interfaceWindow != -1) {
         if (!intfaceHidden) {
             win_hide(interfaceWindow);
+            sidePanelsHide();
             intfaceHidden = 1;
         }
     }
@@ -992,6 +1036,7 @@ void intface_show()
             intface_update_hit_points(false);
             intface_update_ac(false);
             win_show(interfaceWindow);
+            sidePanelsShow();
             intfaceHidden = false;
         }
     }
@@ -1144,10 +1189,10 @@ void intface_update_hit_points(bool animate)
     if (animate) {
         int delay = 250 / (abs(last_points - hp) + 1);
         for (int index = 0; index < count; index++) {
-            intface_rotate_numbers(473, 40, v1[index], v1[index + 1], v2[index], delay);
+            intface_rotate_numbers(473 + gInterfaceBarContentOffset, 40, v1[index], v1[index + 1], v2[index], delay);
         }
     } else {
-        intface_rotate_numbers(473, 40, last_points, hp, color, 0);
+        intface_rotate_numbers(473 + gInterfaceBarContentOffset, 40, last_points, hp, color, 0);
     }
 
     last_points = hp;
@@ -1173,7 +1218,7 @@ void intface_update_ac(bool animate)
         delay = 250 / (abs(last_ac - armorClass) + 1);
     }
 
-    intface_rotate_numbers(473, 75, last_ac, armorClass, 0, delay);
+    intface_rotate_numbers(473 + gInterfaceBarContentOffset, 75, last_ac, armorClass, 0, delay);
 
     last_ac = armorClass;
 }
@@ -1187,7 +1232,7 @@ void intface_update_move_points(int actionPoints, int bonusMove)
         return;
     }
 
-    buf_to_buf(movePointBackground, 90, 5, 90, interfaceBuffer + 14 * 640 + 316, 640);
+    buf_to_buf(movePointBackground, 90, 5, 90, interfaceBuffer + 14 * gInterfaceBarWidth + 316 + gInterfaceBarContentOffset, gInterfaceBarWidth);
 
     if (actionPoints == -1) {
         frmData = moveLightRed;
@@ -1204,8 +1249,8 @@ void intface_update_move_points(int actionPoints, int bonusMove)
             5,
             5,
             5,
-            interfaceBuffer + 14 * 640 + 316 + circle * 9,
-            640);
+            interfaceBuffer + 14 * gInterfaceBarWidth + 316 + gInterfaceBarContentOffset + circle * 9,
+            gInterfaceBarWidth);
         circle++;
     }
 
@@ -1214,8 +1259,8 @@ void intface_update_move_points(int actionPoints, int bonusMove)
             5,
             5,
             5,
-            interfaceBuffer + 14 * 640 + 316 + circle * 9,
-            640);
+            interfaceBuffer + 14 * gInterfaceBarWidth + 316 + gInterfaceBarContentOffset + circle * 9,
+            gInterfaceBarWidth);
         circle++;
     }
 
@@ -1535,7 +1580,7 @@ int intface_update_ammo_lights()
         }
     }
 
-    intface_draw_ammo_lights(463, ratio);
+    intface_draw_ammo_lights(463 + gInterfaceBarContentOffset, ratio);
 
     return 0;
 }
@@ -1571,7 +1616,7 @@ void intface_end_window_open(bool animated)
             if (elapsed_time(time) >= delay) {
                 unsigned char* src = art_frame_data(art, frame, 0);
                 if (src != NULL) {
-                    buf_to_buf(src, 57, 58, 57, interfaceBuffer + 640 * 38 + 580, 640);
+                    buf_to_buf(src, 57, 58, 57, interfaceBuffer + gInterfaceBarWidth * 38 + 580 + gInterfaceBarContentOffset, gInterfaceBarWidth);
                     win_draw_rect(interfaceWindow, &endWindowRect);
                 }
 
@@ -1585,7 +1630,7 @@ void intface_end_window_open(bool animated)
         }
     } else {
         unsigned char* src = art_frame_data(art, frameCount - 1, 0);
-        buf_to_buf(src, 57, 58, 57, interfaceBuffer + 640 * 38 + 580, 640);
+        buf_to_buf(src, 57, 58, 57, interfaceBuffer + gInterfaceBarWidth * 38 + 580 + gInterfaceBarContentOffset, gInterfaceBarWidth);
         win_draw_rect(interfaceWindow, &endWindowRect);
     }
 
@@ -1629,9 +1674,9 @@ void intface_end_window_close(bool animated)
 
             if (elapsed_time(time) >= delay) {
                 unsigned char* src = art_frame_data(art, frame - 1, 0);
-                unsigned char* dest = interfaceBuffer + 640 * 38 + 580;
+                unsigned char* dest = interfaceBuffer + gInterfaceBarWidth * 38 + 580 + gInterfaceBarContentOffset;
                 if (src != NULL) {
-                    buf_to_buf(src, 57, 58, 57, dest, 640);
+                    buf_to_buf(src, 57, 58, 57, dest, gInterfaceBarWidth);
                     win_draw_rect(interfaceWindow, &endWindowRect);
                 }
 
@@ -1644,9 +1689,9 @@ void intface_end_window_close(bool animated)
             sharedFpsLimiter.throttle();
         }
     } else {
-        unsigned char* dest = interfaceBuffer + 640 * 38 + 580;
+        unsigned char* dest = interfaceBuffer + gInterfaceBarWidth * 38 + 580 + gInterfaceBarContentOffset;
         unsigned char* src = art_frame_data(art, 0, 0);
-        buf_to_buf(src, 57, 58, 57, dest, 640);
+        buf_to_buf(src, 57, 58, 57, dest, gInterfaceBarWidth);
         win_draw_rect(interfaceWindow, &endWindowRect);
     }
 
@@ -1670,7 +1715,7 @@ void intface_end_buttons_enable()
         }
 
         gsound_play_sfx_file("icombat2");
-        trans_buf_to_buf(lightsFrmData, 57, 58, 57, interfaceBuffer + 38 * 640 + 580, 640);
+        trans_buf_to_buf(lightsFrmData, 57, 58, 57, interfaceBuffer + 38 * gInterfaceBarWidth + 580 + gInterfaceBarContentOffset, gInterfaceBarWidth);
         win_draw_rect(interfaceWindow, &endWindowRect);
 
         art_ptr_unlock(lightsFrmHandle);
@@ -1693,7 +1738,7 @@ void intface_end_buttons_disable()
         }
 
         gsound_play_sfx_file("icombat1");
-        trans_buf_to_buf(lightsFrmData, 57, 58, 57, interfaceBuffer + 38 * 640 + 580, 640);
+        trans_buf_to_buf(lightsFrmData, 57, 58, 57, interfaceBuffer + 38 * gInterfaceBarWidth + 580 + gInterfaceBarContentOffset, gInterfaceBarWidth);
         win_draw_rect(interfaceWindow, &endWindowRect);
 
         art_ptr_unlock(lightsFrmHandle);
@@ -2030,7 +2075,7 @@ static int intface_create_end_turn_button()
         return -1;
     }
 
-    endTurnButton = win_register_button(interfaceWindow, 590, 43, 38, 22, -1, -1, -1, 32, endTurnButtonUp, endTurnButtonDown, NULL, 0);
+    endTurnButton = win_register_button(interfaceWindow, 590 + gInterfaceBarContentOffset, 43, 38, 22, -1, -1, -1, 32, endTurnButtonUp, endTurnButtonDown, NULL, 0);
     if (endTurnButton == -1) {
         return -1;
     }
@@ -2093,7 +2138,7 @@ static int intface_create_end_combat_button()
         return -1;
     }
 
-    endCombatButton = win_register_button(interfaceWindow, 590, 65, 38, 22, -1, -1, -1, 13, endCombatButtonUp, endCombatButtonDown, NULL, 0);
+    endCombatButton = win_register_button(interfaceWindow, 590 + gInterfaceBarContentOffset, 65, 38, 22, -1, -1, -1, 13, endCombatButtonUp, endCombatButtonDown, NULL, 0);
     if (endCombatButton == -1) {
         return -1;
     }
@@ -2138,19 +2183,19 @@ static void intface_draw_ammo_lights(int x, int ratio)
         ratio -= 1;
     }
 
-    unsigned char* dest = interfaceBuffer + 640 * 26 + x;
+    unsigned char* dest = interfaceBuffer + gInterfaceBarWidth * 26 + x;
 
     for (int index = 70; index > ratio; index--) {
         *dest = 14;
-        dest += 640;
+        dest += gInterfaceBarWidth;
     }
 
     while (ratio > 0) {
         *dest = 196;
-        dest += 640;
+        dest += gInterfaceBarWidth;
 
         *dest = 14;
-        dest += 640;
+        dest += gInterfaceBarWidth;
 
         ratio -= 2;
     }
@@ -2200,7 +2245,7 @@ static void intface_rotate_numbers(int x, int y, int previousValue, int value, i
     }
 
     unsigned char* numbers = numbersBuffer + offset;
-    unsigned char* dest = interfaceBuffer + 640 * y;
+    unsigned char* dest = interfaceBuffer + gInterfaceBarWidth * y;
 
     unsigned char* downSrc = numbers + 90;
     unsigned char* upSrc = numbers + 99;
@@ -2226,10 +2271,10 @@ static void intface_rotate_numbers(int x, int y, int previousValue, int value, i
     int tens = (normalizedValue / 10) % 10;
     int hundreds = normalizedValue / 100;
 
-    buf_to_buf(numbers + 9 * hundreds, 9, 17, 360, hundredsDest, 640);
-    buf_to_buf(numbers + 9 * tens, 9, 17, 360, tensDest, 640);
-    buf_to_buf(numbers + 9 * ones, 9, 17, 360, onesDest, 640);
-    buf_to_buf(normalizedSign >= 0 ? plusSrc : minusSrc, 6, 17, 360, signDest, 640);
+    buf_to_buf(numbers + 9 * hundreds, 9, 17, 360, hundredsDest, gInterfaceBarWidth);
+    buf_to_buf(numbers + 9 * tens, 9, 17, 360, tensDest, gInterfaceBarWidth);
+    buf_to_buf(numbers + 9 * ones, 9, 17, 360, onesDest, gInterfaceBarWidth);
+    buf_to_buf(normalizedSign >= 0 ? plusSrc : minusSrc, 6, 17, 360, signDest, gInterfaceBarWidth);
 
     if (!insideInit) {
         Rect numbersRect = { x, y, x + 33, y + 17 };
@@ -2243,7 +2288,7 @@ static void intface_rotate_numbers(int x, int y, int previousValue, int value, i
                     v49 = 1;
                 }
 
-                buf_to_buf(upSrc, 9, 17, 360, onesDest, 640);
+                buf_to_buf(upSrc, 9, 17, 360, onesDest, gInterfaceBarWidth);
                 mouse_info();
                 gmouse_bk_process();
                 renderPresent();
@@ -2253,7 +2298,7 @@ static void intface_rotate_numbers(int x, int y, int previousValue, int value, i
                 ones += v49;
 
                 if (ones > 9 || ones < 0) {
-                    buf_to_buf(upSrc, 9, 17, 360, tensDest, 640);
+                    buf_to_buf(upSrc, 9, 17, 360, tensDest, gInterfaceBarWidth);
                     mouse_info();
                     gmouse_bk_process();
                     renderPresent();
@@ -2263,7 +2308,7 @@ static void intface_rotate_numbers(int x, int y, int previousValue, int value, i
                     tens += v49;
                     ones -= 10 * v49;
                     if (tens == 10 || tens == -1) {
-                        buf_to_buf(upSrc, 9, 17, 360, hundredsDest, 640);
+                        buf_to_buf(upSrc, 9, 17, 360, hundredsDest, gInterfaceBarWidth);
                         mouse_info();
                         gmouse_bk_process();
                         block_for_tocks(delay);
@@ -2275,7 +2320,7 @@ static void intface_rotate_numbers(int x, int y, int previousValue, int value, i
                             hundreds -= 10 * v49;
                         }
 
-                        buf_to_buf(downSrc, 9, 17, 360, hundredsDest, 640);
+                        buf_to_buf(downSrc, 9, 17, 360, hundredsDest, gInterfaceBarWidth);
                         mouse_info();
                         gmouse_bk_process();
                         renderPresent();
@@ -2283,12 +2328,12 @@ static void intface_rotate_numbers(int x, int y, int previousValue, int value, i
                         win_draw_rect(interfaceWindow, &numbersRect);
                     }
 
-                    buf_to_buf(downSrc, 9, 17, 360, tensDest, 640);
+                    buf_to_buf(downSrc, 9, 17, 360, tensDest, gInterfaceBarWidth);
                     block_for_tocks(delay);
                     win_draw_rect(interfaceWindow, &numbersRect);
                 }
 
-                buf_to_buf(downSrc, 9, 17, 360, onesDest, 640);
+                buf_to_buf(downSrc, 9, 17, 360, onesDest, gInterfaceBarWidth);
                 mouse_info();
                 gmouse_bk_process();
                 renderPresent();
@@ -2297,11 +2342,11 @@ static void intface_rotate_numbers(int x, int y, int previousValue, int value, i
 
                 previousValue += change;
 
-                buf_to_buf(numbers + 9 * hundreds, 9, 17, 360, hundredsDest, 640);
-                buf_to_buf(numbers + 9 * tens, 9, 17, 360, tensDest, 640);
-                buf_to_buf(numbers + 9 * ones, 9, 17, 360, onesDest, 640);
+                buf_to_buf(numbers + 9 * hundreds, 9, 17, 360, hundredsDest, gInterfaceBarWidth);
+                buf_to_buf(numbers + 9 * tens, 9, 17, 360, tensDest, gInterfaceBarWidth);
+                buf_to_buf(numbers + 9 * ones, 9, 17, 360, onesDest, gInterfaceBarWidth);
 
-                buf_to_buf(previousValue >= 0 ? plusSrc : minusSrc, 6, 17, 360, signDest, 640);
+                buf_to_buf(previousValue >= 0 ? plusSrc : minusSrc, 6, 17, 360, signDest, gInterfaceBarWidth);
                 mouse_info();
                 gmouse_bk_process();
                 renderPresent();
@@ -2588,6 +2633,54 @@ static bool add_bar_box(int indicator)
     return false;
 }
 
+static void customInterfaceBarInit()
+{
+    gInterfaceBarIsCustom = false;
+    gInterfaceBarContentOffset = 0;
+
+    if (gInterfaceBarWidth <= INTERFACE_BAR_WIDTH) {
+        gInterfaceBarWidth = INTERFACE_BAR_WIDTH;
+        return;
+    }
+
+    if (gInterfaceBarWidth > screenGetWidth()) {
+        debug_printf("\nINTRFACE: Custom interface bar width (%d) is greater than screen width (%d). Using default interface bar.\n", gInterfaceBarWidth, screenGetWidth());
+        gInterfaceBarWidth = INTERFACE_BAR_WIDTH;
+        return;
+    }
+
+    char path[COMPAT_MAX_PATH];
+    snprintf(path, sizeof(path), "art\\intrface\\HR_IFACE_%d.FRM", gInterfaceBarWidth);
+
+    gCustomInterfaceBarBackground = load_frame(path);
+    if (gCustomInterfaceBarBackground == NULL) {
+        gInterfaceBarWidth = INTERFACE_BAR_WIDTH;
+        return;
+    }
+
+    int imageWidth = art_frame_width(gCustomInterfaceBarBackground, 0, 0);
+    int imageHeight = art_frame_length(gCustomInterfaceBarBackground, 0, 0);
+    if (imageWidth < gInterfaceBarWidth || imageHeight <= 0) {
+        mem_free(gCustomInterfaceBarBackground);
+        gCustomInterfaceBarBackground = NULL;
+        gInterfaceBarWidth = INTERFACE_BAR_WIDTH;
+        return;
+    }
+
+    gInterfaceBarContentOffset = gInterfaceBarWidth - INTERFACE_BAR_WIDTH;
+    gInterfaceBarIsCustom = true;
+}
+
+static void customInterfaceBarExit()
+{
+    if (gCustomInterfaceBarBackground != NULL) {
+        mem_free(gCustomInterfaceBarBackground);
+        gCustomInterfaceBarBackground = NULL;
+    }
+
+    gInterfaceBarIsCustom = false;
+}
+
 // 0x456C84
 bool enable_box_bar_win()
 {
@@ -2608,6 +2701,131 @@ bool disable_box_bar_win()
     refresh_box_bar_win();
 
     return oldIsVisible;
+}
+
+static void sidePanelsInit()
+{
+    if (interfaceWindow == -1) {
+        return;
+    }
+
+    if (gInterfaceSidePanelsImageId == 0) {
+        return;
+    }
+
+    if (gInterfaceBarWidth >= screenGetWidth()) {
+        return;
+    }
+
+    Rect windowRect;
+    win_get_rect(interfaceWindow, &windowRect);
+
+    int leadingWidth = windowRect.ulx;
+    int trailingWidth = screenGetWidth() - windowRect.lrx - 1;
+    int height = windowRect.lry - windowRect.uly + 1;
+
+    if (leadingWidth > 0) {
+        gInterfaceSidePanelsLeadingWindow = win_add(0, windowRect.uly, leadingWidth, height, colorTable[0], WINDOW_HIDDEN | WINDOW_DONT_MOVE_TOP);
+    }
+
+    if (trailingWidth > 0) {
+        gInterfaceSidePanelsTrailingWindow = win_add(windowRect.lrx + 1, windowRect.uly, trailingWidth, height, colorTable[0], WINDOW_HIDDEN | WINDOW_DONT_MOVE_TOP);
+    }
+
+    char path[COMPAT_MAX_PATH];
+    if (gInterfaceSidePanelsLeadingWindow != -1) {
+        snprintf(path, sizeof(path), "art\\intrface\\HR_IFACELFT%d.frm", gInterfaceSidePanelsImageId);
+        sidePanelsDraw(path, gInterfaceSidePanelsLeadingWindow, true);
+    }
+
+    if (gInterfaceSidePanelsTrailingWindow != -1) {
+        snprintf(path, sizeof(path), "art\\intrface\\HR_IFACERHT%d.frm", gInterfaceSidePanelsImageId);
+        sidePanelsDraw(path, gInterfaceSidePanelsTrailingWindow, false);
+    }
+}
+
+static void sidePanelsExit()
+{
+    if (gInterfaceSidePanelsTrailingWindow != -1) {
+        win_delete(gInterfaceSidePanelsTrailingWindow);
+        gInterfaceSidePanelsTrailingWindow = -1;
+    }
+
+    if (gInterfaceSidePanelsLeadingWindow != -1) {
+        win_delete(gInterfaceSidePanelsLeadingWindow);
+        gInterfaceSidePanelsLeadingWindow = -1;
+    }
+}
+
+static void sidePanelsHide()
+{
+    if (gInterfaceSidePanelsLeadingWindow != -1) {
+        win_hide(gInterfaceSidePanelsLeadingWindow);
+    }
+
+    if (gInterfaceSidePanelsTrailingWindow != -1) {
+        win_hide(gInterfaceSidePanelsTrailingWindow);
+    }
+}
+
+static void sidePanelsShow()
+{
+    if (gInterfaceSidePanelsLeadingWindow != -1) {
+        win_show(gInterfaceSidePanelsLeadingWindow);
+    }
+
+    if (gInterfaceSidePanelsTrailingWindow != -1) {
+        win_show(gInterfaceSidePanelsTrailingWindow);
+    }
+}
+
+static void sidePanelsDraw(const char* path, int win, bool isLeading)
+{
+    if (win == -1) {
+        return;
+    }
+
+    Art* image = load_frame(path);
+    if (image == nullptr) {
+        return;
+    }
+
+    unsigned char* imageData = art_frame_data(image, 0, 0);
+    if (imageData == NULL) {
+        mem_free(image);
+        return;
+    }
+
+    int imageWidth = art_frame_width(image, 0, 0);
+    int imageHeight = art_frame_length(image, 0, 0);
+
+    int windowWidth = win_width(win);
+    int windowHeight = win_height(win);
+    if (imageWidth <= 0 || imageHeight <= 0 || windowWidth <= 0 || windowHeight <= 0) {
+        mem_free(image);
+        return;
+    }
+
+    int width = std::min(imageWidth, windowWidth);
+
+    if (!gInterfaceSidePanelsExtendFromScreenEdge && isLeading) {
+        imageData += imageWidth - width;
+    }
+
+    if (gInterfaceSidePanelsExtendFromScreenEdge && !isLeading) {
+        imageData += imageWidth - width;
+    }
+
+    cscale(imageData,
+        width,
+        imageHeight,
+        imageWidth,
+        win_get_buf(win),
+        windowWidth,
+        windowHeight,
+        windowWidth);
+
+    mem_free(image);
 }
 
 } // namespace fallout
