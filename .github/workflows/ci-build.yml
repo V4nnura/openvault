@@ -192,12 +192,16 @@ jobs:
             --build build \
             -j $(nproc) \
             # EOL
-
+      
+      - name: Change executable file name
+        run: |
+          mv build/fallout-ce out/build/linux-${{ matrix.arch }}-debug/fallout-ce-linux-${{ matrix.arch }}
+      
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: fallout-ce-linux-${{ matrix.arch }}
-          path:  build/fallout-ce
+          path: out/build/linux-${{ matrix.arch }}-debug/fallout-ce-linux-${{ matrix.arch }}
           retention-days: 7
 
   macos:
@@ -281,12 +285,16 @@ jobs:
             --build build \
             --config RelWithDebInfo \
             # EOL
-
+      
+      - name: Change executable file name
+        run: |
+          mv build/RelWithDebInfo/fallout-ce.exe out/build/windows-${{ matrix.arch }}/RelWithDebInfo/fallout-ce-${{ matrix.arch }}.exe
+        
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: fallout-ce-windows-${{ matrix.arch }}
-          path:  build/RelWithDebInfo/fallout-ce.exe
+          path: out/build/windows-${{ matrix.arch }}/RelWithDebInfo/fallout-ce-${{ matrix.arch }}.exe
           retention-days: 7
 
 
