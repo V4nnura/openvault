@@ -195,13 +195,15 @@ jobs:
       
       - name: Change executable file name
         run: |
-          mv build/fallout-ce out/build/linux-${{ matrix.arch }}-debug/fallout-ce-linux-${{ matrix.arch }}
-      
+          mkdir -p out/build/fallout-ce-linux-${{ matrix.arch }}
+          cp build/fallout-ce out/dist/fallout-ce-linux-${{ matrix.arch }}/fallout-ce
+          tar -czvf out/build/fallout-ce-linux-${{ matrix.arch }}.tar.gz -C out/dist fallout-ce-linux-${{ matrix.arch }}
+          
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: fallout-ce-linux-${{ matrix.arch }}
-          path: out/build/linux-${{ matrix.arch }}-debug/fallout-ce-linux-${{ matrix.arch }}
+          path: out/build/fallout-ce-linux-${{ matrix.arch }}.tar.gz
           retention-days: 7
 
   macos:
@@ -288,13 +290,16 @@ jobs:
       
       - name: Change executable file name
         run: |
-          mv build/RelWithDebInfo/fallout-ce.exe out/build/windows-${{ matrix.arch }}/RelWithDebInfo/fallout-ce-${{ matrix.arch }}.exe
+          mkdir -p out/dist/fallout-ce-windows-${{ matrix.arch }}
+          cp build/RelWithDebInfo/fallout-ce.exe out/build/fallout-ce-windows-${{ matrix.arch }}/fallout2-ce.exe
+          cd out/build
+          7z a fallout-ce-windows-${{ matrix.arch }}.zip fallout-ce-windows-${{ matrix.arch }}
         
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: fallout-ce-windows-${{ matrix.arch }}
-          path: out/build/windows-${{ matrix.arch }}/RelWithDebInfo/fallout-ce-${{ matrix.arch }}.exe
+          path: out/build/fallout-ce-windows-${{ matrix.arch }}.zip
           retention-days: 7
 
 
