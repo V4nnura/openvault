@@ -299,7 +299,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: fallout-ce-windows-${{ matrix.arch }}
-          path: out/dist/fallout2-ce-windows-${{ matrix.arch }}.zip
+          path: out/dist/fallout-ce-windows-${{ matrix.arch }}.zip
           retention-days: 7
 
 
