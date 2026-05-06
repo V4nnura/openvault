@@ -291,7 +291,7 @@ jobs:
       - name: Change executable file name
         run: |
           mkdir -p out/dist/fallout-ce-windows-${{ matrix.arch }}
-          cp build/RelWithDebInfo/fallout-ce.exe out/build/fallout-ce-windows-${{ matrix.arch }}/fallout2-ce.exe
+          cp build/RelWithDebInfo/fallout-ce.exe out/build/fallout-ce-windows-${{ matrix.arch }}/fallout-ce.exe
           cd out/build
           7z a fallout-ce-windows-${{ matrix.arch }}.zip fallout-ce-windows-${{ matrix.arch }}
         
