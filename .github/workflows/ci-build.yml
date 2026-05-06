@@ -192,18 +192,12 @@ jobs:
             --build build \
             -j $(nproc) \
             # EOL
-      
-      - name: Change executable file name
-        run: |
-          mkdir -p out/build/fallout-ce-linux-${{ matrix.arch }}
-          cp build/fallout-ce out/dist/fallout-ce-linux-${{ matrix.arch }}/fallout-ce
-          tar -czvf out/build/fallout-ce-linux-${{ matrix.arch }}.tar.gz -C out/dist fallout-ce-linux-${{ matrix.arch }}
-          
+
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: fallout-ce-linux-${{ matrix.arch }}
-          path: out/build/fallout-ce-linux-${{ matrix.arch }}.tar.gz
+          path: build/fallout-ce-linux-${{ matrix.arch }}
           retention-days: 7
 
   macos:
@@ -287,19 +281,12 @@ jobs:
             --build build \
             --config RelWithDebInfo \
             # EOL
-      
-      - name: Change executable file name
-        run: |
-          mkdir -p out/dist/fallout-ce-windows-${{ matrix.arch }}
-          cp build/RelWithDebInfo/fallout-ce.exe out/build/fallout-ce-windows-${{ matrix.arch }}/fallout-ce.exe
-          cd out/build
-          7z a fallout-ce-windows-${{ matrix.arch }}.zip fallout-ce-windows-${{ matrix.arch }}
         
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: fallout-ce-windows-${{ matrix.arch }}
-          path: out/build/fallout-ce-windows-${{ matrix.arch }}.zip
+          path: uild/RelWithDebInfo/fallout-ce-windows-${{ matrix.arch }}.exe
           retention-days: 7
 
 
