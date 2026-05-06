@@ -290,8 +290,8 @@ jobs:
 
       - name: Package
         run: |
-          mkdir -p out/dist/fallout2-ce-windows-${{ matrix.arch }}
-          cp build/RelWithDebInfo/fallout-ce.exe out/dist/fallout2-ce-windows-${{ matrix.arch }}/fallout-ce.exe
+          mkdir -p out/dist/fallout-ce-windows-${{ matrix.arch }}
+          cp build/RelWithDebInfo/fallout-ce.exe out/dist/fallout-ce-windows-${{ matrix.arch }}/fallout-ce.exe
           cd out/dist
           7z a fallout-ce-windows-${{ matrix.arch }}.zip fallout-ce-windows-${{ matrix.arch }}
         
