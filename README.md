@@ -44,7 +44,7 @@ $ sudo apt install libsdl2-2.0-0
 
 ```console
 $ brew install innoextract
-$ innoextract ~/Downloads/setup_fallout_2.1.0.18.exe -I app
+$ innoextract ~/Downloads/setup_fallout_2.1.0.18.exe -d fallout
 $ mv app /Applications/Fallout
 ```
 
