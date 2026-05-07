@@ -391,7 +391,7 @@ void show_damage_to_object(Object* defender, int damage, int flags, Object* weap
 
     if ((flags & DAM_DEAD) != 0) {
         // TODO: Get rid of casts.
-        register_object_must_call(defender, (void*)anim, (AnimationCallback*)show_death, -1);
+        register_object_must_call(defender, (void*)(intptr_t)anim, (AnimationCallback*)show_death, -1);
     }
 }
 
@@ -1369,7 +1369,7 @@ int action_use_skill_on(Object* a1, Object* a2, int skill)
 
     register_object_animate(a1, anim, -1);
     // TODO: Get rid of casts.
-    register_object_call3(a1, a2, (void*)skill, (AnimationCallback3*)obj_use_skill_on, -1);
+    register_object_call3(a1, a2, (void*)(intptr_t)skill, (AnimationCallback3*)obj_use_skill_on, -1);
     return register_end();
 }
 
