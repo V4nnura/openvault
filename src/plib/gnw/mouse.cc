@@ -663,10 +663,10 @@ bool mouse_click_in(int left, int top, int right, int bottom)
         return false;
     }
 
-    return (mouse_hoty + mouse_y >= top - expand) &&
-        (mouse_hotx + mouse_x <= right + expand) &&
-        (mouse_hotx + mouse_x >= left - expand) &&
-        (mouse_hoty + mouse_y <= bottom + expand);
+    return (mouse_hoty + mouse_y >= top - expand)
+        && (mouse_hotx + mouse_x <= right + expand)
+        && (mouse_hotx + mouse_x >= left - expand)
+        && (mouse_hoty + mouse_y <= bottom + expand);
 }
 
 /*
