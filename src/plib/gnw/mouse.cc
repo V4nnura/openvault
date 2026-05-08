@@ -435,7 +435,7 @@ void mouse_info()
         static int prevy;
 
         switch (gesture.type) {
-            case kTap:
+        case kTap:
             if (gesture.numberOfTouches == 1) {
                 // Save current cursor position
                 int current_x, current_y;
@@ -530,7 +530,6 @@ void mouse_info()
         raw_buttons |= MOUSE_EVENT_WHEEL;
     }
 }
-
 
 // 0x4B4ECC
 void mouse_simulate_input(int delta_x, int delta_y, int buttons)
@@ -665,9 +664,9 @@ bool mouse_click_in(int left, int top, int right, int bottom)
     }
 
     return (mouse_hoty + mouse_y >= top - expand) &&
-           (mouse_hotx + mouse_x <= right + expand) &&
-           (mouse_hotx + mouse_x >= left - expand) &&
-           (mouse_hoty + mouse_y <= bottom + expand);
+        (mouse_hotx + mouse_x <= right + expand) &&
+        (mouse_hotx + mouse_x >= left - expand) &&
+        (mouse_hoty + mouse_y <= bottom + expand);
 }
 
 /*
