@@ -139,9 +139,9 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
-    // Disable relative mouse mode to keep the native cursor visible
+    // Enable relative mouse mode to keep the native cursor invisible
     // Deltas are calculated manually in dxinput_get_mouse_state()
-    SDL_SetRelativeMouseMode(SDL_FALSE);
+    SDL_SetRelativeMouseMode(SDL_TRUE);
     gMousePrevInitialized = false;
     return true;
 }
