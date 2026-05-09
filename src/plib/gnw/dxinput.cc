@@ -86,8 +86,6 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
 
     // Calculate deltas in game coordinates for VCR compatibility
     if (!gMousePrevInitialized) {
-        gMousePrevX = currentX;
-        gMousePrevY = currentY;
         gMousePrevX = gameX;
         gMousePrevY = gameY;
         gMousePrevInitialized = true;
