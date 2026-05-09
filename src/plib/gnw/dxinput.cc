@@ -14,6 +14,11 @@ static void dxinput_keyboard_exit();
 static int gMouseWheelDeltaX = 0;
 static int gMouseWheelDeltaY = 0;
 
+// Track previous mouse position for calculating deltas in non-relative mode
+static int gMousePrevX = 0;
+static int gMousePrevY = 0;
+static bool gMousePrevInitialized = false;
+
 // 0x4E0400
 bool dxinput_init()
 {
