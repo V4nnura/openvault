@@ -11,6 +11,8 @@ typedef struct MouseData {
     unsigned char buttons[2];
     int wheelX;
     int wheelY;
+    int absX;
+    int absY;
 } MouseData;
 
 typedef struct KeyboardData {
