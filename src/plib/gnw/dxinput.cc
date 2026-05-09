@@ -139,10 +139,7 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
-    // Deltas are calculated manually in dxinput_get_mouse_state()
-    SDL_ShowCursor(SDL_DISABLE);
-    gMousePrevInitialized = false;
-    return true;
+    return SDL_ShowCursor(SDL_DISABLE) == 0;
 }
 
 // 0x4E078C
