@@ -484,15 +484,10 @@ void mouse_info()
         return;
     }
 
-    int x;
-    int y;
     int buttons = 0;
 
     MouseData mouseData;
     if (dxinput_get_mouse_state(&mouseData)) {
-        x = mouseData.x;
-        y = mouseData.y;
-
         if (mouseData.buttons[0] == 1) {
             buttons |= MOUSE_STATE_LEFT_BUTTON_DOWN;
         }
@@ -500,28 +495,31 @@ void mouse_info()
         if (mouseData.buttons[1] == 1) {
             buttons |= MOUSE_STATE_RIGHT_BUTTON_DOWN;
         }
-    } else {
-        x = 0;
-        y = 0;
     }
 
-    // Adjust for mouse senstivity.
-    x = (int)(x * mouse_sensitivity);
-    y = (int)(y * mouse_sensitivity);
-
     if (vcr_state == VCR_STATE_PLAYING) {
+        int x = mouseData.x;
+        int y = mouseData.y;
         if (((vcr_terminate_flags & VCR_TERMINATE_ON_MOUSE_PRESS) != 0 && buttons != 0)
             || ((vcr_terminate_flags & VCR_TERMINATE_ON_MOUSE_MOVE) != 0 && (x != 0 || y != 0))) {
             vcr_terminated_condition = VCR_PLAYBACK_COMPLETION_REASON_TERMINATED;
             vcr_stop();
             return;
         }
-        x = 0;
-        y = 0;
-        buttons = last_buttons;
-    }
+        // In VCR playback mode, use delta-based input from recording
+        mouse_simulate_input(0, 0, last_buttons);
+    } else {
+        // Use absolute positioning for perfect cursor sync with OS
+        // This ensures the game cursor always matches the native cursor position
+        int targetX = mouseData.absX - mouse_hotx;
+        int targetY = mouseData.absY - mouse_hoty;
 
-    mouse_simulate_input(x, y, buttons);
+        // Calculate effective delta for VCR recording
+        int deltaX = targetX - mouse_x;
+        int deltaY = targetY - mouse_y;
+
+        mouse_simulate_input(deltaX, deltaY, buttons);
+    }
 
     // TODO: Move to `_mouse_simulate_input`.
     // TODO: Record wheel event in VCR.
