@@ -139,7 +139,8 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
-    return SDL_ShowCursor(SDL_DISABLE) == 0;
+    SDL_ShowCursor(SDL_DISABLE);
+    return true;
 }
 
 // 0x4E078C
