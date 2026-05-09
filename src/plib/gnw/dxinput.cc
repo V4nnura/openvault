@@ -134,7 +134,11 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
-    return SDL_SetRelativeMouseMode(SDL_TRUE) == 0;
+    // Disable relative mouse mode to keep the native cursor visible
+    // Deltas are calculated manually in dxinput_get_mouse_state()
+    SDL_SetRelativeMouseMode(SDL_FALSE);
+    gMousePrevInitialized = false;
+    return true;
 }
 
 // 0x4E078C
