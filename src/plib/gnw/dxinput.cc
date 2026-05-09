@@ -62,12 +62,43 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // CE: This function is sometimes called outside loops calling `get_input`
     // and subsequently `GNW95_process_message`, so mouse events might not be
     // handled by SDL yet.
-    //
-    // TODO: Move mouse events processing into `GNW95_process_message` and
-    // update mouse position manually.
     SDL_PumpEvents();
 
-    Uint32 buttons = SDL_GetRelativeMouseState(&(mouseState->x), &(mouseState->y));
+    // Get absolute window mouse position
+    int windowX, windowY;
+    Uint32 buttons = SDL_GetMouseState(&(mouseState->x), &(mouseState->y));
+
+    // Convert window coordinates to game (logical) coordinates
+    // This handles scaling automatically via SDL's renderer
+    float logicalX, logicalY;
+    if (gSdlRenderer != NULL) {
+        SDL_RenderWindowToLogical(gSdlRenderer, (mouseState->x), (mouseState->y), &logicalX, &logicalY);
+    } else {
+        logicalX = (float)(mouseState->x);
+        logicalY = (float)(mouseState->y);
+    }
+
+    int gameX = (int)logicalX;
+    int gameY = (int)logicalY;
+
+    // Store absolute position in game coordinates
+    mouseState->absX = gameX;
+    mouseState->absY = gameY;
+
+    // Calculate deltas in game coordinates for VCR compatibility
+    if (!gMousePrevInitialized) {
+        gMousePrevX = currentX;
+        gMousePrevY = currentY;
+        gMousePrevX = gameX;
+        gMousePrevY = gameY;
+        gMousePrevInitialized = true;
+    }
+
+    mouseState->x = gameX - gMousePrevX;
+    mouseState->y = gameY - gMousePrevY;
+    gMousePrevX = gameX;
+    gMousePrevY = gameY;
+    
     mouseState->buttons[0] = (buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
     mouseState->buttons[1] = (buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
