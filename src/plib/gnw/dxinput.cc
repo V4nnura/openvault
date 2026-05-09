@@ -1,5 +1,9 @@
 #include "plib/gnw/dxinput.h"
 
+#include "plib/gnw/debug.h"
+#include "plib/gnw/mouse.h"
+#include "plib/gnw/svga.h"
+
 namespace fallout {
 
 static bool dxinput_mouse_init();
