@@ -95,7 +95,6 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     mouseState->y = gameY - gMousePrevY;
     gMousePrevX = gameX;
     gMousePrevY = gameY;
-    
     mouseState->buttons[0] = (buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
     mouseState->buttons[1] = (buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
     mouseState->wheelX = gMouseWheelDeltaX;
