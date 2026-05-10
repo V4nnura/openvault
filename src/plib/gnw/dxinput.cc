@@ -78,8 +78,8 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     if (gSdlRenderer != NULL) {
         SDL_RenderWindowToLogical(gSdlRenderer, cursorX, cursorY, &logicalX, &logicalY);
     } else {
-        logicalX = (float)(mouseState->x);
-        logicalY = (float)(mouseState->y);
+        logicalX = (float)cursorX;
+        logicalY = (float)cursorY;
     }
 
     int gameX = (int)logicalX;
