@@ -25,11 +25,22 @@ $ mv app Fallout
 - Download and copy `fallout-ce` to this folder.
 
 - Install [SDL2](https://libsdl.org/download-2.0.php):
-
+#### Debian-based distros
 ```console
 $ sudo apt install libsdl2-2.0-0
 ```
-
+#### Arch-based distros
+```console
+$ sudo pacman -S sdl2-compat
+```
+#### Gentoo-based distros
+```console
+$ sudo emerge -a libsdl2
+```
+#### Fedora/RPM-based distros
+```console
+$ sudo dnf install SDL2
+```
 - Run `./fallout-ce`.
 
 ### macOS
