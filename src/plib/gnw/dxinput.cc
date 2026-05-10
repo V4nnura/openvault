@@ -11,10 +11,9 @@ static void dxinput_mouse_exit();
 static bool dxinput_keyboard_init();
 static void dxinput_keyboard_exit();
 
+// Track previous mouse position for calculating deltas in non-relative mode
 static int gMouseWheelDeltaX = 0;
 static int gMouseWheelDeltaY = 0;
-
-// Track previous mouse position for calculating deltas in non-relative mode
 static int gMousePrevX = 0;
 static int gMousePrevY = 0;
 static bool gMousePrevInitialized = false;
@@ -70,13 +69,13 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     SDL_PumpEvents();
 
     // Get absolute window mouse position
-    Uint32 buttons = SDL_GetMouseState(&(mouseState->x), &(mouseState->y));
+    Uint32 buttons = SDL_GetMouseState(&cursorX, &cursorY);
 
     // Convert window coordinates to game (logical) coordinates
     // This handles scaling automatically via SDL's renderer
     float logicalX, logicalY;
     if (gSdlRenderer != NULL) {
-        SDL_RenderWindowToLogical(gSdlRenderer, (mouseState->x), (mouseState->y), &logicalX, &logicalY);
+        SDL_RenderWindowToLogical(gSdlRenderer, cursorX, cursorY, &logicalX, &logicalY);
     } else {
         logicalX = (float)(mouseState->x);
         logicalY = (float)(mouseState->y);
