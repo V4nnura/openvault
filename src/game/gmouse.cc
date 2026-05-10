@@ -1377,7 +1377,7 @@ int gmouse_3d_get_mode()
 // 0x444608
 void gmouse_3d_toggle_mode()
 {
-     int mode;
+    int mode;
 
     // With auto-switching between MOVE and ARROW, right-click now toggles
     // between the auto modes and CROSSHAIR (combat targeting)
