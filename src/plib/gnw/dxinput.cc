@@ -69,6 +69,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     SDL_PumpEvents();
 
     // Get absolute window mouse position
+    int cursorX, cursorY;
     Uint32 buttons = SDL_GetMouseState(&cursorX, &cursorY);
 
     // Convert window coordinates to game (logical) coordinates
