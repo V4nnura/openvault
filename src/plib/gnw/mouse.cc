@@ -435,6 +435,8 @@ void mouse_info()
         static int prevy;
 
         switch (gesture.type) {
+        case kUnrecognized:
+            break;
         case kTap:
             if (gesture.numberOfTouches == 1) {
                 // Save current cursor position
