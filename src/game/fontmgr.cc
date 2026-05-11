@@ -245,7 +245,7 @@ int FMtext_char_width(char c)
     if (c == ' ') {
         width = gCurrentFont->wordSpacing;
     } else {
-        width = gCurrentFont->glyphs[c].width;
+        width = gCurrentFont->glyphs[(unsigned char)c].width;
     }
 
     return width;
