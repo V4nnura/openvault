@@ -273,7 +273,7 @@ void endgame_slideshow()
             endgame_display_image(fid, "nar_37");
         } else {
             v1 = game_get_global_var(GVAR_TOTAL_RAIDERS);
-            if (game_get_global_var(GVAR_GARL_DEAD) && v1 < 8 || game_get_global_var(GVAR_GARL_DEAD) && v1 < 4) {
+            if ((game_get_global_var(GVAR_GARL_DEAD) && v1 < 8) || (game_get_global_var(GVAR_GARL_DEAD) && v1 < 4)) {
                 fid = art_id(OBJ_TYPE_INTERFACE, 320, 0, 0, 0);
                 endgame_display_image(fid, "nar_35");
             } else {
