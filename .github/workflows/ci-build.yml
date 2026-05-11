@@ -167,7 +167,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build
-          key: linux-${{ matrix.arch }}-cmake-v1
+          key: linux-${{ matrix.arch }}-cmake-v101
 
       - name: Configure (x86)
         if: matrix.arch == 'x86'
@@ -271,13 +271,13 @@ jobs:
         uses: actions/cache@v4
         with:
           path: build
-          key: windows-${{ matrix.arch }}-cmake-v1
+          key: windows-${{ matrix.arch }}-cmake-v103
 
       - name: Configure
         run: |
           cmake \
             -B build \
-            -G "Visual Studio 18 2026" \
+            -G "Visual Studio 17 2022" \
             -A ${{ matrix.generator-platform }} \
             # EOL
 
