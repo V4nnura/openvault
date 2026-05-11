@@ -302,8 +302,7 @@ endif()
 
 if(MSVC)
     target_link_libraries(${EXECUTABLE_NAME} 
-        debug libcpmtd
-        optimized libcpmt
+        winmm
     )
 endif()
 
