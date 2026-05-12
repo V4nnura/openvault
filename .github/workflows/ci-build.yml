@@ -195,15 +195,14 @@ jobs:
 
       - name: Package
         run: |
-          mkdir -p out/dist/fallout-ce-linux-${{ matrix.arch }}
-          cp build/fallout-ce out/dist/fallout-ce-linux-${{ matrix.arch }}/fallout-ce
-          tar -czvf out/dist/fallout-ce-linux-${{ matrix.arch }}.tar.gz -C out/dist fallout-ce-linux-${{ matrix.arch }}
+          cd build
+          tar -czvf out/dist/fallout-ce-linux-${{ matrix.arch }}.tar.gz -C fallout-ce
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: fallout-ce-linux-${{ matrix.arch }}
-          path: out/dist/fallout-ce-linux-${{ matrix.arch }}.tar.gz
+          path: build/fallout-ce-linux-${{ matrix.arch }}.tar.gz
           retention-days: 7
 
   macos:
@@ -290,16 +289,14 @@ jobs:
 
       - name: Package
         run: |
-          mkdir -p out/dist/fallout-ce-windows-${{ matrix.arch }}
-          cp build/RelWithDebInfo/fallout-ce.exe out/dist/fallout-ce-windows-${{ matrix.arch }}/fallout-ce.exe
-          cd out/dist
+          cd build/RelWithDebInfo
           7z a fallout-ce-windows-${{ matrix.arch }}.zip fallout-ce-windows-${{ matrix.arch }}
         
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: fallout-ce-windows-${{ matrix.arch }}
-          path: out/dist/fallout-ce-windows-${{ matrix.arch }}.zip
+          path: build/RelWithDebInfo/fallout-ce-windows-${{ matrix.arch }}.zip
           retention-days: 7
 
 
