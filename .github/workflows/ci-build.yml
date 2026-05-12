@@ -290,7 +290,7 @@ jobs:
       - name: Package
         run: |
           cd build/RelWithDebInfo
-          7z a fallout-ce-windows-${{ matrix.arch }}.zip fallout-ce-windows-${{ matrix.arch }}
+          7z a fallout-ce-windows-${{ matrix.arch }}.zip fallout-ce.exe
         
       - name: Upload
         uses: actions/upload-artifact@v4
