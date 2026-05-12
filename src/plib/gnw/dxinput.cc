@@ -16,6 +16,7 @@ static int gMouseWheelDeltaX = 0;
 static int gMouseWheelDeltaY = 0;
 static int gMousePrevX = 0;
 static int gMousePrevY = 0;
+static bool gMousePrevInitialized = false;
 
 // 0x4E0400
 bool dxinput_init()
@@ -66,7 +67,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // and subsequently `GNW95_process_message`, so mouse events might not be
     // handled by SDL yet.
     SDL_PumpEvents();
-    
+
     // Get absolute window mouse position
     Uint32 buttons = SDL_GetMouseState(&(mouseState->x), &(mouseState->y));
 
@@ -86,6 +87,13 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // Store absolute position in game coordinates
     mouseState->absX = gameX;
     mouseState->absY = gameY;
+
+    // Calculate deltas in game coordinates for VCR compatibility
+    if (!gMousePrevInitialized) {
+        gMousePrevX = gameX;
+        gMousePrevY = gameY;
+        gMousePrevInitialized = true;
+    }
 
     mouseState->x = gameX - gMousePrevX;
     mouseState->y = gameY - gMousePrevY;
@@ -131,6 +139,7 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 bool dxinput_mouse_init()
 {
     SDL_ShowCursor(SDL_DISABLE);
+    gMousePrevInitialized = false;
     return true;
 }
 
