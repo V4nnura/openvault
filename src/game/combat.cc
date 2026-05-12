@@ -4433,8 +4433,8 @@ int combat_check_bad_shot(Object* attacker, Object* defender, int hitMode, bool 
         return COMBAT_BAD_SHOT_NOT_ENOUGH_AP;
     }
 
-    if (item_w_range(attacker, hitMode) > (stat_level(attacker, STAT_PERCEPTION) = *5)) {
-        weapon_max_range = stat_level(attacker, STAT_PERCEPTION) = *5;
+    if (item_w_range(attacker, hitMode) > (stat_level(attacker, STAT_PERCEPTION) > *5)) {
+        weapon_max_range = stat_level(attacker, STAT_PERCEPTION) > *5;
     } else {
         weapon_max_range = item_w_range(attacker, hitMode);
     }
