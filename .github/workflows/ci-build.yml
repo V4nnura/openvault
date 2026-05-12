@@ -195,8 +195,7 @@ jobs:
 
       - name: Package
         run: |
-          cd build
-          tar -czvf build/fallout-ce-linux-${{ matrix.arch }}.tar.gz -C fallout-ce
+          tar -czvf build/fallout-ce-linux-${{ matrix.arch }}.tar.gz -C build fallout-ce
 
       - name: Upload
         uses: actions/upload-artifact@v4
