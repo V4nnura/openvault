@@ -287,4 +287,29 @@ bool touch_get_gesture(Gesture* gesture)
     return true;
 }
 
+void touch_reset()
+{
+    for (int index = 0; index < MAX_TOUCHES; index++) {
+        touches[index].used = false;
+        touches[index].fingerId = 0;
+        touches[index].startTimestamp = 0;
+        touches[index].currentTimestamp = 0;
+        touches[index].startLocation.x = 0;
+        touches[index].startLocation.y = 0;
+        touches[index].currentLocation.x = 0;
+        touches[index].currentLocation.y = 0;
+        touches[index].phase = TOUCH_PHASE_ENDED;
+    }
+
+    currentGesture.type = kUnrecognized;
+    currentGesture.state = kPossible;
+    currentGesture.numberOfTouches = 0;
+    currentGesture.x = 0;
+    currentGesture.y = 0;
+
+    while (!gestureEventsQueue.empty()) {
+        gestureEventsQueue.pop();
+    }
+}
+
 } // namespace fallout
