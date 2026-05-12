@@ -32,6 +32,7 @@ void touch_handle_move(SDL_TouchFingerEvent* event);
 void touch_handle_end(SDL_TouchFingerEvent* event);
 void touch_process_gesture();
 bool touch_get_gesture(Gesture* gesture);
+void touch_reset();
 
 } // namespace fallout
 
