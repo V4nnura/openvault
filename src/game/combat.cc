@@ -4438,7 +4438,7 @@ int combat_check_bad_shot(Object* attacker, Object* defender, int hitMode, bool 
     } else {
         weapon_max_range = item_w_range(attacker, hitMode);
     }
-    
+
     if (weapon_max_range < obj_dist(attacker, defender)) {
         return COMBAT_BAD_SHOT_OUT_OF_RANGE;
     }
