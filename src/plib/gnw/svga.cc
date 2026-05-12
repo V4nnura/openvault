@@ -1,5 +1,6 @@
 #include "plib/gnw/svga.h"
 
+#include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/mouse.h"
@@ -226,9 +227,19 @@ int screenGetHeight()
 
 static bool createRenderer(int width, int height)
 {
-    gSdlRenderer = SDL_CreateRenderer(gSdlWindow, -1, 0);
+    gSdlRenderer = SDL_CreateRenderer(gSdlWindow, -1, SDL_RENDERER_PRESENTVSYNC);
     if (gSdlRenderer == NULL) {
         return false;
+    }
+
+    // Log display refresh rate for diagnostic purposes
+    int displayIndex = SDL_GetWindowDisplayIndex(gSdlWindow);
+    SDL_DisplayMode mode;
+    if (SDL_GetCurrentDisplayMode(displayIndex, &mode) == 0) {
+        debug_printf("Display refresh rate: %d Hz\n", mode.refresh_rate);
+        debug_printf("Display resolution: %dx%d\n", mode.w, mode.h);
+    } else {
+        debug_printf("Could not query display mode: %s\n", SDL_GetError());
     }
 
     if (SDL_RenderSetLogicalSize(gSdlRenderer, width, height) != 0) {
