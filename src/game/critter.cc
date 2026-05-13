@@ -1145,14 +1145,39 @@ int critter_wake_clear(Object* obj, void* data)
 // 0x428BB0
 int critter_set_who_hit_me(Object* critter, Object* who_hit_me)
 {
+    if (critter == NULL) {
+        return -1;
+    }
+
     if (who_hit_me != NULL && FID_TYPE(who_hit_me->fid) != OBJ_TYPE_CRITTER) {
         return -1;
     }
 
-    critter->data.critter.combat.whoHitMe = who_hit_me;
+    // BUGFIX: Prevent self-targeting which causes the player to attack themselves
+    // and creates infinite combat loops. This was a known issue in Vault 15 and
+    // other locations where corrupted combat data could set whoHitMe to self.
+    if (who_hit_me == critter) {
+        return -1;
+    }
 
-    if (who_hit_me == obj_dude) {
-        reaction_set(critter, 1);
+    // Only set whoHitMe if:
+    // 1. Clearing the value (who_hit_me is NULL), OR
+    // 2. The attacker is on a different team, OR
+    // 3. The critter fails an intelligence check (confused/berserk) AND
+    //    neither critter is a party member (party members shouldn't attack each other)
+    //
+    // This prevents same-team targeting which causes combat to never end,
+    // as combat_should_end() checks for teammates with whoHitMe on same team.
+    // Based on Fallout 2 CE fix for similar self-attack bugs.
+    if (who_hit_me == NULL
+        || critter->data.critter.combat.team != who_hit_me->data.critter.combat.team
+        || (stat_result(critter, STAT_INTELLIGENCE, -1, NULL) < ROLL_SUCCESS
+            && (!isPartyMember(critter) || !isPartyMember(who_hit_me)))) {
+        critter->data.critter.combat.whoHitMe = who_hit_me;
+
+        if (who_hit_me == obj_dude) {
+            reaction_set(critter, 1);
+        }
     }
 
     return 0;
