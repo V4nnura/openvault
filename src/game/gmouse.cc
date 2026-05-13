@@ -1246,10 +1246,7 @@ int gmouse_set_cursor(int cursor)
 
     int offsetX;
     int offsetY;
-    art_frame_offset(mouseCursorFrm, 0, &offsetX, &offsetY);
-
-    offsetX = width / 2 - offsetX;
-    offsetY = height - 1 - offsetY;
+    art_frame_hot(mouseCursorFrm, frame, 0, &offsetX, &offsetY);
 
     unsigned char* mouseCursorFrmData = art_frame_data(mouseCursorFrm, frame, 0);
     if (mouse_set_shape(mouseCursorFrmData, width, height, width, offsetX, offsetY, 0) != 0) {
