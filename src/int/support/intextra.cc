@@ -3727,7 +3727,8 @@ static void op_attack_setup(Program* program)
         if (isInCombat()) {
             if ((attacker->data.critter.combat.maneuver & CRITTER_MANEUVER_ENGAGING) == 0) {
                 attacker->data.critter.combat.maneuver |= CRITTER_MANEUVER_ENGAGING;
-                attacker->data.critter.combat.whoHitMe = defender;
+                // BUGFIX: Use setter with validation to prevent self-targeting bugs
+                critter_set_who_hit_me(attacker, defender);
             }
         } else {
             STRUCT_664980 attack;
