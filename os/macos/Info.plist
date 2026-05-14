@@ -31,7 +31,7 @@
     <key>LSApplicationCategoryType</key>
     <string>public.app-category.role-playing-games</string>
     <key>LSMinimumSystemVersion</key>
-    <string>10.11</string>
+    <string>10.12</string>
     <key>SDL_FILESYSTEM_BASE_DIR_TYPE</key>
     <string>parent</string>
 </dict>
