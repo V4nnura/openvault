@@ -889,7 +889,7 @@ int map_load(char* file_name)
 
         if (rc == 0) {
             strcpy(map_data.name, file_name);
-            obj_dude->data.critter.combat.whoHitMe = NULL;
+            critter_set_who_hit_me(obj_dude, NULL);
         }
     }
 
