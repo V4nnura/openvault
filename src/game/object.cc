@@ -712,7 +712,6 @@ int obj_save(DB_FILE* stream)
                     whoHitMe = combatData->whoHitMe;
                     if (whoHitMe != NULL) {
                         combatData->whoHitMeCid = whoHitMe->cid;
-                        }
                     } else {
                         combatData->whoHitMeCid = -1;
                     }
