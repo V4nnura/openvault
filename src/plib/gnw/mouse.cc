@@ -657,22 +657,6 @@ bool mouse_in(int left, int top, int right, int bottom)
 }
 
 // 0x4B51C0
-// Expanding cursor hot Size for touch devices
-bool mouse_click_in(int left, int top, int right, int bottom)
-{
-    int expand = 10; // Extend active area by 10 pixels (set as needed)
-
-    if (!have_mouse) {
-        return false;
-    }
-
-    return (mouse_hoty + mouse_y >= top - expand)
-        && (mouse_hotx + mouse_x <= right + expand)
-        && (mouse_hotx + mouse_x >= left - expand)
-        && (mouse_hoty + mouse_y <= bottom + expand);
-}
-
-/*
 bool mouse_click_in(int left, int top, int right, int bottom)
 {
     if (!have_mouse) {
@@ -684,7 +668,6 @@ bool mouse_click_in(int left, int top, int right, int bottom)
         && mouse_hotx + mouse_x >= left
         && mouse_hoty + mouse_y <= bottom;
 }
- */
 
 // 0x4B522C
 void mouse_get_rect(Rect* rect)
