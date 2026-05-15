@@ -582,13 +582,13 @@ static void obj_fix_combat_cid_for_dude()
     int critterListLength = obj_create_list(-1, map_elevation, OBJ_TYPE_CRITTER, &critterList);
 
     if (obj_dude->data.critter.combat.whoHitMeCid == -1) {
-        obj_dude->data.critter.combat.whoHitMe = NULL;
+        critter_set_who_hit_me(obj_dude, NULL);
     } else {
         int index = find_cid(0, obj_dude->data.critter.combat.whoHitMeCid, critterList, critterListLength);
         if (index != critterListLength) {
-            obj_dude->data.critter.combat.whoHitMe = critterList[index];
+            critter_set_who_hit_me(obj_dude, critterList[index]);
         } else {
-            obj_dude->data.critter.combat.whoHitMe = NULL;
+            critter_set_who_hit_me(obj_dude, NULL);
         }
     }
 
