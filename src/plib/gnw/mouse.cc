@@ -882,7 +882,7 @@ void mouse_set_sensitivity(double value)
 double mouse_get_sensitivity()
 {
     if (value > 0 && value <= 2.5) {
-    return mouse_sensitivity;
+        return mouse_sensitivity;
     }
 }
 
