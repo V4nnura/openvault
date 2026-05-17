@@ -128,33 +128,29 @@ void compat_makepath(char* path, const char* drive, const char* dir, const char*
 #else
     path[0] = '\0';
 
-    if (drive != NULL) {
-        if (*drive != '\0') {
-            strcpy(path, drive);
-            path = strchr(path, '\0');
+    if (drive != NULL && *drive != '\0') {
+        strcpy(path, drive);
+        path = strchr(path, '\0');
 
-            if (path[-1] == '/') {
-                path--;
-            } else {
-                *path = '/';
-            }
+        if (path[-1] == '/') {
+            path--;
+        } else {
+            *path = '/';
         }
     }
 
-    if (dir != NULL) {
-        if (*dir != '\0') {
-            if (*dir != '/' && *path == '/') {
-                path++;
-            }
+    if (dir != NULL && *dir != '\0') {
+        if (*dir != '/' && *path == '/') {
+            path++;
+        }
 
-            strcpy(path, dir);
-            path = strchr(path, '\0');
+        strcpy(path, dir);
+        path = strchr(path, '\0');
 
-            if (path[-1] == '/') {
-                path--;
-            } else {
-                *path = '/';
-            }
+        if (path[-1] == '/') {
+            path--;
+        } else {
+            *path = '/';
         }
     }
 
@@ -171,15 +167,13 @@ void compat_makepath(char* path, const char* drive, const char* dir, const char*
         }
     }
 
-    if (ext != NULL) {
-        if (*ext != '\0') {
-            if (*ext != '.') {
-                *path++ = '.';
-            }
-
-            strcpy(path, ext);
-            path = strchr(path, '\0');
+    if (ext != NULL && *ext != '\0') {
+        if (*ext != '.') {
+            *path++ = '.';
         }
+
+        strcpy(path, ext);
+        path = strchr(path, '\0');
     }
 
     *path = '\0';
