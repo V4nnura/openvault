@@ -143,8 +143,10 @@ bool svga_init(VideoOptions* video_options)
 
     Uint32 windowFlags = SDL_WINDOW_OPENGL | SDL_WINDOW_ALLOW_HIGHDPI;
 
-    if (video_options->fullscreen) {
+    if (video_options->fullscreen && video_options->exclusive) {
         windowFlags |= SDL_WINDOW_FULLSCREEN;
+    } else {
+        windowFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
     }
 
     gSdlWindow = SDL_CreateWindow(GNW95_title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
