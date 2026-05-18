@@ -703,7 +703,7 @@ int proto_update_init(Object* obj)
     data->critter.hp = stat_level(obj, STAT_MAXIMUM_HIT_POINTS);
     data->critter.combat.ap = stat_level(obj, STAT_MAXIMUM_ACTION_POINTS);
     stat_recalc_derived(obj);
-    obj->data.critter.combat.whoHitMe = NULL;
+    critter_set_who_hit_me(obj, NULL);
 
     Proto* proto;
     if (proto_ptr(obj->pid, &proto) != -1) {
