@@ -97,6 +97,13 @@ int db_fwriteInt16List(DB_FILE* stream, short* arr, int count);
 int db_fwriteInt32List(DB_FILE* stream, int* arr, int count);
 int db_fwriteBool(DB_FILE* stream, bool value);
 
+// Diagnostics: count DB opens that fail to resolve in both patches and DAT.
+// This is intended for automated content validation runs (for example, map
+// sweep tests). It is safe to call in shipping builds, but only used when
+// explicitly invoked by tooling/debug hooks.
+void db_diag_reset_open_fail_count();
+int db_diag_open_fail_count();
+
 } // namespace fallout
 
 #endif /* FALLOUT_PLIB_DB_DB_H_ */
