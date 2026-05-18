@@ -3920,7 +3920,7 @@ static int Save_as_ASCII(const char* fileName)
         getmsg(&editor_message_file, &mesg, 642),
         critter_name(obj_dude));
 
-    int paddingLength = static_cast<int>(27 - strlen(title1);
+    int paddingLength = static_cast<int>(27 - strlen(title1));
     if (paddingLength > 0) {
         // NOTE: Uninline.
         padding[0] = '\0';
