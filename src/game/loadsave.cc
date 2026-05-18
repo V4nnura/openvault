@@ -1633,15 +1633,15 @@ static int LoadSlot(int slot)
         LoadGameHandler* handler = master_load_list[index];
         if (handler(flptr) == -1) {
             debug_printf("\nLOADSAVE: ** Error reading load function #%d data! **\n", index);
-            int v12 = db_ftell(flptr);
-            debug_printf("LOADSAVE: Load function #%d data size read: %d bytes.\n", index, db_ftell(flptr) - pos);
+            int v12 = static_cast<int>(db_ftell(flptr));
+            debug_printf("LOADSAVE: Load function #%d data size read: %d bytes.\n", index, static_cast<int>(db_ftell(flptr) - pos));
             db_fclose(flptr);
             game_reset();
             loadingGame = 0;
             return -1;
         }
 
-        debug_printf("LOADSAVE: Load function #%d data size read: %d bytes.\n", index, db_ftell(flptr) - pos);
+        debug_printf("LOADSAVE: Load function #%d data size read: %d bytes.\n", index, static_cast<int>(db_ftell(flptr) - pos));
     }
 
     debug_printf("LOADSAVE: Total load data read: %ld bytes.\n", db_ftell(flptr));
@@ -2190,7 +2190,7 @@ static int get_input_str2(int win, int doneKeyCode, int cancelKeyCode, char* des
     char text[256];
     strcpy(text, description);
 
-    int textLength = strlen(text);
+    int textLength = static_cast<int>(strlen(text));
     text[textLength] = ' ';
     text[textLength + 1] = '\0';
 
@@ -2384,7 +2384,7 @@ static int GameMap2Slot(DB_FILE* stream)
         return -1;
     }
 
-    int automap_size = db_filelength(automap_stream);
+    int automap_size = static_cast<int>(db_filelength(automap_stream));
     if (automap_size == -1) {
         db_fclose(automap_stream);
         return -1;
@@ -2455,7 +2455,7 @@ static int SlotMap2Game(DB_FILE* stream)
         return -1;
     }
 
-    int automap_size = db_filelength(automap_stream);
+    int automap_size = static_cast<int>(db_filelength(automap_stream));
     if (automap_size == -1) {
         db_fclose(automap_stream);
         return -1;
@@ -2521,7 +2521,7 @@ static int copy_file(const char* a1, const char* a2)
         goto out;
     }
 
-    length = db_filelength(stream1);
+    length = static_cast<int>(db_filelength(stream1));
     if (length == -1) {
         goto out;
     }
