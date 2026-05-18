@@ -72,7 +72,11 @@ int init_message()
         }
 
         int len = strlen(word);
-        if (word[len - 1] == '\n') {
+        if (len > 0 && word[len - 1] == '\n') {
+            len--;
+            word[len] = '\0';
+        }
+        if (len > 0 && word[len - 1] == '\r') {
             len--;
             word[len] = '\0';
         }
@@ -466,6 +470,9 @@ int message_load_field(DB_FILE* file, char* str)
             return 0;
         }
 
+        if (ch == '\r') {
+            continue;
+        }
         if (ch != '\n') {
             *(str + len) = ch;
             len++;
