@@ -14,6 +14,10 @@ static int compat_scr_get_local_var(int sid, int var, int* value);
 // 0x490C40
 int reaction_set(Object* critter, int value)
 {
+    if (critter == NULL || critter->sid == -1) {
+        // No script = skip safely
+        return -1;
+    }
     compat_scr_set_local_var(critter->sid, 0, value);
     return 0;
 }
@@ -73,6 +77,10 @@ int reaction_get(Object* critter)
     int sid;
     int v1 = 0;
     int v2 = 0;
+    if (critter == NULL || critter->sid == -1) {
+        // No script = skip safely
+        return -1;
+    }
 
     sid = critter->sid;
     if (compat_scr_get_local_var(sid, 2, &v1) == -1) {
