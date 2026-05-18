@@ -108,7 +108,6 @@ static int fread_short(FILE* stream, unsigned short* s);
 
 static inline bool fileFindIsDirectory(DB_FIND_DATA* find_data);
 static inline char* fileFindGetName(DB_FIND_DATA* find_data);
-static bool db_has_case_variant(const std::string& full_path, std::string& actual_name);
 
 // 0x4FE058
 static char empty_patches_path[] = "";
@@ -2807,30 +2806,6 @@ static inline char* fileFindGetName(DB_FIND_DATA* findData)
 #else
     return findData->entry->d_name;
 #endif
-}
-
-static bool db_has_case_variant(const std::string& full_path, std::string& actual_name)
-{
-    size_t sep = full_path.find_last_of(PATH_SEP);
-    std::string dir = sep != std::string::npos ? full_path.substr(0, sep) : std::string(".");
-    std::string target = sep != std::string::npos ? full_path.substr(sep + 1) : full_path;
-
-    DB_FIND_DATA* d = opendir(dir.c_str());
-    if (d == NULL) {
-        return false;
-    }
-
-    struct dirent* ent;
-    while ((ent = readdir(d)) != NULL) {
-        if (strcasecmp(ent->d_name, target.c_str()) == 0 && strcmp(ent->d_name, target.c_str()) != 0) {
-            actual_name = ent->d_name;
-            closedir(d);
-            return true;
-        }
-    }
-
-    closedir(d);
-    return false;
 }
 
 int db_freadUInt8(DB_FILE* stream, unsigned char* valuePtr)
