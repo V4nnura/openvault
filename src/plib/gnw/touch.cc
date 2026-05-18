@@ -93,10 +93,8 @@ static bool convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, in
 {
     // Get window dimensions in points and pixels for debugging
     int window_w, window_h;
-    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
-
     int window_pw, window_ph;
-    SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
+    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h, &window_pw, &window_ph);
 
     float scale_x = (window_w > 0) ? (float)window_pw / (float)window_w : 1.0f;
     float scale_y = (window_h > 0) ? (float)window_ph / (float)window_h : 1.0f;
@@ -112,7 +110,7 @@ static bool convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, in
     SDL_Log("TOUCH_CONVERT: window_coords=(%.1f, %.1f)", window_x, window_y);
 
     float logical_x, logical_y;
-    if (SDL_RenderCoordinatesFromWindow(gSdlRenderer, window_x, window_y, &logical_x, &logical_y)) {
+    if (SDL_RenderLogicalToWindow(gSdlRenderer, window_x, window_y, &logical_x, &logical_y)) {
         *out_x = static_cast<int>(logical_x);
         *out_y = static_cast<int>(logical_y);
 
@@ -144,7 +142,8 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
         int logical_y = 0;
         if (!convert_touch_to_logical(event, &logical_x, &logical_y)) {
             return;
-        }   
+        }
+
         touch->used = true;
         touch->fingerId = event->fingerId;
         touch->startTimestamp = event->timestamp;
