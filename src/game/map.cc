@@ -60,6 +60,18 @@ static void square_reset();
 static int square_load(DB_FILE* stream, int a2);
 static int map_write_MapData(MapHeader* ptr, DB_FILE* stream);
 static int map_read_MapData(MapHeader* ptr, DB_FILE* stream);
+static int map_count_scroll_blockers(int elevation);
+
+static int map_count_scroll_blockers(int elevation)
+{
+    int count = 0;
+    for (int tile = 1; tile < HEX_GRID_SIZE; tile++) {
+        if (obj_scroll_blocking_at(tile, elevation) == 0) {
+            count++;
+        }
+    }
+    return count;
+}
 
 // 0x4735CE
 static const short city_vs_city_idx_table[MAP_COUNT][5] = {
