@@ -1492,6 +1492,17 @@ int obj_reset_roof()
     return 0;
 }
 
+bool obj_get_player_roof_info(int* outRoofX, int* outRoofY, int* outElev)
+{
+    if (obj_last_is_empty) {
+        return false;
+    }
+    if (outRoofX != nullptr) *outRoofX = obj_last_roof_x;
+    if (outRoofY != nullptr) *outRoofY = obj_last_roof_y;
+    if (outElev != nullptr) *outElev = obj_last_elev;
+    return true;
+}
+
 // Sets object fid.
 //
 // 0x47C624
@@ -4512,9 +4523,9 @@ static void obj_render_outline(Object* object, Rect* rect)
                 }
             }
 
-            int v22 = dest14 - back_buf;
+            int v22 = static_cast<int>(dest14 - back_buf);
             for (int x = 0; x < frameWidth; x++) {
-                v22 = dest14 - back_buf;
+                v22 = static_cast<int>(dest14 - back_buf);
                 if (*src15 != 0 && cycle) {
                     if (x >= v49.ulx && x <= v49.lrx && y >= v49.uly && y <= v49.lry && v22 > 0 && v22 % buf_full != 0) {
                         unsigned char v20;
