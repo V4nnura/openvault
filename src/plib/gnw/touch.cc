@@ -13,7 +13,7 @@ namespace fallout {
 
 #define MAX_TOUCHES 10
 
-#define TAP_MAXIMUM_DURATION 75
+#define TAP_MAXIMUM_DURATION 150
 #define PAN_MINIMUM_MOVEMENT 4
 #define LONG_PRESS_MINIMUM_DURATION 500
 
@@ -30,6 +30,8 @@ struct Touch {
     TouchLocation currentLocation;
     Uint32 currentTimestamp;
     int phase;
+    bool started_in_bounds;
+    TouchLocation lastInBounds;
 };
 
 static Touch touches[MAX_TOUCHES];
@@ -96,14 +98,22 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
 
     if (index != -1) {
         Touch* touch = &(touches[index]);
+        int logical_x = 0;
+        int logical_y = 0;
+        if (!convert_touch_to_logical(event, &logical_x, &logical_y)) {
+            return;
+        }
+        
         touch->used = true;
         touch->fingerId = event->fingerId;
         touch->startTimestamp = event->timestamp;
-        touch->startLocation.x = static_cast<int>(event->x * screenGetWidth());
-        touch->startLocation.y = static_cast<int>(event->y * screenGetHeight());
+        touch->startLocation.x = logical_x;
+        touch->startLocation.y = logical_y;
         touch->currentTimestamp = touch->startTimestamp;
         touch->currentLocation = touch->startLocation;
         touch->phase = TOUCH_PHASE_BEGAN;
+        touch->started_in_bounds = true;
+        touch->lastInBounds = touch->startLocation;
     }
 }
 
@@ -113,8 +123,16 @@ void touch_handle_move(SDL_TouchFingerEvent* event)
     if (index != -1) {
         Touch* touch = &(touches[index]);
         touch->currentTimestamp = event->timestamp;
-        touch->currentLocation.x = static_cast<int>(event->x * screenGetWidth());
-        touch->currentLocation.y = static_cast<int>(event->y * screenGetHeight());
+        int logical_x = 0;
+        int logical_y = 0;
+        bool in_bounds = convert_touch_to_logical(event, &logical_x, &logical_y);
+        if (in_bounds) {
+            touch->currentLocation.x = logical_x;
+            touch->currentLocation.y = logical_y;
+            touch->lastInBounds = touch->currentLocation;
+        } else if (touch->started_in_bounds) {
+            touch->currentLocation = touch->lastInBounds;
+        }
         touch->phase = TOUCH_PHASE_MOVED;
     }
 }
@@ -125,8 +143,16 @@ void touch_handle_end(SDL_TouchFingerEvent* event)
     if (index != -1) {
         Touch* touch = &(touches[index]);
         touch->currentTimestamp = event->timestamp;
-        touch->currentLocation.x = static_cast<int>(event->x * screenGetWidth());
-        touch->currentLocation.y = static_cast<int>(event->y * screenGetHeight());
+        int logical_x = 0;
+        int logical_y = 0;
+        bool in_bounds = convert_touch_to_logical(event, &logical_x, &logical_y);
+        if (in_bounds) {
+            touch->currentLocation.x = logical_x;
+            touch->currentLocation.y = logical_y;
+            touch->lastInBounds = touch->currentLocation;
+        } else if (touch->started_in_bounds) {
+            touch->currentLocation = touch->lastInBounds;
+        }
         touch->phase = TOUCH_PHASE_ENDED;
     }
 }
@@ -299,6 +325,9 @@ void touch_reset()
         touches[index].currentLocation.x = 0;
         touches[index].currentLocation.y = 0;
         touches[index].phase = TOUCH_PHASE_ENDED;
+        touches[index].started_in_bounds = false;
+        touches[index].lastInBounds.x = 0;
+        touches[index].lastInBounds.y = 0;
     }
 
     currentGesture.type = kUnrecognized;
