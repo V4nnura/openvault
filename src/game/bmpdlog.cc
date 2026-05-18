@@ -1085,7 +1085,7 @@ int save_file_dialog(char* title, char** fileList, char* dest, int fileListLengt
     char fileNameCopy[32];
     strncpy(fileNameCopy, dest, 32);
 
-    int fileNameCopyLength = strlen(fileNameCopy);
+    int fileNameCopyLength = static_cast<int>(strlen(fileNameCopy));
     fileNameCopy[fileNameCopyLength + 1] = '\0';
     fileNameCopy[fileNameCopyLength] = ' ';
 
@@ -1176,7 +1176,7 @@ int save_file_dialog(char* title, char** fileList, char* dest, int fileListLengt
                     }
 
                     fileNameCopy[index] = '\0';
-                    fileNameCopyLength = strlen(fileNameCopy);
+                    fileNameCopyLength = static_cast<int>(strlen(fileNameCopy));
                     fileNameCopy[fileNameCopyLength] = ' ';
                     fileNameCopy[fileNameCopyLength + 1] = '\0';
 
