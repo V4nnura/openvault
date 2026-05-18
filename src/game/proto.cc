@@ -230,6 +230,10 @@ int proto_list_str(int pid, char* proto_path)
     if (pch != NULL) {
         *pch = '\0';
     }
+    pch = strchr(string, '\r');
+    if (pch != NULL) {
+        *pch = '\0';
+    }
 
     strcpy(proto_path, string);
 
