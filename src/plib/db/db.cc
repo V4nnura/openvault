@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <string>
-#include <strings.h>
 
 #if defined(_WIN32)
 #include <windows.h>
 #else
 #include <dirent.h>
+#include <strings.h>
 #endif
 
 #include <fpattern/fpattern.h>
