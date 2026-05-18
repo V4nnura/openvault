@@ -147,6 +147,52 @@ static size_t read_threshold = 16384;
 // 0x539D54
 static db_read_callback* read_callback = NULL;
 
+// Diagnostics: count DB opens that fail to resolve in both patches and DAT.
+static int db_diag_open_fail_count_value = 0;
+void db_diag_reset_open_fail_count()
+{
+    db_diag_open_fail_count_value = 0;
+}
+
+int db_diag_open_fail_count()
+{
+    return db_diag_open_fail_count_value;
+}
+
+static bool db_diag_is_soft_open_fail(const char* request, const char* resolved_path)
+{
+    const char* s = resolved_path != NULL ? resolved_path : request;
+    if (s == NULL) {
+        return false;
+    }
+
+    const char* ext = strrchr(s, '.');
+    if (ext == NULL) {
+        return false;
+    }
+
+    // map_load() probes for MAPS\*.SAV to detect "saved map" variants.
+    // A miss here is expected and should not trip diagnostics.
+    if (ext[0] == '.' && (ext[1] == 'S' || ext[1] == 's') && (ext[2] == 'A' || ext[2] == 'a') && (ext[3] == 'V' || ext[3] == 'v') && ext[4] == '\0') {
+        return true;
+    }
+
+    // Map globals (.GAM) are optional for many maps; map_load ignores missing.
+    if (ext[0] == '.' && (ext[1] == 'G' || ext[1] == 'g') && (ext[2] == 'A' || ext[2] == 'a') && (ext[3] == 'M' || ext[3] == 'm') && ext[4] == '\0') {
+        return true;
+    }
+
+    return false;
+}
+
+static void db_diag_note_open_fail(const char* request, const char* resolved_path)
+{
+    if (db_diag_is_soft_open_fail(request, resolved_path)) {
+        return;
+    }
+
+    db_diag_open_fail_count_value++;
+}
 // 0x6713C8
 static DB_DATABASE* database_list[DB_DATABASE_LIST_CAPACITY];
 
