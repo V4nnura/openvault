@@ -7,36 +7,6 @@
 
 namespace fallout {
 
-// Convert normalized SDL touch coordinates (0.0-1.0) to logical game coordinates
-// using SDL_RenderWindowToLogical for proper coordinate transformation.
-// This matches how mouse coordinates are handled in dxinput.cc.
-static void touch_normalized_to_logical(float norm_x, float norm_y, int* out_x, int* out_y)
-{
-    // Get actual window size in screen coordinates
-    int window_w, window_h;
-    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
-
-    // Convert normalized coordinates to window pixel coordinates
-    int window_x = static_cast<int>(norm_x * window_w);
-    int window_y = static_cast<int>(norm_y * window_h);
-
-    // Use SDL's logical coordinate transformation (same as mouse path in dxinput.cc)
-    float logical_x, logical_y;
-    SDL_RenderWindowToLogical(gSdlRenderer, window_x, window_y, &logical_x, &logical_y);
-
-    // Clamp to screen bounds
-    int screen_w = screenGetWidth();
-    int screen_h = screenGetHeight();
-
-    *out_x = static_cast<int>(logical_x);
-    *out_y = static_cast<int>(logical_y);
-
-    if (*out_x < 0) *out_x = 0;
-    if (*out_x >= screen_w) *out_x = screen_w - 1;
-    if (*out_y < 0) *out_y = 0;
-    if (*out_y >= screen_h) *out_y = screen_h - 1;
-}
-
 #define TOUCH_PHASE_BEGAN 0
 #define TOUCH_PHASE_MOVED 1
 #define TOUCH_PHASE_ENDED 2
@@ -114,6 +84,48 @@ static TouchLocation touch_get_current_location_centroid(int* indexes, int lengt
     centroid.x /= length;
     centroid.y /= length;
     return centroid;
+}
+
+// Helper to convert touch finger event coordinates to logical (render) coordinates
+// SDL touch events have x/y normalized to window dimensions (0...1), but we need
+// logical coordinates that account for the render logical presentation scaling.
+static bool convert_touch_to_logical(SDL_TouchFingerEvent* event, int* out_x, int* out_y)
+{
+    // Get window dimensions in points and pixels for debugging
+    int window_w, window_h;
+    SDL_GetWindowSize(gSdlWindow, &window_w, &window_h);
+
+    int window_pw, window_ph;
+    SDL_GetWindowSizeInPixels(gSdlWindow, &window_pw, &window_ph);
+
+    float scale_x = (window_w > 0) ? (float)window_pw / (float)window_w : 1.0f;
+    float scale_y = (window_h > 0) ? (float)window_ph / (float)window_h : 1.0f;
+
+    SDL_Log("TOUCH_CONVERT: window_points=%dx%d window_pixels=%dx%d scale=(%.3f,%.3f)",
+        window_w, window_h, window_pw, window_ph, scale_x, scale_y);
+    SDL_Log("TOUCH_CONVERT: normalized coords=(%.6f, %.6f)", event->x, event->y);
+
+    // Convert normalized (0...1) to window coordinates (points)
+    float window_x = event->x * window_w;
+    float window_y = event->y * window_h;
+
+    SDL_Log("TOUCH_CONVERT: window_coords=(%.1f, %.1f)", window_x, window_y);
+
+    float logical_x, logical_y;
+    if (SDL_RenderCoordinatesFromWindow(gSdlRenderer, window_x, window_y, &logical_x, &logical_y)) {
+        *out_x = static_cast<int>(logical_x);
+        *out_y = static_cast<int>(logical_y);
+
+        // Clamp to valid screen bounds
+        if (*out_x < 0) *out_x = 0;
+        if (*out_y < 0) *out_y = 0;
+        if (*out_x >= screenGetWidth()) *out_x = screenGetWidth() - 1;
+        if (*out_y >= screenGetHeight()) *out_y = screenGetHeight() - 1;
+    } else {
+        // Fallback to old method if conversion fails
+        *out_x = static_cast<int>(event->x * screenGetWidth());
+        *out_y = static_cast<int>(event->y * screenGetHeight());
+    }
 }
 
 void touch_handle_start(SDL_TouchFingerEvent* event)
