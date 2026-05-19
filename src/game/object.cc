@@ -2610,7 +2610,7 @@ void intensity_mask_buf_to_buf(unsigned char* src, int srcWidth, int srcHeight, 
 }
 
 // 0x47D9A4
-int obj_outline_object(Object* obj, int outlineType, Rect* rect)
+int obj_outline_object(Object* obj, int outlineType, Rect* rect, bool skipNoHighlight)
 {
     if (obj == NULL) {
         return -1;
@@ -2620,7 +2620,7 @@ int obj_outline_object(Object* obj, int outlineType, Rect* rect)
         return -1;
     }
 
-    if ((obj->flags & OBJECT_NO_HIGHLIGHT) != 0) {
+    if ((obj->flags & OBJECT_NO_HIGHLIGHT) != 0 && !skipNoHighlight) {
         return -1;
     }
 
