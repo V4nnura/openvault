@@ -27,7 +27,7 @@ bool tweaks_init()
             if (config_get_value(&tweaksConfig, "Roof", "HoverHide", &value)) {
                 tweak_hover_hide_roof = (value != 0);
             }
-             if (config_get_value(&tweaksConfig, "Mouse", "ObjectTooltip", &value)) {
+            if (config_get_value(&tweaksConfig, "Mouse", "ObjectTooltip", &value)) {
                 tweak_object_tooltip = (value != 0);
             }
             if (config_get_value(&tweaksConfig, "Accessibility", "HighlightKey", &value)) {
