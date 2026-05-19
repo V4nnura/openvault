@@ -820,13 +820,13 @@ void gmouse_bk_process()
                     if (target != last_object) {
                         last_object = target;
                         obj_look_at(obj_dude, last_object);
+                    }
 
                     // Update tooltip for the hovered object
                     gmouse_tooltip_update(target, mouseX, mouseY);
                 } else {
-                    // No object under cursor, hide tooltip
+                     // No object under cursor, hide tooltip
                     gmouse_tooltip_update(NULL, mouseX, mouseY);
-                    }
                 }
             } else if (gmouse_3d_current_mode == GAME_MOUSE_MODE_CROSSHAIR) {
                 Object* pointedObject = object_under_mouse(OBJ_TYPE_CRITTER, false, map_elevation);
