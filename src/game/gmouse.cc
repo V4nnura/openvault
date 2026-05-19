@@ -15,8 +15,8 @@
 #include "game/item.h"
 #include "game/map.h"
 #include "game/object.h"
-#include "game/protinst.h"
 #include "game/proto.h"
+#include "game/protinst.h"
 #include "game/skilldex.h"
 #include "game/tile.h"
 #include "game/tweaks.h"
@@ -25,6 +25,7 @@
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
+#include "plib/gnw/kb.h"
 #include "plib/gnw/rect.h"
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
@@ -48,6 +49,7 @@ static int gmouse_3d_reset_flat_fid(Rect* rect);
 static int gmouse_3d_move_to(int x, int y, int elevation, Rect* a4);
 static int gmouse_check_scrolling(int x, int y, int cursor);
 static int gmouse_3d_determine_auto_mode(int mouseX, int mouseY, int elevation);
+static void gmouse_tooltip_update(Object* target, int mouseX, int mouseY);
 
 // 0x505258
 static bool gmouse_initialized = false;
@@ -288,6 +290,18 @@ static Object* outlined_object = NULL;
 
 // 0x5053F4
 bool gmouse_clicked_on_edge = false;
+
+// Object tooltip window
+static int gmouse_tooltip_win = -1;
+static bool gmouse_tooltip_visible = false;
+static Object* gmouse_tooltip_object = NULL;
+
+// Accessibility highlight state
+static bool accessibility_highlight_active = false;
+
+// Maximum width for tooltip (characters can have long names)
+static const int GMOUSE_TOOLTIP_MAX_WIDTH = 200;
+static const int GMOUSE_TOOLTIP_PADDING = 4;
 
 // 0x5951E0
 static int gmouse_3d_menu_frame_actions[GAME_MOUSE_ACTION_MENU_ITEM_COUNT];
@@ -574,6 +588,9 @@ void gmouse_bk_process()
         return;
     }
 
+    // Check accessibility highlight key state
+    gmouse_accessibility_highlight_check();
+
     int mouseX;
     int mouseY;
 
@@ -803,6 +820,12 @@ void gmouse_bk_process()
                     if (target != last_object) {
                         last_object = target;
                         obj_look_at(obj_dude, last_object);
+
+                    // Update tooltip for the hovered object
+                    gmouse_tooltip_update(target, mouseX, mouseY);
+                } else {
+                    // No object under cursor, hide tooltip
+                    gmouse_tooltip_update(NULL, mouseX, mouseY);
                     }
                 }
             } else if (gmouse_3d_current_mode == GAME_MOUSE_MODE_CROSSHAIR) {
@@ -889,6 +912,9 @@ void gmouse_bk_process()
     gmouse_3d_hover_test = false;
     gmouse_3d_last_mouse_x = mouseX;
     gmouse_3d_last_mouse_y = mouseY;
+
+    // Hide tooltip when mouse moves
+    gmouse_tooltip_update(NULL, mouseX, mouseY);
 
     // Auto-switch between MOVE and ARROW modes based on what's under cursor
     if (!gmouse_mapper_mode) {
@@ -2121,6 +2147,9 @@ static int gmouse_3d_reset()
         return -1;
     }
 
+    // Hide any visible tooltip
+    gmouse_tooltip_hide();
+
     // NOTE: Uninline.
     gmouse_3d_enable_modes();
 
@@ -2536,6 +2565,133 @@ static int gmouse_3d_determine_auto_mode(int mouseX, int mouseY, int elevation)
     return GAME_MOUSE_MODE_MOVE;
 }
 
+// Checks if a tooltip should be shown for the given object.
+// Returns true if the object passes the same basic checks as obj_look_at.
+// Note: target must be non-NULL (caller should check).
+static bool gmouse_tooltip_should_show(Object* viewer, Object* target)
+{
+    if (critter_is_dead(viewer)) {
+        return false;
+    }
+
+    if (FID_TYPE(target->fid) == OBJ_TYPE_TILE) {
+        return false;
+    }
+
+    Proto* proto;
+    if (proto_ptr(target->pid, &proto) == -1) {
+        return false;
+    }
+
+    return true;
+}
+
+// Creates and shows the tooltip window at the given position.
+static void gmouse_tooltip_show(const char* text, int mouseX, int mouseY)
+{
+    if (gmouse_tooltip_win != -1) {
+        win_delete(gmouse_tooltip_win);
+        gmouse_tooltip_win = -1;
+    }
+
+    int oldFont = text_curr();
+    text_font(101);
+
+    int textWidth = text_width(text);
+    int textHeight = text_height();
+
+    // Limit text width and calculate window dimensions
+    if (textWidth > GMOUSE_TOOLTIP_MAX_WIDTH) {
+        textWidth = GMOUSE_TOOLTIP_MAX_WIDTH;
+    }
+
+    int winWidth = textWidth + GMOUSE_TOOLTIP_PADDING * 2;
+    int winHeight = textHeight + GMOUSE_TOOLTIP_PADDING * 2;
+
+    // Position tooltip below and to the right of the cursor
+    int winX = mouseX - 16;
+    int winY = mouseY + 16;
+
+    // Keep tooltip on screen
+    if (winX + winWidth > scr_size.lrx) {
+        winX = mouseX - winWidth - 4;
+    }
+    if (winY + winHeight > scr_size.lry - 100) { // Account for interface bar
+        winY = mouseY - winHeight - 4;
+    }
+    if (winX < scr_size.ulx) {
+        winX = scr_size.ulx;
+    }
+    if (winY < scr_size.uly) {
+        winY = scr_size.uly;
+    }
+
+    gmouse_tooltip_win = win_add(winX, winY, winWidth, winHeight, colorTable[0], WINDOW_TRANSPARENT | WINDOW_MOVE_ON_TOP);
+    if (gmouse_tooltip_win != -1) {
+        unsigned char* buf = win_get_buf(gmouse_tooltip_win);
+        if (buf != NULL) {
+            // Fill background with a semi-dark color
+            buf_fill(buf, winWidth, winHeight, winWidth, colorTable[0]);
+
+            // Draw border
+            draw_box(buf, winWidth, 0, 0, winWidth - 1, winHeight - 1, colorTable[8947]);
+
+            // Draw text
+            text_to_buf(buf + GMOUSE_TOOLTIP_PADDING * winWidth + GMOUSE_TOOLTIP_PADDING,
+                text,
+                winWidth - GMOUSE_TOOLTIP_PADDING * 2,
+                winWidth,
+                colorTable[32747]);
+
+            win_draw(gmouse_tooltip_win);
+        }
+    }
+
+    text_font(oldFont);
+    gmouse_tooltip_visible = true;
+}
+
+// Hides and destroys the tooltip window.
+void gmouse_tooltip_hide()
+{
+    if (gmouse_tooltip_win != -1) {
+        win_delete(gmouse_tooltip_win);
+        gmouse_tooltip_win = -1;
+    }
+    gmouse_tooltip_visible = false;
+    gmouse_tooltip_object = NULL;
+}
+
+// Updates the tooltip based on the current hover state.
+// Should be called from gmouse_bk_process when hovering in ARROW mode.
+static void gmouse_tooltip_update(Object* target, int mouseX, int mouseY)
+{
+    if (!tweaks_object_tooltip()) {
+        if (gmouse_tooltip_visible) {
+            gmouse_tooltip_hide();
+        }
+        return;
+    }
+
+    if (target == NULL || !gmouse_tooltip_should_show(obj_dude, target)) {
+        if (gmouse_tooltip_visible) {
+            gmouse_tooltip_hide();
+        }
+        return;
+    }
+
+    // Only update if the target changed
+    if (target != gmouse_tooltip_object) {
+        gmouse_tooltip_object = target;
+        const char* name = object_name(target);
+        if (name != NULL && name[0] != '\0') {
+            gmouse_tooltip_show(name, mouseX, mouseY);
+        } else {
+            gmouse_tooltip_hide();
+        }
+    }
+}
+
 // 0x445FD0
 void gmouse_remove_item_outline(Object* object)
 {
@@ -2552,6 +2708,83 @@ void gameMouseRefreshImmediately()
 {
     gmouse_bk_process();
     renderPresent();
+}
+
+// Applies accessibility outlines to all interactable objects on current elevation.
+static void gmouse_accessibility_highlight_on()
+{
+    if (accessibility_highlight_active) {
+        return;
+    }
+
+    Object* obj = obj_find_first_at(map_elevation);
+    while (obj != NULL) {
+        int objType = PID_TYPE(obj->pid);
+
+        if (objType == OBJ_TYPE_CRITTER) {
+            // Living NPCs (not dead, not player)
+            if (obj != obj_dude && !critter_is_dead(obj)) {
+                obj_outline_object(obj, OUTLINE_TYPE_FRIENDLY, NULL);
+            }
+        } else if (objType == OBJ_TYPE_ITEM) {
+            // Ground items and containers
+            obj_outline_object(obj, OUTLINE_TYPE_ITEM, NULL);
+        } else if (objType == OBJ_TYPE_MISC) {
+            // Exit grids: PIDs 0x5000010 to 0x5000017
+            if (obj->pid >= 0x5000010 && obj->pid <= 0x5000017) {
+                obj_outline_object(obj, OUTLINE_TYPE_2, NULL);
+            }
+        } else if (objType == OBJ_TYPE_SCENERY) {
+            // Doors, stairs, ladders
+            Proto* proto;
+            if (proto_ptr(obj->pid, &proto) == 0) {
+                int sceneryType = proto->scenery.type;
+                if (sceneryType == SCENERY_TYPE_DOOR
+                    || sceneryType == SCENERY_TYPE_STAIRS
+                    || sceneryType == SCENERY_TYPE_LADDER_UP
+                    || sceneryType == SCENERY_TYPE_LADDER_DOWN) {
+                    obj_outline_object(obj, OUTLINE_TYPE_4, NULL);
+                }
+            }
+        }
+
+        obj = obj_find_next_at();
+    }
+
+    accessibility_highlight_active = true;
+    tile_refresh_display();
+}
+
+// Removes accessibility outlines from all objects on current elevation.
+static void gmouse_accessibility_highlight_off()
+{
+    if (!accessibility_highlight_active) {
+        return;
+    }
+
+    Object* obj = obj_find_first_at(map_elevation);
+    while (obj != NULL) {
+        obj_remove_outline(obj, NULL);
+        obj = obj_find_next_at();
+    }
+
+    accessibility_highlight_active = false;
+    tile_refresh_display();
+}
+
+// Checks if the accessibility highlight key is held and toggles highlights.
+void gmouse_accessibility_highlight_check()
+{
+    int highlightKey = tweaks_highlight_objects_key();
+    if (highlightKey <= 0 || highlightKey >= SDL_NUM_SCANCODES) {
+        return;
+    }
+
+    if (keys[highlightKey]) {
+        gmouse_accessibility_highlight_on();
+    } else {
+        gmouse_accessibility_highlight_off();
+    }
 }
 
 } // namespace fallout
