@@ -1,5 +1,4 @@
 #include "game/gmouse.h"
-
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
