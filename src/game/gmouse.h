@@ -112,6 +112,8 @@ int gmouse_3d_build_to_hit_frame(const char* string, int color);
 int gmouse_3d_build_hex_frame(const char* string, int color);
 void gmouse_3d_synch_item_highlight();
 void gmouse_remove_item_outline(Object* object);
+void gmouse_tooltip_hide();
+void gmouse_accessibility_highlight_check();
 
 void gameMouseRefreshImmediately();
 
