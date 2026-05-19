@@ -825,7 +825,7 @@ void gmouse_bk_process()
                     // Update tooltip for the hovered object
                     gmouse_tooltip_update(target, mouseX, mouseY);
                 } else {
-                     // No object under cursor, hide tooltip
+                    // No object under cursor, hide tooltip
                     gmouse_tooltip_update(NULL, mouseX, mouseY);
                 }
             } else if (gmouse_3d_current_mode == GAME_MOUSE_MODE_CROSSHAIR) {
