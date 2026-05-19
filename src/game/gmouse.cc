@@ -19,6 +19,7 @@
 #include "game/proto.h"
 #include "game/skilldex.h"
 #include "game/tile.h"
+#include "game/tweaks.h"
 #include "platform_compat.h"
 #include "plib/color/color.h"
 #include "plib/gnw/gnw.h"
@@ -805,10 +806,12 @@ void gmouse_bk_process()
 
     // Auto-switch between MOVE and ARROW modes based on what's under cursor
     if (!gmouse_mapper_mode) {
-        if (gmouse_3d_current_mode == GAME_MOUSE_MODE_MOVE || gmouse_3d_current_mode == GAME_MOUSE_MODE_ARROW) {
-            int autoMode = gmouse_3d_determine_auto_mode(mouseX, mouseY, map_elevation);
-            if (autoMode != gmouse_3d_current_mode) {
-                gmouse_3d_set_mode(autoMode);
+        if (tweaks_auto_mouse_mode()) {
+            if (gmouse_3d_current_mode == GAME_MOUSE_MODE_MOVE || gmouse_3d_current_mode == GAME_MOUSE_MODE_ARROW) {
+                int autoMode = gmouse_3d_determine_auto_mode(mouseX, mouseY, map_elevation);
+                if (autoMode != gmouse_3d_current_mode) {
+                    gmouse_3d_set_mode(autoMode);
+                }
             }
         }
         gmouse_3d_reset_fid();
@@ -1376,32 +1379,52 @@ void gmouse_3d_toggle_mode()
 {
     int mode;
 
-    // With auto-switching between MOVE and ARROW, right-click now toggles
-    // between the auto modes and CROSSHAIR (combat targeting)
-    if (gmouse_3d_current_mode == GAME_MOUSE_MODE_MOVE || gmouse_3d_current_mode == GAME_MOUSE_MODE_ARROW) {
-        // From auto mode: switch to CROSSHAIR in combat, otherwise no-op
+    if (tweaks_auto_mouse_mode()) {
+        // With auto-switching between MOVE and ARROW, right-click now toggles
+        // between the auto modes and CROSSHAIR (combat targeting)
+        if (gmouse_3d_current_mode == GAME_MOUSE_MODE_MOVE || gmouse_3d_current_mode == GAME_MOUSE_MODE_ARROW) {
+            // From auto mode: switch to CROSSHAIR in combat, otherwise no-op
+            if (isInCombat()) {
+                Object* item;
+                if (intface_get_current_item(&item) == 0) {
+                    // Only allow CROSSHAIR if holding a weapon
+                    if (item != NULL && item_get_type(item) != ITEM_TYPE_WEAPON) {
+                        return;
+                    }
+                }
+                mode = GAME_MOUSE_MODE_CROSSHAIR;
+            } else {
+                // Outside combat, no toggle needed (auto-switching handles MOVE/ARROW)
+                return;
+            }
+        } else if (gmouse_3d_current_mode == GAME_MOUSE_MODE_CROSSHAIR) {
+            // From CROSSHAIR: return to auto-determined mode
+            int mouseX;
+            int mouseY;
+            mouse_get_position(&mouseX, &mouseY);
+            mode = gmouse_3d_determine_auto_mode(mouseX, mouseY, map_elevation);
+        } else {
+            // From other modes (skill modes, USE_CROSSHAIR): return to MOVE
+            mode = GAME_MOUSE_MODE_MOVE;
+        }
+    } else {
+        // Original toggle behavior: cycle through MOVE -> ARROW -> CROSSHAIR
+        mode = (gmouse_3d_current_mode + 1) % 3;
+        
         if (isInCombat()) {
             Object* item;
             if (intface_get_current_item(&item) == 0) {
                 // Only allow CROSSHAIR if holding a weapon
-                if (item != NULL && item_get_type(item) != ITEM_TYPE_WEAPON) {
-                    return;
+                if (item != NULL && item_get_type(item) != ITEM_TYPE_WEAPON && mode == GAME_MOUSE_MODE_CROSSHAIR) {
+                    mode = GAME_MOUSE_MODE_MOVE;
                 }
             }
-            mode = GAME_MOUSE_MODE_CROSSHAIR;
         } else {
             // Outside combat, no toggle needed (auto-switching handles MOVE/ARROW)
-            return;
+            if (mode == GAME_MOUSE_MODE_CROSSHAIR) {
+                mode = GAME_MOUSE_MODE_MOVE;
+            }
         }
-    } else if (gmouse_3d_current_mode == GAME_MOUSE_MODE_CROSSHAIR) {
-        // From CROSSHAIR: return to auto-determined mode
-        int mouseX;
-        int mouseY;
-        mouse_get_position(&mouseX, &mouseY);
-        mode = gmouse_3d_determine_auto_mode(mouseX, mouseY, map_elevation);
-    } else {
-        // From other modes (skill modes, USE_CROSSHAIR): return to MOVE
-        mode = GAME_MOUSE_MODE_MOVE;
     }
 
     gmouse_3d_set_mode(mode);
