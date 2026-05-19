@@ -43,6 +43,7 @@
 #include "game/stat.h"
 #include "game/tile.h"
 #include "game/trait.h"
+#include "game/tweaks.h"
 #include "game/version.h"
 #include "game/worldmap.h"
 #include "int/movie.h"
@@ -187,6 +188,8 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
         config_exit(&resolutionConfig);
     }
 
+    tweaks_init();
+    
     initWindow(&video_options, flags);
     palette_init();
 
@@ -431,6 +434,7 @@ void game_exit()
     FMExit();
     windowClose();
     db_exit();
+    tweaks_exit();
     gconfig_exit(true);
 }
 
