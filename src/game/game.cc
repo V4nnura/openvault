@@ -189,7 +189,7 @@ int game_init(const char* windowTitle, bool isMapper, int font, int flags, int a
     }
 
     tweaks_init();
-    
+
     initWindow(&video_options, flags);
     palette_init();
 
