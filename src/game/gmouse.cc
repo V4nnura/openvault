@@ -3,7 +3,6 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
-
 #include "game/actions.h"
 #include "game/art.h"
 #include "game/combat.h"
