@@ -5,7 +5,6 @@
 #include <string.h>
 
 #include "game/actions.h"
-
 #include "game/art.h"
 #include "game/combat.h"
 #include "game/critter.h"
@@ -2477,20 +2476,21 @@ static int gmouse_check_scrolling(int x, int y, int cursor)
     }
 
     int flags = 0;
+    const int edge_margin = 8;
 
-    if (x <= scr_size.ulx) {
+    if (x <= scr_size.ulx + edge_margin) {
         flags |= SCROLLABLE_W;
     }
 
-    if (x >= scr_size.lrx) {
+    if (x >= scr_size.lrx - edge_margin) {
         flags |= SCROLLABLE_E;
     }
 
-    if (y <= scr_size.uly) {
+    if (y <= scr_size.uly + edge_margin) {
         flags |= SCROLLABLE_N;
     }
 
-    if (y >= scr_size.lry) {
+    if (y >= scr_size.lry - edge_margin) {
         flags |= SCROLLABLE_S;
     }
 
