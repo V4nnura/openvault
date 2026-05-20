@@ -1743,6 +1743,23 @@ void floor_draw(int fid, int x, int y, Rect* rect)
 
     if (v77 <= 0 || v76 <= 0) goto out;
 
+    // Collect pre-draw non-zero counts for tiles in the top area when patch logging is enabled.
+    if (savedY < top_h) {
+        tile_is_top = true;
+        for (int yy = y; yy < y + v76; yy++) {
+            if (yy < 0 || yy >= buf_length) {
+                continue;
+            }
+            unsigned char* row = buf + buf_full * yy;
+            for (int xx = x; xx < x + v77; xx++) {
+                if (xx < 0 || xx >= buf_width) {
+                    continue;
+                }
+                pre_non_zero += (row[xx] != 0);
+            }
+        }
+    }
+    
     tile = tile_num(savedX, savedY + 13, map_elevation);
     if (tile == -1) {
         floor_draw_tile_fail++;
