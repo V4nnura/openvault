@@ -711,9 +711,9 @@ int obj_save(DB_FILE* stream)
                     combatData = &(object->data.critter.combat);
                     whoHitMe = combatData->whoHitMe;
                     if (whoHitMe != nullptr) {
-                        whoHitMeCid (CombatData, whoHitMe->cid);
+                        whoHitMeCid (combatData, whoHitMe->cid);
                     } else {
-                        whoHitMeCid (CombatData, -1);
+                        whoHitMeCid (combatData, -1);
                     }
                 }
 
@@ -722,7 +722,7 @@ int obj_save(DB_FILE* stream)
                 }
 
                 if (PID_TYPE(object->pid) == OBJ_TYPE_CRITTER) {
-                    whoHitMe (combatData, whoHitMe);
+                    combatData->whoHitMe = whoHitMe;
                 }
 
                 Inventory* inventory = &(object->data.inventory);
