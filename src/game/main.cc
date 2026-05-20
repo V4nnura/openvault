@@ -12,6 +12,12 @@
 
 #include <limits.h>
 #include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+
+#if defined(__APPLE__)
+#include <TargetConditionals.h>
+#endif
 
 #include "game/amutex.h"
 #include "game/art.h"
@@ -34,9 +40,12 @@
 #include "game/scripts.h"
 #include "game/select.h"
 #include "game/selfrun.h"
+#include "game/tile.h"
 #include "game/wordwrap.h"
 #include "game/worldmap.h"
+#include "platform_compat.h"
 #include "plib/color/color.h"
+#include "plib/db/db.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
@@ -94,6 +103,37 @@ int gnw_main(int argc, char** argv)
 
     if (!main_init_system(argc, argv)) {
         return 1;
+    }
+
+     const char* autorun_map = getenv("F1R_AUTORUN_MAP");
+    if (autorun_map != NULL && autorun_map[0] != '\0' && autorun_map[0] != '0') {
+        const char* map_name = autorun_map;
+        if (strcmp(autorun_map, "1") == 0) {
+            map_name = mainMap;
+        }
+
+        char map_buf[COMPAT_MAX_PATH];
+        strncpy(map_buf, map_name, sizeof(map_buf) - 1);
+        map_buf[sizeof(map_buf) - 1] = '\0';
+
+        db_diag_reset_open_fail_count();
+        roll_set_seed(-1);
+
+        int load_rc = main_load_new(map_buf);
+        int open_failures = db_diag_open_fail_count();
+        if (open_failures != 0) {
+            debug_printf("\n[autorun] DB open failures during map load: %d\n", open_failures);
+        }
+
+        main_unload_new();
+        main_exit_system();
+        autorun_mutex_destroy();
+
+        if (open_failures != 0) {
+            return 2;
+        }
+
+        return load_rc == 0 ? 0 : 3;
     }
 
     gmovie_play(MOVIE_IPLOGO, GAME_MOVIE_FADE_IN);
@@ -253,6 +293,10 @@ static void main_exit_system()
 
     // TODO: Find a better place for this call.
     SDL_Quit();
+
+#if defined(__APPLE__) && TARGET_OS_IOS
+exit(EXIT_SUCCESS);
+#endif
 }
 
 // 0x472958
@@ -278,7 +322,14 @@ static int main_load_new(char* mapFileName)
     win_delete(win);
     loadColorTable("color.pal");
     palette_fade_to(cmap);
-    return 0;
+    tile_refresh_display();
+
+    const char* screenshot_env = getenv("F1R_AUTOSCREENSHOT");
+    if (screenshot_env != NULL && screenshot_env[0] != '\0' && screenshot_env[0] != '0') {
+        dump_screen();
+    }
+
+    return rc;
 }
 
 // 0x472A04
