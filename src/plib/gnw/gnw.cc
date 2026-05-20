@@ -909,7 +909,7 @@ void GNW_win_refresh(Window* w, Rect* rect, unsigned char* a3)
                             scr_blit(
                                 w->buffer + v20->rect.ulx - w->rect.ulx + (v20->rect.uly - w->rect.uly) * w->width,
                                 w->width,
-                                v20->rect.lry - v20->rect.lry + 1,
+                                v20->rect.lry - v20->rect.uly + 1,
                                 0,
                                 0,
                                 v20->rect.lrx - v20->rect.ulx + 1,
