@@ -20,6 +20,7 @@ extern int tile_center_tile;
 int tile_init(TileData** a1, int squareGridWidth, int squareGridHeight, int hexGridWidth, int hexGridHeight, unsigned char* buf, int windowWidth, int windowHeight, int windowPitch, TileWindowRefreshProc* windowRefreshProc);
 void tile_set_border(int windowWidth, int windowHeight, int hexGridWidth, int hexGridHeight);
 void tile_reset();
+void tile_log_stage_top_pixels_public(const char* stage);
 void tile_exit();
 void tile_disable_refresh();
 void tile_enable_refresh();
