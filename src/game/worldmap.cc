@@ -1292,18 +1292,20 @@ int world_map(WorldMapContext ctx)
 
             scroll_dx = 0;
             scroll_dy = 0;
-            if (abs_mouse_x == 0) {
+            const int edge_margin = 8;
+            int scroll_step = 16;
+            if (abs_mouse_x <= edge_margin) {
                 scroll_dx = -1;
                 autofollow = 0;
-            } else if (abs_mouse_x == screenGetWidth() - 1) {
+            } else if (abs_mouse_x >= screenGetWidth() - 1 - edge_margin) {
                 scroll_dx = 1;
                 autofollow = 0;
             }
 
-            if (abs_mouse_y == 0) {
+            if (abs_mouse_y <= edge_margin) {
                 scroll_dy = -1;
                 autofollow = 0;
-            } else if (abs_mouse_y == screenGetHeight() - 1) {
+            } else if (abs_mouse_y >= screenGetHeight() - 1 - edge_margin) {
                 scroll_dy = 1;
                 autofollow = 0;
             }
@@ -1312,12 +1314,12 @@ int world_map(WorldMapContext ctx)
             scroll_invalid_x = 0;
             scroll_invalid_y = 0;
 
-            candidate_viewport_x = viewport_x + 16 * scroll_dx;
+            candidate_viewport_x = viewport_x + scroll_step * scroll_dx;
             if (candidate_viewport_x < 0 || candidate_viewport_x > VIEWPORT_MAX_X) {
                 scroll_invalid_x = 1;
             }
 
-            candidate_viewport_y = viewport_y + 16 * scroll_dy;
+            candidate_viewport_y = viewport_y + scroll_step * scroll_dy;
             if (candidate_viewport_y < 0 || candidate_viewport_y > VIEWPORT_MAX_Y) {
                 scroll_invalid_y = 1;
             }
@@ -1402,8 +1404,8 @@ int world_map(WorldMapContext ctx)
             }
 
             if (scroll_dx != 0 || scroll_dy != 0) {
-                viewport_x += 16 * scroll_dx;
-                viewport_y += 16 * scroll_dy;
+                viewport_x += scroll_step * scroll_dx;
+                viewport_y += scroll_step * scroll_dy;
 
                 if (viewport_x < 0) {
                     viewport_x = 0;
@@ -3513,6 +3515,10 @@ static void HvrOffBtn(int btn, int input)
         if (brnpos[entrance].bid == btn) {
             break;
         }
+    }
+
+    if (entrance >= 7) {
+        return;
     }
 
     for (px = 0; px < 4100; px++) {
