@@ -295,7 +295,7 @@ static void main_exit_system()
     SDL_Quit();
 
 #if defined(__APPLE__) && TARGET_OS_IOS
-exit(EXIT_SUCCESS);
+    exit(EXIT_SUCCESS);
 #endif
 }
 
