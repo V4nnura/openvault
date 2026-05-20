@@ -1759,7 +1759,7 @@ void floor_draw(int fid, int x, int y, Rect* rect)
             }
         }
     }
-    
+
     tile = tile_num(savedX, savedY + 13, map_elevation);
     if (tile == -1) {
         floor_draw_tile_fail++;
@@ -1949,7 +1949,6 @@ out:
                 post_non_zero += (row[xx] != 0);
             }
         }
-        patchlog_write("TILE_DRAW", "tile=%d fid=%d savedX=%d savedY=%d x=%d y=%d pre=%ld post=%ld", tile, fid, savedX, savedY, x, y, pre_non_zero, post_non_zero);
     }
 
     art_ptr_unlock(cacheEntry);
