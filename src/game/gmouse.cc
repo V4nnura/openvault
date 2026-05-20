@@ -25,6 +25,7 @@
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
+#include "plib/gnw/kb.h"
 #include "plib/gnw/rect.h"
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
