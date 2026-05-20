@@ -105,7 +105,7 @@ int gnw_main(int argc, char** argv)
         return 1;
     }
 
-     const char* autorun_map = getenv("F1R_AUTORUN_MAP");
+    const char* autorun_map = getenv("F1R_AUTORUN_MAP");
     if (autorun_map != NULL && autorun_map[0] != '\0' && autorun_map[0] != '0') {
         const char* map_name = autorun_map;
         if (strcmp(autorun_map, "1") == 0) {
@@ -323,13 +323,11 @@ static int main_load_new(char* mapFileName)
     loadColorTable("color.pal");
     palette_fade_to(cmap);
     tile_refresh_display();
-
     const char* screenshot_env = getenv("F1R_AUTOSCREENSHOT");
     if (screenshot_env != NULL && screenshot_env[0] != '\0' && screenshot_env[0] != '0') {
         dump_screen();
     }
-
-    return rc;
+    return 0;
 }
 
 // 0x472A04
