@@ -316,7 +316,12 @@ static int main_load_new(char* mapFileName)
     map_init();
     gmouse_set_cursor(MOUSE_CURSOR_NONE);
     mouse_show();
-    map_load(mapFileName);
+    const char* autorun_env = getenv("F1R_AUTORUN_MAP");
+    if (autorun_env != NULL && autorun_env[0] != '\0' && autorun_env[0] != '0') {
+        // Count only map-load phase failures; game init often probes optional files.
+        db_diag_reset_open_fail_count();
+    }
+    int rc = map_load(mapFileName);
     PlayCityMapMusic();
     palette_fade_to(white_palette);
     win_delete(win);
@@ -327,7 +332,7 @@ static int main_load_new(char* mapFileName)
     if (screenshot_env != NULL && screenshot_env[0] != '\0' && screenshot_env[0] != '0') {
         dump_screen();
     }
-    return 0;
+    return rc;
 }
 
 // 0x472A04
