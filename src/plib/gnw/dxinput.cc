@@ -151,8 +151,12 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
+#if defined(__ANDROID__)
+    return SDL_SetRelativeMouseMode(SDL_TRUE) == 0;
+#else
     SDL_ShowCursor(SDL_DISABLE);
     return true;
+#endif
 }
 
 // 0x4E078C
