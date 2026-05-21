@@ -68,6 +68,18 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // handled by SDL yet.
     SDL_PumpEvents();
 
+#if defined(__ANDROID__)
+    Uint32 buttons = SDL_GetRelativeMouseState(&(mouseState->x), &(mouseState->y));
+    mouseState->buttons[0] = (buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
+    mouseState->buttons[1] = (buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
+    mouseState->wheelX = gMouseWheelDeltaX;
+    mouseState->wheelY = gMouseWheelDeltaY;
+
+    gMouseWheelDeltaX = 0;
+    gMouseWheelDeltaY = 0;
+
+    return true;
+#else
     // Get absolute window mouse position
     Uint32 buttons = SDL_GetMouseState(&(mouseState->x), &(mouseState->y));
 
@@ -108,6 +120,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     gMouseWheelDeltaY = 0;
 
     return true;
+#endif
 }
 
 // 0x4E05A8
