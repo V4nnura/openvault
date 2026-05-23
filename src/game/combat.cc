@@ -4416,7 +4416,6 @@ int combat_check_bad_shot(Object* attacker, Object* defender, int hitMode, bool 
 {
     Object* weapon;
     int attack_type;
-    int weapon_max_range;
 
     if ((defender->data.critter.combat.results & DAM_DEAD) != 0) {
         return COMBAT_BAD_SHOT_ALREADY_DEAD;
@@ -4440,13 +4439,7 @@ int combat_check_bad_shot(Object* attacker, Object* defender, int hitMode, bool 
         return COMBAT_BAD_SHOT_NOT_ENOUGH_AP;
     }
 
-    if (item_w_range(attacker, hitMode) > (stat_level(attacker, STAT_PERCEPTION) * 5)) {
-        weapon_max_range = stat_level(attacker, STAT_PERCEPTION) * 5;
-    } else {
-        weapon_max_range = item_w_range(attacker, hitMode);
-    }
-
-    if (weapon_max_range < obj_dist(attacker, defender)) {
+    if (item_w_range(attacker, hitMode) < obj_dist(attacker, defender)) {
         return COMBAT_BAD_SHOT_OUT_OF_RANGE;
     }
 
