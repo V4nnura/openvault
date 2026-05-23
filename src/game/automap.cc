@@ -197,6 +197,8 @@ int automap_save(DB_FILE* stream)
 // 0x41A80C
 void automap(bool isInGame, bool isUsingScanner)
 {
+    gmouse_tooltip_hide();
+
     // 0x41A738
     static const int frmIds[AUTOMAP_FRM_COUNT] = {
         171, // automap.frm - automap window
@@ -676,7 +678,8 @@ int automap_pip_save()
                 return -1;
             }
 
-            if (copy_file_data(stream1, stream2, automapDataSize - nextEntryOffset) == -1) {
+            int remainingDataSize = static_cast<int>(automapDataSize - nextEntryOffset);
+            if (copy_file_data(stream1, stream2, remainingDataSize) == -1) {
                 debug_printf("\nAUTOMAP: Error copying file data!\n");
                 db_fclose(stream1);
                 db_fclose(stream2);
