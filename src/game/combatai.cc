@@ -50,7 +50,7 @@ static void ai_run_away(Object* critter);
 static int compare_nearer(const void* critter_ptr1, const void* critter_ptr2);
 static void ai_sort_list(Object** critterList, int length, Object* origin);
 static Object* ai_find_nearest_team(Object* critter, Object* other, int flags);
-static int ai_find_attackers(Object* critter, Object** a2, Object** a3, Object** a4);
+static int ai_find_attackers(Object* critter, Object** whoHitMePtr, Object** whoHitFriendPtr, Object** whoHitByFriendPtr);
 static Object* ai_have_ammo(Object* critter, Object* weapon);
 static Object* ai_best_weapon(Object* weapon1, Object* weapon2);
 static bool ai_can_use_weapon(Object* critter, Object* weapon, int hitMode);
@@ -523,18 +523,18 @@ static Object* ai_find_nearest_team(Object* critter, Object* other, int flags)
 }
 
 // 0x424F58
-static int ai_find_attackers(Object* critter, Object** a2, Object** a3, Object** a4)
+static int ai_find_attackers(Object* critter, Object** whoHitMePtr, Object** whoHitFriendPtr, Object** whoHitByFriendPtr)
 {
-    if (a2 != NULL) {
-        *a2 = NULL;
+    if (whoHitMePtr != NULL) {
+        *whoHitMePtr = NULL;
     }
 
-    if (a3 != NULL) {
-        *a3 = NULL;
+    if (whoHitFriendPtr != NULL) {
+        *whoHitFriendPtr = NULL;
     }
 
-    if (a4 != NULL) {
-        *a4 = NULL;
+    if (*whoHitByFriendPtr != NULL) {
+        *whoHitByFriendPtr = NULL;
     }
 
     if (curr_crit_num == 0) {
@@ -550,15 +550,16 @@ static int ai_find_attackers(Object* critter, Object** a2, Object** a3, Object**
     for (int index = 0; foundTargetCount < 3 && index < curr_crit_num; index++) {
         Object* candidate = curr_crit_list[index];
         if (candidate != critter) {
-            if (a2 != NULL && *a2 == NULL) {
+            if (whoHitMePtr != NULL && *whoHitMePtr == NULL) {
                 if ((candidate->data.critter.combat.results & DAM_DEAD) == 0
                     && candidate->data.critter.combat.whoHitMe == critter) {
                     foundTargetCount++;
-                    *a2 = candidate;
+                    *whoHitMePtr = candidate;
+                    continue;
                 }
             }
 
-            if (a3 != NULL && *a3 == NULL) {
+            if (whoHitFriendPtr != NULL && *whoHitFriendPtr == NULL) {
                 if (team == candidate->data.critter.combat.team) {
                     Object* whoHitCandidate = candidate->data.critter.combat.whoHitMe;
                     if (whoHitCandidate != NULL
@@ -566,19 +567,21 @@ static int ai_find_attackers(Object* critter, Object** a2, Object** a3, Object**
                         && team != whoHitCandidate->data.critter.combat.team
                         && (whoHitCandidate->data.critter.combat.results & DAM_DEAD) == 0) {
                         foundTargetCount++;
-                        *a3 = whoHitCandidate;
+                        *whoHitFriendPtr = whoHitCandidate;
+                        continue;
                     }
                 }
             }
 
-            if (a4 != NULL && *a4 == NULL) {
+            if (whoHitByFriendPtr != NULL && *whoHitByFriendPtr == NULL) {
                 if (candidate->data.critter.combat.team != team
                     && (candidate->data.critter.combat.results & DAM_DEAD) == 0) {
                     Object* whoHitCandidate = candidate->data.critter.combat.whoHitMe;
                     if (whoHitCandidate != NULL
                         && whoHitCandidate->data.critter.combat.team == team) {
                         foundTargetCount++;
-                        *a4 = candidate;
+                        *whoHitByFriendPtr = candidate;
+                        continue;
                     }
                 }
             }
