@@ -617,7 +617,7 @@ Object* ai_danger_source(Object* a1)
     ai_sort_list(targets, 4, a1);
 
     for (index = 0; index < 4; index++) {
-        if (targets[index] != NULL && is_within_perception(critter, targets[index])) {
+        if (targets[index] != NULL && is_within_perception(a1, targets[index])) {
             return targets[index];
         }
     }
