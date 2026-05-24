@@ -589,7 +589,7 @@ static int ai_find_attackers(Object* critter, Object** a2, Object** a3, Object**
 }
 
 // 0x4250C8
-Object* ai_danger_source(Object* critter)
+Object* ai_danger_source(Object* a1)
 {
     if (a1 == NULL) {
         return NULL;
