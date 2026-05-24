@@ -594,12 +594,11 @@ Object* ai_danger_source(Object* a1)
     if (a1 == NULL) {
         return NULL;
     }
-    
-    Object* who_hit_me;
+
     Object* targets[4];
     int index;
 
-    who_hit_me = critter->data.critter.combat.whoHitMe;
+    Object* who_hit_me = a1->data.critter.combat.whoHitMe;
     if (who_hit_me == NULL || a1 == who_hit_me) {
         targets[0] = NULL;
     } else {
