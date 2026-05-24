@@ -607,12 +607,12 @@ Object* ai_danger_source(Object* a1)
     } else {
         if ((who_hit_me->data.critter.combat.results & DAM_DEAD) == 0) {
             return who_hit_me;
-        }
-
-        if (who_hit_me->data.critter.combat.team != a1->data.critter.combat.team) {
-            targets[0] = ai_find_nearest_team(a1, who_hit_me, 1);
         } else {
-            targets[0] = NULL;
+            if (who_hit_me->data.critter.combat.team != a1->data.critter.combat.team) {
+                targets[0] = ai_find_nearest_team(a1, who_hit_me, 1);
+            } else {
+                targets[0] = NULL;
+            }
         }
     }
 
