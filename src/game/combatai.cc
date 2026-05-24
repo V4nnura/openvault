@@ -622,7 +622,7 @@ Object* ai_danger_source(Object* critter)
 
     if (ignoreFleeingCritters) {
         for (int index = 0; index < 4; index++) {
-            if (targets[index] != NULL && critterIsFleeing(targets[index])) {
+            if (targets[index] != NULL) {
                 targets[index] = NULL;
             }
         }
@@ -631,7 +631,7 @@ Object* ai_danger_source(Object* critter)
     ai_sort_list(targets, 4, critter);
 
     for (index = 0; index < 4; index++) {
-        if (targets[index] != NULL && is_within_perception(a1, targets[index])) {
+        if (targets[index] != NULL && is_within_perception(critter, targets[index])) {
             return targets[index];
         }
     }
