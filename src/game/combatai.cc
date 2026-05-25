@@ -598,8 +598,6 @@ Object* ai_danger_source(Object* critter)
         return NULL;
     }
 
-    bool ignoreFleeingCritters = false;
-
     Object* targets[4];
     int index;
 
@@ -619,14 +617,6 @@ Object* ai_danger_source(Object* critter)
     }
 
     ai_find_attackers(critter, &(targets[1]), &(targets[2]), &(targets[3]));
-
-    if (ignoreFleeingCritters) {
-        for (int index = 0; index < 4; index++) {
-            if (targets[index] != NULL) {
-                targets[index] = NULL;
-            }
-        }
-    }
 
     ai_sort_list(targets, 4, critter);
 
