@@ -706,7 +706,7 @@ int obj_save(DB_FILE* stream)
                 }
 
                 CritterCombatData* combatData = NULL;
-                Object* whoHitMe = nullptr;
+                Object* whoHitMe = NULL;
                 if (PID_TYPE(object->pid) == OBJ_TYPE_CRITTER) {
                     combatData = &(object->data.critter.combat);
                     whoHitMe = combatData->whoHitMe;
