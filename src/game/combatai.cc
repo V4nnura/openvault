@@ -606,7 +606,7 @@ Object* ai_danger_source(Object* critter)
         targets[0] = NULL;
     } else {
         if ((whoHitMe->data.critter.combat.results & DAM_DEAD) == 0) {
-            return who_hit_me;
+            return whoHitMe;
         } else {
             if (whoHitMe->data.critter.combat.team != critter->data.critter.combat.team) {
                 targets[0] = ai_find_nearest_team(critter, whoHitMe, 1);
