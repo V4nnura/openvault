@@ -277,7 +277,6 @@ linux-arm:
           name: fallout-ce-linux-${{ matrix.arch }}
           path: build/fallout-ce-linux-${{ matrix.arch }}.tar.gz
           retention-days: 7
-
   macos:
     name: macOS
 
