@@ -601,15 +601,15 @@ Object* ai_danger_source(Object* critter)
     Object* targets[4];
     int index;
 
-    Object* who_hit_me = critter->data.critter.combat.whoHitMe;
-    if (who_hit_me == NULL || critter == who_hit_me) {
+    Object* whoHitMe = critter->data.critter.combat.whoHitMe;
+    if (whoHitMe == NULL || critter == whoHitMe) {
         targets[0] = NULL;
     } else {
-        if ((who_hit_me->data.critter.combat.results & DAM_DEAD) == 0) {
+        if ((whoHitMe->data.critter.combat.results & DAM_DEAD) == 0) {
             return who_hit_me;
         } else {
-            if (who_hit_me->data.critter.combat.team != critter->data.critter.combat.team) {
-                targets[0] = ai_find_nearest_team(critter, who_hit_me, 1);
+            if (whoHitMe->data.critter.combat.team != critter->data.critter.combat.team) {
+                targets[0] = ai_find_nearest_team(critter, whoHitMe, 1);
             } else {
                 targets[0] = NULL;
             }
