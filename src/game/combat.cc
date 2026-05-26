@@ -3664,21 +3664,6 @@ void combat_display(Attack* attack)
 {
     MessageListItem messageListItem;
 
-    if (attack->attacker == obj_dude) {
-        Object* weapon = item_hit_with(attack->attacker, attack->hitMode);
-        int strengthRequired = item_w_min_st(weapon);
-
-        if (weapon != NULL) {
-            if (strengthRequired > stat_level(obj_dude, STAT_STRENGTH)) {
-                // You are not strong enough to use this weapon properly.
-                messageListItem.num = 107;
-                if (message_search(&combat_message_file, &messageListItem)) {
-                    display_print(messageListItem.text);
-                }
-            }
-        }
-    }
-
     Object* mainCritter;
     if ((attack->attackerFlags & DAM_HIT) != 0) {
         mainCritter = attack->defender;
@@ -4417,12 +4402,18 @@ int combat_check_bad_shot(Object* attacker, Object* defender, int hitMode, bool 
     Object* weapon;
     int attack_type;
     int weapon_max_range;
+    weapon = item_hit_with(attacker, hitMode);
 
     if ((defender->data.critter.combat.results & DAM_DEAD) != 0) {
         return COMBAT_BAD_SHOT_ALREADY_DEAD;
     }
 
-    weapon = item_hit_with(attacker, hitMode);
+    if (weapon != NULL) {
+        if (item_w_min_st(weapon) > stat_level(obj_dude, STAT_STRENGTH)) {
+            return COMBAT_BAD_SHOT_NOT_ENOUGH_STRENGTH;
+        }
+    }
+
     if (weapon != NULL) {
         if ((attacker->data.critter.combat.results & DAM_CRIP_ARM_LEFT) != 0
             && (attacker->data.critter.combat.results & DAM_CRIP_ARM_RIGHT) != 0) {
@@ -4550,6 +4541,12 @@ void combat_attack_this(Object* a1)
         return;
     case COMBAT_BAD_SHOT_BOTH_ARMS_CRIPPLED:
         messageListItem.num = 105; // You cannot use weapons with both arms crippled.
+        if (message_search(&combat_message_file, &messageListItem)) {
+            display_print(messageListItem.text);
+        }
+        return;
+    case COMBAT_BAD_SHOT_NOT_ENOUGH_STRENGTH:
+        messageListItem.num = 107; // you are not strong enough to use this weapon properly
         if (message_search(&combat_message_file, &messageListItem)) {
             display_print(messageListItem.text);
         }
