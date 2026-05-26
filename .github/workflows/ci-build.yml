@@ -376,7 +376,7 @@ jobs:
   release:
     name: Experimental build
     runs-on: ubuntu-latest
-    needs: [android, ios, linux, macos, windows]
+    needs: [android, ios, linux, linux-arm, macos, windows]
     permissions: write-all
     steps:
       - name: Search artifacts
