@@ -153,6 +153,7 @@ typedef enum CombatBadShot {
     COMBAT_BAD_SHOT_AIM_BLOCKED = 5,
     COMBAT_BAD_SHOT_ARM_CRIPPLED = 6,
     COMBAT_BAD_SHOT_BOTH_ARMS_CRIPPLED = 7,
+    COMBAT_BAD_SHOT_NOT_ENOUGH_STRENGTH = 8,
 } CombatBadShot;
 
 } // namespace fallout
