@@ -1499,9 +1499,9 @@ bool obj_get_player_roof_info(int* outRoofX, int* outRoofY, int* outElev)
     if (obj_last_is_empty) {
         return false;
     }
-    if (outRoofX != nullptr) *outRoofX = obj_last_roof_x;
-    if (outRoofY != nullptr) *outRoofY = obj_last_roof_y;
-    if (outElev != nullptr) *outElev = obj_last_elev;
+    if (outRoofX != NULL) *outRoofX = obj_last_roof_x;
+    if (outRoofY != NULL) *outRoofY = obj_last_roof_y;
+    if (outElev != NULL) *outElev = obj_last_elev;
     return true;
 }
 
