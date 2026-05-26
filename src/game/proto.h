@@ -145,7 +145,6 @@ void proto_remove_all();
 int proto_ptr(int pid, Proto** out_proto);
 int proto_undo_new_id(int type);
 int proto_max_id(int a1);
-int protoGetProto(int pid, Proto** protoPtr);
 int ResetPlayer();
 
 } // namespace fallout
