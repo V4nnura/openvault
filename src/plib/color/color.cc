@@ -33,6 +33,8 @@ static char _aColor_cColorTa[] = "color.c: color table not found\n";
 // 0x4FE130
 static char _aColor_cColorpa[] = "color.c: colorpalettestack overflow";
 
+static char _aColor_cOutOfMemory[] = "color.c: out of memory\n";
+
 // 0x4FE158
 static char aColor_cColor_0[] = "color.c: colorpalettestack underflow";
 
@@ -701,6 +703,10 @@ bool colorPushColorPalette()
     }
 
     ColorPaletteStackEntry* entry = (ColorPaletteStackEntry*)malloc(sizeof(*entry));
+    if (entry == NULL) {
+        errorStr = _aColor_cOutOfMemory;
+        return false;
+    }
     colorPaletteStack[tos] = entry;
 
     memcpy(entry->mappedColors, mappedColor, sizeof(mappedColor));
