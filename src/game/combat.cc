@@ -4404,15 +4404,15 @@ int combat_check_bad_shot(Object* attacker, Object* defender, int hitMode, bool 
     int weapon_max_range;
     weapon = item_hit_with(attacker, hitMode);
 
-    if (attacker == obj_dude) {
-        if ((defender->data.critter.combat.results & DAM_DEAD) != 0) {
-            return COMBAT_BAD_SHOT_ALREADY_DEAD;
-        }
+    if ((defender->data.critter.combat.results & DAM_DEAD) != 0) {
+        return COMBAT_BAD_SHOT_ALREADY_DEAD;
     }
 
-    if (weapon != NULL) {
-        if (item_w_min_st(weapon) > stat_level(obj_dude, STAT_STRENGTH)) {
-            return COMBAT_BAD_SHOT_NOT_ENOUGH_STRENGTH;
+    if (attacker == obj_dude) {
+        if (weapon != NULL) {
+            if (item_w_min_st(weapon) > stat_level(obj_dude, STAT_STRENGTH)) {
+                return COMBAT_BAD_SHOT_NOT_ENOUGH_STRENGTH;
+            }
         }
     }
 
