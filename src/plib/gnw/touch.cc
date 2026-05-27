@@ -293,6 +293,7 @@ void touch_reset()
 {
     for (int index = 0; index < MAX_TOUCHES; index++) {
         touches[index].used = false;
+        touches[index].touchId = 0;
         touches[index].fingerId = 0;
         touches[index].startTimestamp = 0;
         touches[index].currentTimestamp = 0;
