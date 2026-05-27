@@ -2777,7 +2777,7 @@ void executeProcedure(Program* program, int procedureIndex)
     int externalProcedureArgumentCount;
     int procedureFlags;
     char err[256];
-    jmp_buf env;
+    jmp_buf env = {};
 
     procedurePtr = program->procedures + 4 + sizeof(Procedure) * procedureIndex;
     procedureFlags = fetchLong(procedurePtr, 4);
@@ -2789,7 +2789,7 @@ void executeProcedure(Program* program, int procedureIndex)
             if (externalProcedureArgumentCount == 0) {
                 // NOTE: Uninline.
                 setupExternalCall(program, externalProgram, externalProcedureAddress, 32);
-                memcpy(env, program->env, sizeof(env));
+                memcpy(env, externalProgram->env, sizeof(env));
                 interpret(externalProgram, -1);
                 memcpy(externalProgram->env, env, sizeof(env));
             } else {
@@ -2823,7 +2823,7 @@ static void doEvents()
     int oldProgramFlags;
     int oldInstructionPointer;
     int data;
-    jmp_buf env;
+    jmp_buf env = {};
 
     if (suspendEvents) {
         return;
@@ -2839,7 +2839,7 @@ static void doEvents()
         for (procedureIndex = 0; procedureIndex < procedureCount; procedureIndex++) {
             procedureFlags = fetchLong(procedurePtr, 4);
             if ((procedureFlags & PROCEDURE_FLAG_CONDITIONAL) != 0) {
-                memcpy(env, programListNode->program, sizeof(env));
+                memcpy(env, programListNode->program->env, sizeof(env));
                 oldProgramFlags = programListNode->program->flags;
                 oldInstructionPointer = programListNode->program->instructionPointer;
 
@@ -2860,7 +2860,7 @@ static void doEvents()
                     }
                 }
 
-                memcpy(programListNode->program, env, sizeof(env));
+                memcpy(programListNode->program->env, env, sizeof(env));
             } else if ((procedureFlags & PROCEDURE_FLAG_TIMED) != 0) {
                 if ((unsigned int)fetchLong(procedurePtr, 8) < time) {
                     // NOTE: Uninline.
