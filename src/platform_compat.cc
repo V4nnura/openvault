@@ -17,12 +17,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef _WIN32
-#include <timeapi.h>
-#else
-#include <chrono>
-#endif
-
 #include <SDL.h>
 
 namespace fallout {
