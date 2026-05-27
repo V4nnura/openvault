@@ -24,6 +24,7 @@ struct TouchLocation {
 
 struct Touch {
     bool used;
+    SDL_TouchID touchId;
     SDL_FingerID fingerId;
     TouchLocation startLocation;
     Uint32 startTimestamp;
@@ -36,10 +37,10 @@ static Touch touches[MAX_TOUCHES];
 static Gesture currentGesture;
 static std::stack<Gesture> gestureEventsQueue;
 
-static int find_touch(SDL_FingerID fingerId)
+static int find_touch(SDL_TouchID touchId, SDL_FingerID fingerId)
 {
     for (int index = 0; index < MAX_TOUCHES; index++) {
-        if (touches[index].fingerId == fingerId) {
+        if (touches[index].touchId == touchId && touches[index].fingerId == fingerId) {
             return index;
         }
     }
@@ -89,7 +90,7 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
     // On iOS `fingerId` is an address of underlying `UITouch` object. When
     // `touchesBegan` is called this object might be reused, but with
     // incresed `tapCount` (which is ignored in this implementation).
-    int index = find_touch(event->fingerId);
+    int index = find_touch(event->touchId, event->fingerId);
     if (index == -1) {
         index = find_unused_touch_index();
     }
@@ -97,6 +98,7 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
     if (index != -1) {
         Touch* touch = &(touches[index]);
         touch->used = true;
+        touch->touchId = event->touchId;
         touch->fingerId = event->fingerId;
         touch->startTimestamp = event->timestamp;
         touch->startLocation.x = static_cast<int>(event->x * screenGetWidth());
@@ -109,7 +111,7 @@ void touch_handle_start(SDL_TouchFingerEvent* event)
 
 void touch_handle_move(SDL_TouchFingerEvent* event)
 {
-    int index = find_touch(event->fingerId);
+    int index = find_touch(event->touchId, event->fingerId);
     if (index != -1) {
         Touch* touch = &(touches[index]);
         touch->currentTimestamp = event->timestamp;
@@ -121,7 +123,7 @@ void touch_handle_move(SDL_TouchFingerEvent* event)
 
 void touch_handle_end(SDL_TouchFingerEvent* event)
 {
-    int index = find_touch(event->fingerId);
+    int index = find_touch(event->touchId, event->fingerId);
     if (index != -1) {
         Touch* touch = &(touches[index]);
         touch->currentTimestamp = event->timestamp;
