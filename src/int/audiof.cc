@@ -119,6 +119,10 @@ int audiofOpen(const char* fname, int flags)
     if (compression == 2) {
         audioFile->flags |= AUDIO_FILE_COMPRESSED;
         audioFile->audioDecoder = Create_AudioDecoder(decodeRead, audioFile->stream, &(audioFile->channels), &(audioFile->sampleRate), &(audioFile->fileSize));
+        if (audioFile->audioDecoder == NULL) {
+            fclose(stream);
+            return -1;
+        }
         audioFile->fileSize *= 2;
     } else {
         audioFile->fileSize = getFileSize(stream);
@@ -177,22 +181,45 @@ long audiofSeek(int fileHandle, long offset, int origin)
         a4 = offset;
         break;
     case SEEK_CUR:
-        a4 = audioFile->fileSize + offset;
+        a4 = offset + audioFile->position;
         break;
     case SEEK_END:
-        a4 = audioFile->position + offset;
+        a4 = offset + audioFile->fileSize;
         break;
     default:
         assert(false && "Should be unreachable");
+    }
+
+        if (a4 < 0) {
+        a4 = 0;
+    }
+    if (a4 > audioFile->fileSize) {
+        a4 = audioFile->fileSize;
     }
 
     if ((audioFile->flags & AUDIO_FILE_COMPRESSED) != 0) {
         if (a4 <= audioFile->position) {
             AudioDecoder_Close(audioFile->audioDecoder);
             fseek(audioFile->stream, 0, SEEK_SET);
+            clearerr(audioFile->stream);
             audioFile->audioDecoder = Create_AudioDecoder(decodeRead, audioFile->stream, &(audioFile->channels), &(audioFile->sampleRate), &(audioFile->fileSize));
+
+            // If decoder creation failed, disable compression and fall back to uncompressed seeking
+            if (audioFile->audioDecoder == NULL) {
+                audioFile->flags &= ~AUDIO_FILE_COMPRESSED;
+                audioFile->fileSize = getFileSize(audioFile->stream);
+                audioFile->position = 0;
+                return fseek(audioFile->stream, a4, SEEK_SET);
+            }
+
             audioFile->fileSize *= 2;
             audioFile->position = 0;
+
+            // After reinitializing decoder, just return position 0
+            // Don't try to skip ahead - let normal reads handle it
+            if (a4 == 0) {
+                return audioFile->position;
+            }
 
             if (a4) {
                 buf = mymalloc(4096, __FILE__, __LINE__); // "..\int\audiof.c", 363
@@ -207,7 +234,7 @@ long audiofSeek(int fileHandle, long offset, int origin)
             }
         } else {
             buf = mymalloc(0x400, __FILE__, __LINE__); // "..\int\audiof.c", 315
-            remaining = audioFile->position - a4;
+            remaining = a4 - audioFile->position;
             while (remaining > 1024) {
                 audiofRead(fileHandle, buf, 1024);
                 remaining -= 1024;
@@ -215,7 +242,7 @@ long audiofSeek(int fileHandle, long offset, int origin)
             if (remaining != 0) {
                 audiofRead(fileHandle, buf, remaining);
             }
-            // TODO: Obiously leaks memory.
+            myfree(buf, __FILE__, __LINE__);
         }
         return audioFile->position;
     }
