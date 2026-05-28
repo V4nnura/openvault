@@ -249,6 +249,8 @@ static bool createRenderer(int width, int height)
         return false;
     }
 
+    // Set render scale quality to nearest (fastest for pixel art)
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
     gSdlTexture = SDL_CreateTexture(gSdlRenderer, SDL_PIXELFORMAT_RGB888, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (gSdlTexture == NULL) {
         return false;
@@ -293,6 +295,7 @@ void handleWindowSizeChanged()
 
 void renderPresent()
 {
+    // Standard SDL rendering
     SDL_UpdateTexture(gSdlTexture, NULL, gSdlTextureSurface->pixels, gSdlTextureSurface->pitch);
     SDL_RenderClear(gSdlRenderer);
     SDL_RenderCopy(gSdlRenderer, gSdlTexture, NULL, NULL);
