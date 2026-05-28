@@ -341,8 +341,10 @@ int assoc_copy(assoc_array* dst, assoc_array* src)
 // 0x4DA090
 static int assoc_read_long(FILE* fp, long* theLong)
 {
-    int c;    // Temporary variable to store each byte read from the file.
-    int temp;    // Temporary variable to construct the 4-byte integer.
+    // Temporary variable to store each byte read from the file.
+    int c;
+    // Temporary variable to construct the 4-byte integer.
+    int temp;
 
     // Read the first byte and store it in temp.
     c = fgetc(fp);
