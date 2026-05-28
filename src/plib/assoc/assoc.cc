@@ -328,20 +328,33 @@ int assoc_copy(assoc_array* dst, assoc_array* src)
 }
 
 // NOTE: Unused.
+// Reads a 4-byte integer (long) from the given file pointer in big-endian order.
+//
+// Parameters:
+// - fp: Pointer to the file to read from.
+// - theLong: Pointer to a long variable where the read value will be stored.
+//
+// Returns:
+// - 0 on success.
+// - -1 if an error occurs (e.g., end of file is reached before reading 4 bytes).
 //
 // 0x4DA090
 static int assoc_read_long(FILE* fp, long* theLong)
 {
-    int c;
-    int temp;
+    int c;    // Temporary variable to store each byte read from the file.
+    int temp;    // Temporary variable to construct the 4-byte integer.
 
+    // Read the first byte and store it in temp.
     c = fgetc(fp);
     if (c == -1) {
+        // Check for end of file or error.
         return -1;
     }
 
+    // Mask to ensure only the lower 8 bits are used.
     temp = (c & 0xFF);
 
+    // Read the second byte and shift the previous value left by 8 bits.
     c = fgetc(fp);
     if (c == -1) {
         return -1;
@@ -349,6 +362,7 @@ static int assoc_read_long(FILE* fp, long* theLong)
 
     temp = (temp << 8) | (c & 0xFF);
 
+    // Read the third byte and shift the previous value left by 8 bits.
     c = fgetc(fp);
     if (c == -1) {
         return -1;
@@ -356,6 +370,7 @@ static int assoc_read_long(FILE* fp, long* theLong)
 
     temp = (temp << 8) | (c & 0xFF);
 
+    // Read the fourth byte and shift the previous value left by 8 bits.
     c = fgetc(fp);
     if (c == -1) {
         return -1;
@@ -363,8 +378,10 @@ static int assoc_read_long(FILE* fp, long* theLong)
 
     temp = (temp << 8) | (c & 0xFF);
 
+    // Store the constructed 4-byte integer in the provided pointer.
     *theLong = temp;
 
+    // Indicate success.
     return 0;
 }
 
