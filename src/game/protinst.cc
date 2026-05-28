@@ -90,7 +90,7 @@ int obj_new_sid(Object* object, int* sidPtr)
     script->scr_script_idx = sid & 0xFFFFFF;
 
     if (objectType == OBJ_TYPE_CRITTER) {
-        object->field_80 = script->scr_script_idx;
+        object->scriptIndex = script->scr_script_idx;
     }
 
     if (scriptType == SCRIPT_TYPE_SPATIAL) {
@@ -143,7 +143,7 @@ int obj_new_sid_inst(Object* obj, int scriptType, int a3)
     scr_find_str_run_info(a3 & 0xFFFFFF, &(script->run_info_flags), sid);
 
     if (PID_TYPE(obj->pid) == OBJ_TYPE_CRITTER) {
-        obj->field_80 = script->scr_script_idx;
+        obj->scriptIndex = script->scr_script_idx;
     }
 
     return 0;
