@@ -712,7 +712,7 @@ int obj_save(DB_FILE* stream)
                     whoHitMe = combatData->whoHitMe;
                     if (whoHitMe != 0) {
                         if (combatData->whoHitMeCid != -1) {
-                            combatData->whoHitMeCid = whoHitMe->cid;
+                            whoHitMeCid(object->data.critter.combat, whoHitMe->cid);
                         }
                     } else {
                         combatData->whoHitMeCid = -1;
