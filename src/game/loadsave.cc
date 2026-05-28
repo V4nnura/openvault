@@ -188,6 +188,8 @@ static char* patches = NULL;
 // 0x505974
 static char emgpath[] = "\\FALLOUT\\CD\\DATA\\SAVEGAME";
 
+static long gvar_offset_correction = 0;
+
 // 0x505990
 static SaveGameHandler* master_save_list[LOAD_SAVE_HANDLER_COUNT] = {
     DummyFunc,
@@ -1594,6 +1596,8 @@ int isLoadingGame()
 // 0x46FCCC
 static int LoadSlot(int slot)
 {
+    gvar_offset_correction = 0;
+
     gmouse_set_cursor(MOUSE_CURSOR_WAIT_PLANET);
 
     if (isInCombat()) {
@@ -2403,11 +2407,113 @@ static int GameMap2Slot(DB_FILE* stream)
     return 0;
 }
 
+static bool isSavFileName(const char* fileName, int nameLen)
+{
+    if (nameLen < 5) {
+        return false;
+    }
+
+    const char* ext = fileName + nameLen - 4;
+    return ext[0] == '.'
+        && (ext[1] == 'S' || ext[1] == 's')
+        && (ext[2] == 'A' || ext[2] == 'a')
+        && (ext[3] == 'V' || ext[3] == 'v');
+}
+
+static int checkFileListPosition(DB_FILE* stream, long pos)
+{
+    db_fseek(stream, pos, SEEK_SET);
+
+    int count;
+    if (db_freadInt(stream, &count) == -1) {
+        return -1;
+    }
+
+    // Valid count should be 1-100 map files
+    if (count < 1 || count > 100) {
+        return -1;
+    }
+
+    // Validate all file names from list. SlotMap2Game/mygets treats names as
+    // short null-terminated strings with a max stored length of 15 bytes.
+    for (int index = 0; index < count; index++) {
+        char testName[16];
+        int nameLen = -1;
+
+        for (int i = 0; i < 15; i++) {
+            unsigned char c;
+            if (db_freadByte(stream, &c) == -1) {
+                return -1;
+            }
+
+            testName[i] = (char)c;
+            if (c == 0) {
+                nameLen = i;
+                break;
+            }
+        }
+
+        if (nameLen == -1) {
+            return -1;
+        }
+
+        if (!isSavFileName(testName, nameLen)) {
+            return -1;
+        }
+    }
+
+    return count;
+}
+
 // 0x4717E0
 static int SlotMap2Game(DB_FILE* stream)
 {
+    long startPos = db_ftell(stream);
     int fileNameListLength;
     if (db_freadInt(stream, &fileNameListLength) == -1) {
+        return -1;
+    }
+
+    long foundPos = -1;
+
+    if (checkFileListPosition(stream, startPos) > 0) {
+        foundPos = startPos;
+    } else {
+        // Backward scan recovers the N < M case (scr_game_load over-read into
+        // the file list section); forward scan recovers the N > M case
+        // (scr_game_load under-read, file list lies ahead of startPos).
+        long maxScanOffset = 32768;
+        long maxBackward = std::min<long>(startPos, maxScanOffset);
+        for (long offset = 4; offset <= maxBackward; offset += 4) {
+            long testPos = startPos - offset;
+            if (testPos < 0) break;
+
+            int result = checkFileListPosition(stream, testPos);
+            if (result > 0) {
+                foundPos = testPos;
+                break;
+            }
+        }
+
+        if (foundPos < 0) {
+            for (long offset = 4; offset <= maxScanOffset; offset += 4) {
+                long testPos = startPos + offset;
+                int result = checkFileListPosition(stream, testPos);
+                if (result > 0) {
+                    foundPos = testPos;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (foundPos >= 0) {
+        gvar_offset_correction = startPos - foundPos;
+        db_fseek(stream, foundPos, SEEK_SET);
+        if (db_freadInt(stream, &fileNameListLength) == -1) {
+            return -1;
+        }
+    } else {
         return -1;
     }
 
@@ -2449,6 +2555,8 @@ static int SlotMap2Game(DB_FILE* stream)
     if (db_freadInt(stream, &saved_automap_size) == -1) {
         return -1;
     }
+
+    snprintf(str1, sizeof(str1), "%s\\%s", "MAPS", "AUTOMAP.DB");
 
     DB_FILE* automap_stream = db_fopen(str1, "rb");
     if (automap_stream == NULL) {
@@ -2815,6 +2923,11 @@ static int EraseSave()
     compat_remove(str0);
 
     return 0;
+}
+
+long getGvarOffsetCorrection()
+{
+    return gvar_offset_correction;
 }
 
 } // namespace fallout
