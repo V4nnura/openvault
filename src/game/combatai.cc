@@ -601,7 +601,7 @@ Object* ai_danger_source(Object* critter)
     Object* targets[4];
     int index;
 
-    Object* who_hit_me = critter_set_who_hit_me(critter);
+    Object* who_hit_me = critter_set_who_hit_me;
     if (who_hit_me == NULL || critter == who_hit_me) {
         targets[0] = NULL;
     } else {
