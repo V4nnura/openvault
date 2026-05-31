@@ -131,7 +131,7 @@ void audioEngineExit()
     if (SDL_WasInit(SDL_INIT_AUDIO)) {
         SDL_QuitSubSystem(SDL_INIT_AUDIO);
     }
-    
+
     for (int index = 0; index < AUDIO_ENGINE_SOUND_BUFFERS; index++) {
         AudioEngineSoundBuffer* soundBuffer = &(gAudioEngineSoundBuffers[index]);
         SDL_DestroyMutex(soundBuffer->mutex);
