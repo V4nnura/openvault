@@ -620,9 +620,14 @@ Object* ai_danger_source(Object* critter)
 
     ai_sort_list(targets, 4, critter);
 
-    for (index = 0; index < 4; index++) {
-        if (targets[index] != NULL && is_within_perception(critter, targets[index])) {
-            return targets[index];
+    for (int index = 0; index < 4; index++) {
+        Object* candidate = targets[index];
+        if (candidate != NULL && is_within_perception(critter, candidate)) {
+            if (make_path_func(critter, critter->tile, candidate->tile, NULL, 0, obj_blocking_at) != 0
+                || combat_check_bad_shot(critter, candidate, HIT_MODE_RIGHT_WEAPON_PRIMARY, false) == COMBAT_BAD_SHOT_OK) {
+                return candidate;
+            }
+            debugPrint("\nai_danger_source: I couldn't get at my target!  Picking alternate!");
         }
     }
 
