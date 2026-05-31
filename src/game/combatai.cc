@@ -627,7 +627,7 @@ Object* ai_danger_source(Object* critter)
                 || combat_check_bad_shot(critter, candidate, HIT_MODE_RIGHT_WEAPON_PRIMARY, false) == COMBAT_BAD_SHOT_OK) {
                 return candidate;
             }
-            debugPrint("\nai_danger_source: I couldn't get at my target!  Picking alternate!");
+            debug_printf("\nai_danger_source: I couldn't get at my target!  Picking alternate!");
         }
     }
 
