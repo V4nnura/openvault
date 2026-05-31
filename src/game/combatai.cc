@@ -592,24 +592,24 @@ static int ai_find_attackers(Object* critter, Object** whoHitMePtr, Object** who
 }
 
 // 0x4250C8
-Object* ai_danger_source(Object* critter)
+Object* ai_danger_source(Object* a1)
 {
-    if (critter == NULL) {
+    if (a1 == NULL) {
         return NULL;
     }
 
     Object* targets[4];
     int index;
 
-    Object* who_hit_me = critter_set_who_hit_me;
-    if (who_hit_me == NULL || critter == who_hit_me) {
+    Object* who_hit_me = critter_set_who_hit_me(a1);
+    if (who_hit_me == NULL || a1 == who_hit_me) {
         targets[0] = NULL;
     } else {
         if ((who_hit_me->data.critter.combat.results & DAM_DEAD) == 0) {
             return who_hit_me;
         } else {
-            if (who_hit_me->data.critter.combat.team != critter->data.critter.combat.team) {
-                targets[0] = ai_find_nearest_team(critter, who_hit_me, 1);
+            if (who_hit_me->data.critter.combat.team != a1->data.critter.combat.team) {
+                targets[0] = ai_find_nearest_team(a1, who_hit_me, 1);
             } else {
                 targets[0] = NULL;
             }
@@ -621,7 +621,7 @@ Object* ai_danger_source(Object* critter)
     ai_sort_list(targets, 4, critter);
 
     for (index = 0; index < 4; index++) {
-        if (targets[index] != NULL && is_within_perception(critter, targets[index])) {
+        if (targets[index] != NULL && is_within_perception(a1, targets[index])) {
             return targets[index];
         }
     }
