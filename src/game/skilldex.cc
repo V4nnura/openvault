@@ -116,6 +116,8 @@ static int fontsave;
 // 0x499560
 int skilldex_select()
 {
+    gmouse_tooltip_hide();
+
     if (skilldex_start() == -1) {
         debug_printf("\n ** Error loading skilldex dialog data! **\n");
         return -1;
