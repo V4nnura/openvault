@@ -531,6 +531,8 @@ static unsigned char stat_flag;
 // 0x486A80
 int pipboy(int intent)
 {
+    gmouse_tooltip_hide();
+
     intent = StartPipboy(intent);
     if (intent == -1) {
         return -1;
