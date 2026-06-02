@@ -605,6 +605,8 @@ void handle_inventory()
 // 0x462818
 bool setup_inventory(int inventoryWindowType)
 {
+    gmouse_tooltip_hide();
+
     dropped_explosive = 0;
     curr_stack = 0;
     stack_offset[0] = 0;
