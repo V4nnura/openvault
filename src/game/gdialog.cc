@@ -594,6 +594,8 @@ bool dialog_active()
 // 0x43DE28
 void gdialog_enter(Object* target, int a2)
 {
+    gmouse_tooltip_hide();
+
     gdDialogWentOff = false;
 
     if (isInCombat()) {
