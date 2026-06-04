@@ -59,9 +59,8 @@ static bool main_menu_created = false;
 // 0x505AA0
 static unsigned int main_menu_timeout = 120000;
 
-
 // 0x505AA4 button_values / // 0x505AB8 return_values
-static int button_values return_values[MAIN_MENU_BUTTON_COUNT] = {
+static const button_values return_values[MAIN_MENU_BUTTON_COUNT] = {
     { KEY_LOWERCASE_I, MAIN_MENU_INTRO, 9 },
     { KEY_LOWERCASE_N, MAIN_MENU_NEW_GAME, 10 },
     { KEY_LOWERCASE_L, MAIN_MENU_LOAD_GAME, 11 },
