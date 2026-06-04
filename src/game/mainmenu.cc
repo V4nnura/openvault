@@ -59,8 +59,14 @@ static bool main_menu_created = false;
 // 0x505AA0
 static unsigned int main_menu_timeout = 120000;
 
+struct button_spec {
+    int keyCode;
+    int returnValue;
+    int labelMessage;
+};
+
 // 0x505AA4 button_values / // 0x505AB8 return_values
-static int button_values[MAIN_MENU_BUTTON_COUNT] = {
+static const button_spec button_specs[MAIN_MENU_BUTTON_COUNT] = {
     { KEY_LOWERCASE_I, MAIN_MENU_INTRO, 9 },
     { KEY_LOWERCASE_N, MAIN_MENU_NEW_GAME, 10 },
     { KEY_LOWERCASE_L, MAIN_MENU_LOAD_GAME, 11 },
@@ -170,7 +176,7 @@ int main_menu_create()
             -1,
             -1,
             1111,
-            button_values[index],
+            button_specs[index],
             button_up_data,
             button_down_data,
             NULL,
@@ -325,11 +331,12 @@ int main_menu_loop()
         int keyCode = get_input();
 
         for (int buttonIndex = 0; buttonIndex < MAIN_MENU_BUTTON_COUNT; buttonIndex++) {
-            if (keyCode == button_values[buttonIndex] || keyCode == toupper(button_values[buttonIndex])) {
+            int buttonKeyCode = button_specs[buttonIndex].keyCode
+            if (keyCode == buttonKeyCode || keyCode == toupper(buttonKeyCode)) {
                 // NOTE: Uninline.
                 main_menu_play_sound("nmselec1");
 
-                rc = button_values[buttonIndex];
+                rc = button_specs[buttonIndex].returnValue;
 
                 if (buttonIndex == MAIN_MENU_BUTTON_CREDITS && (keys[SDL_SCANCODE_RSHIFT] != KEY_STATE_UP || keys[SDL_SCANCODE_LSHIFT] != KEY_STATE_UP)) {
                     rc = MAIN_MENU_QUOTES;
