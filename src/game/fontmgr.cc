@@ -36,6 +36,7 @@ static void swapUInt16(unsigned short* value);
 
 static void swapInt32(int* value);
 static void swapInt16(short* value);
+static bool FMFontExists(int font_index);
 
 // 0x504F88
 static bool gFMInit = false;
@@ -98,6 +99,10 @@ static int FMLoadFont(int font_index)
 
     char path[56];
     snprintf(path, sizeof(path), "font%d.aaf", font_index);
+
+    if (!FMFontExists(font_index)) {
+        return -1;
+    }
 
     DB_FILE* stream = db_fopen(path, "rb");
     if (stream == NULL) {
@@ -181,6 +186,16 @@ static int FMLoadFont(int font_index)
     db_fclose(stream);
 
     return 0;
+}
+
+static bool FMFontExists(int font_index)
+{
+    dir_entry de;
+    char path[56];
+
+    snprintf(path, sizeof(path), "font%d.aaf", font_index);
+
+    return db_dir_entry(path, &de) == 0;
 }
 
 // 0x43AC20
