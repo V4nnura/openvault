@@ -4,7 +4,7 @@ OpenVault is a re-implementation of Fallout 1 Engine, trying to match at maximum
 
 ## Installation
 
-You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/game/fallout) or [Steam](https://store.steampowered.com/app/38400). Download latest [release](https://github.com/V4nnura/openvault/releases) or build from source.
+You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/game/fallout), [Epic Games](https://store.epicgames.com/p/fallout) or [Steam](https://store.steampowered.com/app/38400). Download latest [release](https://github.com/V4nnura/openvault/releases) or build from source.
 
 ### Windows
 
