@@ -459,7 +459,6 @@ void tile_set_border(int windowWidth, int windowHeight, int hexGridWidth, int he
 }
 
 // Logs non-zero pixel counts in the top area of the display buffer.
-// Only writes to patchlog when patch logging is enabled.
 static void tile_log_stage_top_pixels(const char* stage)
 {
     int window_h = buf_length;
