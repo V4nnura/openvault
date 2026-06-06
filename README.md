@@ -127,6 +127,8 @@ Here is a couple of current goals. Open up an issue if you have suggestion or fe
 
 - **Update to v1.2**. This project is based on Reference Edition which implements v1.1 released in November 1997. There is a newer v1.2 released in March 1998 which at least contains important multilingual support.
 
+- **Support for v1.0**. The idea is also support the Original Version launched in October 10, 1997 (v1.0) for specific playtroughs.
+
 - **Backport some Fallout 2 features**. Fallout 2 (with some Sfall additions) added many great improvements and quality of life enhancements to the original Fallout engine. Only the ones that not affect directly the fidelity purposed on this project will be backported.
 
 ## License
