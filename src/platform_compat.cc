@@ -6,6 +6,8 @@
 #include <windows.h>
 #endif
 
+#include <sys/stat.h>
+
 #ifdef _WIN32
 #include <direct.h>
 #include <io.h>
@@ -13,13 +15,20 @@
 #include <stdlib.h>
 #else
 #include <dirent.h>
-#include <sys/stat.h>
 #include <unistd.h>
 #endif
 
 #include <SDL.h>
 
 namespace fallout {
+
+static void compat_prepare_native_path(char* nativePath, const char* path)
+{
+    strncpy(nativePath, path, COMPAT_MAX_PATH - 1);
+    nativePath[COMPAT_MAX_PATH - 1] = '\0';
+    compat_windows_path_to_native(nativePath);
+    compat_resolve_path(nativePath);
+}
 
 int compat_stricmp(const char* string1, const char* string2)
 {
@@ -206,9 +215,7 @@ long compat_filelength(int fd)
 int compat_mkdir(const char* path)
 {
     char nativePath[COMPAT_MAX_PATH];
-    strcpy(nativePath, path);
-    compat_windows_path_to_native(nativePath);
-    compat_resolve_path(nativePath);
+    compat_prepare_native_path(nativePath, path);
 
 #ifdef _WIN32
     return mkdir(nativePath);
@@ -225,32 +232,24 @@ unsigned int compat_timeGetTime()
 FILE* compat_fopen(const char* path, const char* mode)
 {
     char nativePath[COMPAT_MAX_PATH];
-    strcpy(nativePath, path);
-    compat_windows_path_to_native(nativePath);
-    compat_resolve_path(nativePath);
+    compat_prepare_native_path(nativePath, path);
     return fopen(nativePath, mode);
 }
 
 int compat_remove(const char* path)
 {
     char nativePath[COMPAT_MAX_PATH];
-    strcpy(nativePath, path);
-    compat_windows_path_to_native(nativePath);
-    compat_resolve_path(nativePath);
+    compat_prepare_native_path(nativePath, path);
     return remove(nativePath);
 }
 
 int compat_rename(const char* oldFileName, const char* newFileName)
 {
     char nativeOldFileName[COMPAT_MAX_PATH];
-    strcpy(nativeOldFileName, oldFileName);
-    compat_windows_path_to_native(nativeOldFileName);
-    compat_resolve_path(nativeOldFileName);
+    compat_prepare_native_path(nativeOldFileName, oldFileName);
 
     char nativeNewFileName[COMPAT_MAX_PATH];
-    strcpy(nativeNewFileName, newFileName);
-    compat_windows_path_to_native(nativeNewFileName);
-    compat_resolve_path(nativeNewFileName);
+    compat_prepare_native_path(nativeNewFileName, newFileName);
 
     return rename(nativeOldFileName, nativeNewFileName);
 }
