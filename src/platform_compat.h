@@ -1,11 +1,8 @@
 #ifndef FALLOUT_PLATFORM_COMPAT_H_
 #define FALLOUT_PLATFORM_COMPAT_H_
 
-#include <errno.h>
-#include <filesystem>
 #include <stddef.h>
 #include <stdio.h>
-#include <string>
 
 namespace fallout {
 
@@ -34,7 +31,7 @@ int compat_read(int fileHandle, void* buf, unsigned int size);
 int compat_write(int fileHandle, const void* buf, unsigned int size);
 long compat_lseek(int fileHandle, long offset, int origin);
 long compat_tell(int fileHandle);
-long compat_filelength(const char* path);
+long compat_filelength(int fd);
 int compat_mkdir(const char* path);
 unsigned int compat_timeGetTime();
 FILE* compat_fopen(const char* path, const char* mode);
