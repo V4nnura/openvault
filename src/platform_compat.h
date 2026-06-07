@@ -31,7 +31,7 @@ int compat_read(int fileHandle, void* buf, unsigned int size);
 int compat_write(int fileHandle, const void* buf, unsigned int size);
 long compat_lseek(int fileHandle, long offset, int origin);
 long compat_tell(int fileHandle);
-long compat_filelength(int fd);
+long compat_filelength(const char* path);
 int compat_mkdir(const char* path);
 unsigned int compat_timeGetTime();
 FILE* compat_fopen(const char* path, const char* mode);
