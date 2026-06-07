@@ -207,7 +207,7 @@ void ProcessLeftStick()
     int dx = 0, dy = 0;
 
     // Skip when stick is neutral
-    if (rightStickX == 0 && rightStickY == 0) {
+    if (leftStickX == 0 && leftStickY == 0) {
         acc.Clear();
         return;
     }
