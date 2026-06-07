@@ -6,11 +6,10 @@
 #include "game/map.h"
 
 #include "plib/gnw/debug.h"
-
+#include "plib/gnw/dxinput.h"
 #include "plib/gnw/gamepad.h"
-
+#include "plib/gnw/input.h"
 #include "plib/gnw/mouse.h"
-
 #include "plib/gnw/svga.h"
 
 namespace fallout {
@@ -120,16 +119,47 @@ namespace {
         {
             const Uint32 tc = SDL_GetTicks();
             const int dtc = tc - lastTc;
+            lastTc = tc;
+
             hiresDX += rightStickX * dtc;
             hiresDY += rightStickY * dtc;
-            const int dx = static_cast<int>(hiresDX / slowdown);
-            const int dy = static_cast<int>(hiresDY / slowdown);
-            *x += dx;
-            *y -= dy;
-            lastTc = tc;
-            // keep track of remainder for sub-pixel motion
-            hiresDX -= dx * slowdown;
-            hiresDY -= dy * slowdown;
+
+            int dx = static_cast<int>(hiresDX / slowdown);
+            int dy = static_cast<int>(hiresDY / slowdown);
+
+            // If both stick axes are being pushed, enforce a diagonal
+            // analog stick strength
+            const float diagThreshold = 0.3f;
+
+            bool diagonalIntent =
+                std::abs(rightStickX) > diagThreshold &&
+                std::abs(rightStickY) > diagThreshold;
+
+            if (diagonalIntent) {
+                if (std::abs(hiresDX) >= slowdown || std::abs(hiresDY) >= slowdown) {
+                    *outX = (rightStickX > 0) ? 1 : -1;
+                    *outY = (rightStickY > 0) ? -1 : 1;
+
+                    hiresDX = 0;
+                    hiresDY = 0;
+                    return true;
+                }
+            } else {
+                if (std::abs(hiresDX) >= slowdown) {
+                    *outX = (hiresDX > 0) ? 1 : -1;
+                    *outY = 0;
+                    hiresDX = 0;
+                    return true;
+                }
+                if (std::abs(hiresDY) >= slowdown) {
+                    *outX = 0;
+                    *outY = (hiresDY > 0) ? -1 : 1;
+                    hiresDY = 0;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         void Clear()
