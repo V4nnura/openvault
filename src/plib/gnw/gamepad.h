@@ -4,6 +4,7 @@
 #include <SDL.h>
 
 #include "plib/gnw/rect.h"
+
 #include "plib/gnw/dxinput.h"
 
 namespace fallout {
