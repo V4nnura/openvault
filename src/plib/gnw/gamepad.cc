@@ -3,6 +3,8 @@
 
 #include <SDL.h>
 
+#include "game/map.h"
+
 #include "plib/gnw/debug.h"
 #include "plib/gnw/gamepad.h"
 #include "plib/gnw/mouse.h"
@@ -71,6 +73,73 @@ namespace {
         ScaleJoystickAxes(&rightStickX, &rightStickY, rightDeadzone);
     }
 
+    struct LeftStickAccumulator {
+
+        LeftStickAccumulator()
+        {
+            lastTc = SDL_GetTicks();
+            hiresDX = 0;
+            hiresDY = 0;
+        }
+
+        bool GetScrollDelta(int* outX, int* outY, int slowdown)
+        {
+            const Uint32 tc = SDL_GetTicks();
+            const int dtc = tc - lastTc;
+            lastTc = tc;
+
+            hiresDX += leftStickX * dtc;
+            hiresDY += leftStickY * dtc;
+
+            int dx = static_cast<int>(hiresDX / slowdown);
+            int dy = static_cast<int>(hiresDY / slowdown);
+
+            // If both stick axes are being pushed, enforce a diagonal.
+            // Analog stick strength.
+            const float diagThreshold = 0.3f;
+
+            bool diagonalIntent =
+                std::abs(leftStickX) > diagThreshold &&
+                std::abs(leftStickY) > diagThreshold;
+
+            if (diagonalIntent) {
+                if (std::abs(hiresDX) >= slowdown || std::abs(hiresDY) >= slowdown) {
+                    *outX = (leftStickX > 0) ? 1 : -1;
+                    *outY = (leftStickY > 0) ? -1 : 1;
+
+                    hiresDX = 0;
+                    hiresDY = 0;
+                    return true;
+                }
+            }
+            else {
+                if (std::abs(hiresDX) >= slowdown) {
+                    *outX = (hiresDX > 0) ? 1 : -1;
+                    *outY = 0;
+                    hiresDX = 0;
+                    return true;
+                }
+                if (std::abs(hiresDY) >= slowdown) {
+                    *outX = 0;
+                    *outY = (hiresDY > 0) ? -1 : 1;
+                    hiresDY = 0;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        void Clear()
+        {
+            lastTc = SDL_GetTicks();
+        }
+
+        uint32_t lastTc;
+        float hiresDX;
+        float hiresDY;
+    };
+
     struct RightStickAccumulator {
 
         RightStickAccumulator()
@@ -134,6 +203,18 @@ void HandleControllerAxisMotion(const SDL_Event& event)
 
 void ProcessLeftStick()
 {
+    static LeftStickAccumulator acc;
+    int dx = 0, dy = 0;
+
+    // Skip when stick is neutral
+    if (rightStickX == 0 && rightStickY == 0) {
+        acc.Clear();
+        return;
+    }
+
+    if (acc.GetScrollDelta(&dx, &dy, 50)) {
+        map_scroll(dx, dy);
+    }
 }
 
 void ProcessRightStick()
