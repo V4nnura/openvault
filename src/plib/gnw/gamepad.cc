@@ -4,7 +4,7 @@
 #include <SDL.h>
 
 #include "plib/gnw/debug.h"
-#include "plib/gnw/gamepad.hpp"
+#include "plib/gnw/gamepad.h"
 #include "plib/gnw/mouse.h"
 #include "plib/gnw/svga.h"
 
