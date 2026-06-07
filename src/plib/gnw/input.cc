@@ -8,7 +8,7 @@
 #include "plib/color/color.h"
 #include "plib/gnw/button.h"
 #include "plib/gnw/dxinput.h"
-#include "plib/gnw/gamepad.hpp"
+#include "plib/gnw/gamepad.h"
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/intrface.h"
