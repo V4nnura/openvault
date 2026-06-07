@@ -207,6 +207,7 @@ long compat_filelength(const char* path)
 {
     char nativePath[COMPAT_MAX_PATH];
     compat_prepare_native_path(nativePath, path);
+    return std::filesystem::file_size(nativePath);
 }
 
 int compat_mkdir(const char* path)
