@@ -3,11 +3,15 @@
 
 #include <SDL.h>
 
-#include "plib/gnw/debug.h"
-#include "plib/gnw/gamepad.h"
-#include "plib/gnw/mouse.h"
-#include "plib/gnw/svga.h"
 #include "game/map.h"
+
+#include "plib/gnw/debug.h"
+
+#include "plib/gnw/gamepad.h"
+
+#include "plib/gnw/mouse.h"
+
+#include "plib/gnw/svga.h"
 
 namespace fallout {
 
@@ -197,7 +201,7 @@ void ProcessRightStick()
         return;
     }
 
-    if (acc.GetScrollDelta(&dx, &dy, 50)) {
+    if (acc.Pool(&dx, &dy, 50)) {
         map_scroll(dx, dy);
     }
 }
