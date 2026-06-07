@@ -232,7 +232,7 @@ target_sources(${EXECUTABLE_NAME} PUBLIC
     "src/plib/gnw/dxinput.cc"
     "src/plib/gnw/dxinput.h"
     "src/plib/gnw/gamepad.cc"
-    "src/plib/gnw/gamepad.hpp"
+    "src/plib/gnw/gamepad.h"
     "src/plib/gnw/grbuf.cc"
     "src/plib/gnw/grbuf.h"
     "src/plib/gnw/input.cc"
