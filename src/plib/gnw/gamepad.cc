@@ -98,9 +98,7 @@ namespace {
             // Analog stick strength.
             const float diagThreshold = 0.3f;
 
-            bool diagonalIntent =
-                std::abs(leftStickX) > diagThreshold &&
-                std::abs(leftStickY) > diagThreshold;
+            bool diagonalIntent = std::abs(leftStickX) > diagThreshold && std::abs(leftStickY) > diagThreshold;
 
             if (diagonalIntent) {
                 if (std::abs(hiresDX) >= slowdown || std::abs(hiresDY) >= slowdown) {
@@ -111,8 +109,7 @@ namespace {
                     hiresDY = 0;
                     return true;
                 }
-            }
-            else {
+            } else {
                 if (std::abs(hiresDX) >= slowdown) {
                     *outX = (hiresDX > 0) ? 1 : -1;
                     *outY = 0;
