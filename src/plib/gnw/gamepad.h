@@ -4,11 +4,13 @@
 #include <SDL.h>
 
 #include "plib/gnw/rect.h"
+#include "plib/gnw/dxinput.h"
 
 namespace fallout {
 
 extern float leftStickX, leftStickY, rightStickX, rightStickY;
 
+bool GetGamepadMouseState(MouseData* mouseState);
 void HandleJoystickDeviceAdded(const SDL_Event& event);
 void HandleJoystickDeviceRemoved(const SDL_Event& event);
 void HandleControllerDeviceAdded(const SDL_Event& event);
