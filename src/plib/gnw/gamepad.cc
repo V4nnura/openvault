@@ -7,8 +7,40 @@
 #include "plib/gnw/gamepad.h"
 #include "plib/gnw/mouse.h"
 #include "plib/gnw/svga.h"
+#include "game/map.h"
 
 namespace fallout {
+
+static SDL_GameController* gController = NULL;
+
+// Simulated mouse state using gamepad inputs
+int gGamepadLeftClick = 0;
+int gGamepadRightClick = 0;
+int gLeftStickDeltaX = 0;
+int gLeftStickDeltaY = 0;
+
+// Takes gamepad input and simulates mouse state
+bool GetGamepadMouseState(MouseData* mouseState)
+{
+    if (!mouseState) {
+        return false;
+    }
+
+    mouseState->x = gLeftStickDeltaX;
+    mouseState->y = gLeftStickDeltaY;
+
+    mouseState->buttons[0] = gGamepadLeftClick;
+    mouseState->buttons[1] = gGamepadRightClick;
+
+    mouseState->wheelX = 0;
+    mouseState->wheelY = 0;
+
+    // Reset deltas after they've been consumed
+    gLeftStickDeltaX = 0;
+    gLeftStickDeltaY = 0;
+
+    return true;
+}
 
 namespace {
 
@@ -134,10 +166,6 @@ void HandleControllerAxisMotion(const SDL_Event& event)
 
 void ProcessLeftStick()
 {
-}
-
-void ProcessRightStick()
-{
     static RightStickAccumulator acc;
     // deadzone is handled in ScaleJoystickAxes() already
     if (rightStickX == 0 && rightStickY == 0) {
@@ -153,7 +181,24 @@ void ProcessRightStick()
 
     // clipping to viewport is handled in mouse_simulate_input
     if (newX != x || newY != y) {
-        mouse_simulate_input(newX - x, newY - y, 0);
+        gLeftStickDeltaX += (newX - x);
+        gLeftStickDeltaY += (newY - y);
+    }
+}
+
+void ProcessRightStick()
+{
+    static RightStickAccumulator acc;
+    int dx = 0, dy = 0;
+
+    // Skip when stick is neutral
+    if (rightStickX == 0 && rightStickY == 0) {
+        acc.Clear();
+        return;
+    }
+
+    if (acc.GetScrollDelta(&dx, &dy, 50)) {
+        map_scroll(dx, dy);
     }
 }
 
