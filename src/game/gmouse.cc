@@ -5,35 +5,20 @@
 #include <string.h>
 
 #include "game/actions.h"
-
 #include "game/art.h"
-
 #include "game/combat.h"
-
 #include "game/critter.h"
-
 #include "game/game.h"
-
 #include "game/gconfig.h"
-
 #include "game/gsound.h"
-
 #include "game/intface.h"
-
 #include "game/item.h"
-
 #include "game/map.h"
-
 #include "game/object.h"
-
 #include "game/proto.h"
-
 #include "game/protinst.h"
-
 #include "game/skilldex.h"
-
 #include "game/tile.h"
-
 #include "game/tweaks.h"
 
 #include "platform_compat.h"
@@ -41,17 +26,11 @@
 #include "plib/color/color.h"
 
 #include "plib/gnw/gnw.h"
-
 #include "plib/gnw/grbuf.h"
-
 #include "plib/gnw/input.h"
-
 #include "plib/gnw/kb.h"
-
 #include "plib/gnw/rect.h"
-
 #include "plib/gnw/svga.h"
-
 #include "plib/gnw/text.h"
 
 namespace fallout {
