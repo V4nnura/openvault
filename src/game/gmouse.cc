@@ -15,14 +15,13 @@
 #include "game/item.h"
 #include "game/map.h"
 #include "game/object.h"
-#include "game/proto.h"
 #include "game/protinst.h"
+#include "game/proto.h"
 #include "game/skilldex.h"
 #include "game/tile.h"
 #include "game/tweaks.h"
-
+#include "platform_compat.h"
 #include "plib/color/color.h"
-
 #include "plib/gnw/gnw.h"
 #include "plib/gnw/grbuf.h"
 #include "plib/gnw/input.h"
@@ -30,8 +29,6 @@
 #include "plib/gnw/rect.h"
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
-
-#include "platform_compat.h"
 
 namespace fallout {
 
