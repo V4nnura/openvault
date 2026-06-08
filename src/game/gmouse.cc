@@ -21,8 +21,6 @@
 #include "game/tile.h"
 #include "game/tweaks.h"
 
-#include "platform_compat.h"
-
 #include "plib/color/color.h"
 
 #include "plib/gnw/gnw.h"
@@ -32,6 +30,8 @@
 #include "plib/gnw/rect.h"
 #include "plib/gnw/svga.h"
 #include "plib/gnw/text.h"
+
+#include "platform_compat.h"
 
 namespace fallout {
 
