@@ -82,49 +82,20 @@ namespace {
             hiresDY = 0;
         }
 
-        bool GetScrollDelta(int* outX, int* outY, int slowdown)
+        void Pool(int* x, int* y, int slowdown)
         {
             const Uint32 tc = SDL_GetTicks();
             const int dtc = tc - lastTc;
-            lastTc = tc;
-
             hiresDX += leftStickX * dtc;
             hiresDY += leftStickY * dtc;
-
-            int dx = static_cast<int>(hiresDX / slowdown);
-            int dy = static_cast<int>(hiresDY / slowdown);
-
-            // If both stick axes are being pushed, enforce a diagonal.
-            // Analog stick strength.
-            const float diagThreshold = 0.3f;
-
-            bool diagonalIntent = std::abs(leftStickX) > diagThreshold && std::abs(leftStickY) > diagThreshold;
-
-            if (diagonalIntent) {
-                if (std::abs(hiresDX) >= slowdown || std::abs(hiresDY) >= slowdown) {
-                    *outX = (leftStickX > 0) ? 1 : -1;
-                    *outY = (leftStickY > 0) ? -1 : 1;
-
-                    hiresDX = 0;
-                    hiresDY = 0;
-                    return true;
-                }
-            } else {
-                if (std::abs(hiresDX) >= slowdown) {
-                    *outX = (hiresDX > 0) ? 1 : -1;
-                    *outY = 0;
-                    hiresDX = 0;
-                    return true;
-                }
-                if (std::abs(hiresDY) >= slowdown) {
-                    *outX = 0;
-                    *outY = (hiresDY > 0) ? -1 : 1;
-                    hiresDY = 0;
-                    return true;
-                }
-            }
-
-            return false;
+            const int dx = static_cast<int>(hiresDX / slowdown);
+            const int dy = static_cast<int>(hiresDY / slowdown);
+            *x += dx;
+            *y -= dy;
+            lastTc = tc;
+            // keep track of remainder for sub-pixel motion
+            hiresDX -= dx * slowdown;
+            hiresDY -= dy * slowdown;
         }
 
         void Clear()
@@ -146,20 +117,49 @@ namespace {
             hiresDY = 0;
         }
 
-        void Pool(int* x, int* y, int slowdown)
+        bool GetScrollDelta(int* outX, int* outY, int slowdown)
         {
             const Uint32 tc = SDL_GetTicks();
             const int dtc = tc - lastTc;
+            lastTc = tc;
+
             hiresDX += rightStickX * dtc;
             hiresDY += rightStickY * dtc;
-            const int dx = static_cast<int>(hiresDX / slowdown);
-            const int dy = static_cast<int>(hiresDY / slowdown);
-            *x += dx;
-            *y -= dy;
-            lastTc = tc;
-            // keep track of remainder for sub-pixel motion
-            hiresDX -= dx * slowdown;
-            hiresDY -= dy * slowdown;
+
+            int dx = static_cast<int>(hiresDX / slowdown);
+            int dy = static_cast<int>(hiresDY / slowdown);
+
+            // If both stick axes are being pushed, enforce a diagonal.
+            // Analog stick strength.
+            const float diagThreshold = 0.3f;
+
+            bool diagonalIntent = std::abs(leftStickX) > diagThreshold && std::abs(leftStickY) > diagThreshold;
+
+            if (diagonalIntent) {
+                if (std::abs(hiresDX) >= slowdown || std::abs(hiresDY) >= slowdown) {
+                    *outX = (rightStickX > 0) ? 1 : -1;
+                    *outY = (rightStickY > 0) ? -1 : 1;
+
+                    hiresDX = 0;
+                    hiresDY = 0;
+                    return true;
+                }
+            } else {
+                if (std::abs(hiresDX) >= slowdown) {
+                    *outX = (hiresDX > 0) ? 1 : -1;
+                    *outY = 0;
+                    hiresDX = 0;
+                    return true;
+                }
+                if (std::abs(hiresDY) >= slowdown) {
+                    *outX = 0;
+                    *outY = (hiresDY > 0) ? -1 : 1;
+                    hiresDY = 0;
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         void Clear()
@@ -201,24 +201,8 @@ void HandleControllerAxisMotion(const SDL_Event& event)
 void ProcessLeftStick()
 {
     static LeftStickAccumulator acc;
-    int dx = 0, dy = 0;
-
-    // Skip when stick is neutral
-    if (leftStickX == 0 && leftStickY == 0) {
-        acc.Clear();
-        return;
-    }
-
-    if (acc.GetScrollDelta(&dx, &dy, 50)) {
-        map_scroll(dx, dy);
-    }
-}
-
-void ProcessRightStick()
-{
-    static RightStickAccumulator acc;
     // deadzone is handled in ScaleJoystickAxes() already
-    if (rightStickX == 0 && rightStickY == 0) {
+    if (leftStickX == 0 && leftStickY == 0) {
         acc.Clear();
         return;
     }
@@ -232,6 +216,22 @@ void ProcessRightStick()
     // clipping to viewport is handled in mouse_simulate_input
     if (newX != x || newY != y) {
         mouse_simulate_input(newX - x, newY - y, 0);
+    }
+}
+
+void ProcessRightStick()
+{
+    static RightStickAccumulator acc;
+    int dx = 0, dy = 0;
+
+    // Skip when stick is neutral
+    if (rightStickX == 0 && rightStickY == 0) {
+        acc.Clear();
+        return;
+    }
+
+    if (acc.GetScrollDelta(&dx, &dy, 50)) {
+        map_scroll(dx, dy);
     }
 }
 
