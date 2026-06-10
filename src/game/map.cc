@@ -1331,7 +1331,7 @@ void map_fix_critter_combat_data()
         }
 
         if (object->data.critter.combat.whoHitMeCid == -1) {
-            object->data.critter.combat.whoHitMe = NULL;
+            critter_set_who_hit_me(object, NULL);
         }
     }
 }
