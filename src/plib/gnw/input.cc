@@ -1198,6 +1198,51 @@ static void GNW95_process_key(KeyboardData* data)
     // timestamps, see usage from |_GNW95_process_message|.
     int scanCode = data->key;
 
+#if defined(__APPLE__) && TARGET_OS_IOS
+    // CMD+number combinations on iPadOS for F-key emulation
+    SDL_Keymod modState = SDL_GetModState();
+    if ((modState & KMOD_GUI) != 0) {
+        switch (data->key) {
+        case SDL_SCANCODE_1:
+            data->key = SDL_SCANCODE_F1;
+            break;
+        case SDL_SCANCODE_2:
+            data->key = SDL_SCANCODE_F2;
+            break;
+        case SDL_SCANCODE_3:
+            data->key = SDL_SCANCODE_F3;
+            break;
+        case SDL_SCANCODE_4:
+            data->key = SDL_SCANCODE_F4;
+            break;
+        case SDL_SCANCODE_5:
+            data->key = SDL_SCANCODE_F5;
+            break;
+        case SDL_SCANCODE_6:
+            data->key = SDL_SCANCODE_F6;
+            break;
+        case SDL_SCANCODE_7:
+            data->key = SDL_SCANCODE_F7;
+            break;
+        case SDL_SCANCODE_0:
+            data->key = SDL_SCANCODE_F10;
+            break;
+        case SDL_SCANCODE_MINUS:
+            data->key = SDL_SCANCODE_F11;
+            break;
+        case SDL_SCANCODE_EQUALS:
+            data->key = SDL_SCANCODE_F12;
+            break;
+        default:
+            data->key = GNW95_key_map[data->key];
+            break;
+        }
+    } else {
+        data->key = GNW95_key_map[data->key];
+    }
+#else
+    data->key = GNW95_key_map[data->key];
+#endif
     data->key = GNW95_key_map[data->key];
 
     if (vcr_state == VCR_STATE_PLAYING) {
