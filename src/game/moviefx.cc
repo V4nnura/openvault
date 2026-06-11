@@ -8,6 +8,7 @@
 #include "game/palette.h"
 #include "int/movie.h"
 #include "platform_compat.h"
+#include "plib/db/db.h"
 #include "plib/gnw/debug.h"
 #include "plib/gnw/memory.h"
 
@@ -129,6 +130,12 @@ int moviefx_start(const char* filePath)
     }
 
     strcpy(path + strlen(path), ".cfg");
+
+    dir_entry de;
+    if (db_dir_entry(path, &de) != 0) {
+        rc = 0;
+        goto out;
+    }
 
     int* movieEffectFrameList;
 
