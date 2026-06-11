@@ -1,5 +1,6 @@
-#include "plib/gnw/debug.h"
 #include "plib/gnw/dxinput.h"
+
+#include "plib/gnw/debug.h"
 #include "plib/gnw/mouse.h"
 #include "plib/gnw/svga.h"
 #include <SDL.h>
