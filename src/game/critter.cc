@@ -277,6 +277,12 @@ int critter_adjust_poison(Object* critter, int amount)
     if (amount > 0) {
         // Take poison resistance into account.
         amount -= amount * stat_level(critter, STAT_POISON_RESISTANCE) / 100;
+    } else {
+        if (obj_dude->data.critter.poison <= 0) {
+            // Critter is not poisoned and we're want to decrease it even
+            // further, which makes no sense.
+            return 0;
+        }
     }
 
     critter->data.critter.poison += amount;
