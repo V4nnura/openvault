@@ -228,6 +228,10 @@ int gnw_main(int argc, char** argv)
             case MAIN_MENU_SCREENSAVER:
                 main_selfrun_play();
                 break;
+            case MAIN_MENU_OPTIONS:
+                mainMenuWindowHide(true);
+                do_prefscreen();
+                break;
             case MAIN_MENU_CREDITS:
                 main_menu_hide(true);
                 credits("credits.txt", -1, false);
