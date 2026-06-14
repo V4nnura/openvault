@@ -912,7 +912,6 @@ int map_load(char* file_name)
 int map_load_idx(int map)
 {
     char name[16];
-    int rc;
 
     scr_set_ext_param(map_script_id, map);
 
@@ -920,7 +919,7 @@ int map_load_idx(int map)
         return -1;
     }
 
-    rc = map_load(name);
+    int rc = map_load(name);
 
     PlayCityMapMusic();
 
