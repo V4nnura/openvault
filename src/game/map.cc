@@ -988,7 +988,8 @@ int map_load_file(DB_FILE* stream)
         error = "Error reading objects";
         if (obj_load(stream) != 0) break;
 
-        if ((map_data.flags & 1) == 0) {
+        if (!isLoadingGame()) {
+            // Fix whoHitMe union.  When loading a saved game, combatLoad is responsible for this fix.
             map_fix_critter_combat_data();
         }
 
