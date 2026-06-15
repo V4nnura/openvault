@@ -61,6 +61,7 @@ static int obj_adjust_light(Object* obj, int a2, Rect* rect);
 static void obj_render_outline(Object* object, Rect* rect);
 static void obj_render_object(Object* object, Rect* rect, int light);
 static int obj_preload_sort(const void* a1, const void* a2);
+static Object* obj_prepare_who_hit_me_for_save(CritterCombatData* combatData);
 
 // 0x505B70
 static bool objInitialized = false;
@@ -209,6 +210,19 @@ unsigned char* energyBlendTable = NULL;
 
 // 0x505D08
 unsigned char* redBlendTable = NULL;
+
+static Object* obj_prepare_who_hit_me_for_save(CritterCombatData* combatData)
+{
+    Object* whoHitMe = combatData->whoHitMe;
+
+    if (!isInCombat() || combatData->maneuver == CRITTER_MANEUVER_NONE) {
+        combatData->whoHitMeCid = -1;
+        return whoHitMe;
+    }
+
+    combatData->whoHitMeCid = whoHitMe != NULL ? whoHitMe->cid : -1;
+    return whoHitMe;
+}
 
 // 0x637730
 static int light_blocked[6][36];
@@ -709,14 +723,7 @@ int obj_save(DB_FILE* stream)
                 Object* whoHitMe = NULL;
                 if (PID_TYPE(object->pid) == OBJ_TYPE_CRITTER) {
                     combatData = &(object->data.critter.combat);
-                    whoHitMe = combatData->whoHitMe;
-                    if (whoHitMe != 0) {
-                        if (combatData->whoHitMeCid != -1) {
-                            combatData->whoHitMeCid = whoHitMe->cid;
-                        }
-                    } else {
-                        combatData->whoHitMeCid = -1;
-                    }
+                    whoHitMe = obj_prepare_who_hit_me_for_save(combatData);
                 }
 
                 if (obj_write_obj(object, stream) == -1) {
@@ -3263,14 +3270,7 @@ int obj_save_obj(DB_FILE* stream, Object* object)
     Object* whoHitMe = NULL;
     if (PID_TYPE(object->pid) == OBJ_TYPE_CRITTER) {
         combatData = &(object->data.critter.combat);
-        whoHitMe = combatData->whoHitMe;
-        if (whoHitMe != 0) {
-            if (combatData->whoHitMeCid != -1) {
-                combatData->whoHitMeCid = whoHitMe->cid;
-            }
-        } else {
-            combatData->whoHitMeCid = -1;
-        }
+        whoHitMe = obj_prepare_who_hit_me_for_save(combatData);
     }
 
     if (obj_write_obj(object, stream) == -1) {
