@@ -2042,11 +2042,11 @@ static void combat_sequence_init(Object* attacker, Object* defender)
     list_com = next;
     list_noncom -= next;
 
-    if (a1 != NULL) {
+    if (attacker != NULL) {
         critter_set_who_hit_me(attacker, defender);
     }
 
-    if (a2 != NULL) {
+    if (defender != NULL) {
         critter_set_who_hit_me(defender, attacker);
     }
 }
