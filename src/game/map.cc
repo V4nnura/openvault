@@ -989,7 +989,7 @@ int map_load_file(DB_FILE* stream)
         if (obj_load(stream) != 0) break;
 
         if (!isLoadingGame()) {
-            // Fix whoHitMe union. When loading a saved game, combatLoad is responsible for this fix.
+            // Fix whoHitMe union. When loading a saved game, combat_load is responsible for this fix.
             map_fix_critter_combat_data();
         }
 
