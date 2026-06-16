@@ -54,7 +54,7 @@ static void combat_begin_extra(Object* a1);
 static void combat_over();
 static void combat_add_noncoms();
 static int compare_faster(const void* a1, const void* a2);
-static void combat_sequence_init(Object* a1, Object* a2);
+static void combat_sequence_init(Object* attacker, Object* defender);
 static void combat_sequence();
 static int combat_input();
 static int combat_turn(Object* a1, bool a2);
