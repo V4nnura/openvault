@@ -1994,7 +1994,7 @@ static int compare_faster(const void* a1, const void* a2)
 }
 
 // 0x4202FC
-static void combat_sequence_init(Object* a1, Object* a2)
+static void combat_sequence_init(Object* attacker, Object* defender)
 {
     // Always place attacker first (swap with critter at 0 index).
     int next = 0;
