@@ -1996,11 +1996,12 @@ static int compare_faster(const void* a1, const void* a2)
 // 0x4202FC
 static void combat_sequence_init(Object* a1, Object* a2)
 {
+    // Always place attacker first (swap with critter at 0 index).
     int next = 0;
-    if (a1 != NULL) {
+    if (attacker != NULL) {
         for (int index = 0; index < list_total; index++) {
             Object* obj = combat_list[index];
-            if (obj == a1) {
+            if (obj == attacker) {
                 Object* temp = combat_list[next];
                 combat_list[index] = temp;
                 combat_list[next] = obj;
@@ -2010,10 +2011,11 @@ static void combat_sequence_init(Object* a1, Object* a2)
         }
     }
 
-    if (a2 != NULL) {
+    // Place defender second.
+    if (defender != NULL) {
         for (int index = 0; index < list_total; index++) {
             Object* obj = combat_list[index];
-            if (obj == a2) {
+            if (obj == defender) {
                 Object* temp = combat_list[next];
                 combat_list[index] = temp;
                 combat_list[next] = obj;
@@ -2023,7 +2025,8 @@ static void combat_sequence_init(Object* a1, Object* a2)
         }
     }
 
-    if (a1 != obj_dude && a2 != obj_dude) {
+    // Place dude third, if he's neither attacker, nor defender.
+    if (attacker != obj_dude && defender != obj_dude) {
         for (int index = 0; index < list_total; index++) {
             Object* obj = combat_list[index];
             if (obj == obj_dude) {
@@ -2040,11 +2043,11 @@ static void combat_sequence_init(Object* a1, Object* a2)
     list_noncom -= next;
 
     if (a1 != NULL) {
-        critter_set_who_hit_me(a1, a2);
+        critter_set_who_hit_me(attacker, defender);
     }
 
     if (a2 != NULL) {
-        critter_set_who_hit_me(a2, a1);
+        critter_set_who_hit_me(defender, attacker);
     }
 }
 
