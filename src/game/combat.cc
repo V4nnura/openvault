@@ -1756,6 +1756,7 @@ static void combat_begin(Object* a1)
         list_noncom = list_total;
         list_com = 0;
 
+        Object* v1 = NULL;
         for (index = 0; index < list_total; index++) {
             Object* critter = combat_list[index];
             CritterCombatData* combatData = &(critter->data.critter.combat);
@@ -1764,6 +1765,14 @@ static void combat_begin(Object* a1)
             combatData->whoHitMe = NULL;
             combatData->ap = 0;
             critter->cid = index;
+
+            scr_set_objs(critter->sid, NULL, NULL);
+            scr_set_ext_param(critter->sid, 0);
+            if (critter->pid == 0x1000098) {
+                if (!critter_is_dead(critter)) {
+                    v1 = critter;
+                }
+            }
         }
 
         combat_state |= COMBAT_STATE_0x01;
