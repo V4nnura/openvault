@@ -50,7 +50,7 @@ namespace fallout {
 #define CALLED_SHOT_WINDOW_HEIGHT 309
 
 static void combat_begin(Object* a1);
-static void combat_begin_extra(Object* a1);
+static void combat_begin_extra(Object* attacker);
 static void combat_over();
 static void combat_add_noncoms();
 static int compare_faster(const void* a1, const void* a2);
