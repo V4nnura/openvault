@@ -1788,7 +1788,7 @@ static void combat_begin(Object* a1)
 }
 
 // 0x41FE6C
-static void combat_begin_extra(Object* a1)
+static void combat_begin_extra(Object* attacker)
 {
     int index;
     int outline_type;
@@ -1805,9 +1805,9 @@ static void combat_begin_extra(Object* a1)
         obj_turn_off_outline(combat_list[index], NULL);
     }
 
-    combat_ctd_init(&main_ctd, a1, NULL, HIT_MODE_PUNCH, HIT_LOCATION_TORSO);
+    combat_ctd_init(&main_ctd, attacker, NULL, HIT_MODE_PUNCH, HIT_LOCATION_TORSO);
 
-    combat_turn_obj = a1;
+    combat_turn_obj = attacker;
 
     combat_ai_begin(list_total, combat_list);
 
