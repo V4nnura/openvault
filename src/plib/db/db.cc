@@ -2550,15 +2550,7 @@ static int db_find_dir_entry(char* path, dir_entry* de)
 
     normalized_path = path;
 
-    if (current_database->datafile == NULL) {
-        return -1;
-    }
-
-    if (path == NULL) {
-        return -1;
-    }
-
-    if (de == NULL) {
+    if (current_database->datafile == NULL || path == NULL || de == NULL) {
         return -1;
     }
 
