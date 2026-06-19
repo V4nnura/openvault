@@ -637,10 +637,10 @@ void _sub_4F4BB(int a1)
 }
 
 // 0x4F4BD0
-void _MVE_rmFrameCounts(int* a1, int* a2)
+void _MVE_rmFrameCounts(int* frame_count_ptr, int* frame_drop_count_ptr)
 {
-    *a1 = _rm_FrameCount;
-    *a2 = _rm_FrameDropCount;
+    *frame_count_ptr = _rm_FrameCount;
+    *frame_drop_count_ptr = _rm_FrameDropCount;
 }
 
 // 0x4F4BF0
