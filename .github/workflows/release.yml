@@ -247,7 +247,7 @@ jobs:
   macos:
     name: macOS
 
-    runs-on: macos-11
+    runs-on: macos-14
 
     steps:
       - name: Clone
