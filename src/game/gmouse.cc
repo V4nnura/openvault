@@ -17,6 +17,7 @@
 #include "game/object.h"
 #include "game/protinst.h"
 #include "game/proto.h"
+#include "game/scripts.h"
 #include "game/skilldex.h"
 #include "game/tile.h"
 #include "game/tweaks.h"
