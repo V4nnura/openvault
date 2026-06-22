@@ -4064,7 +4064,7 @@ static void op_critter_stop_attacking(Program* program)
     }
 
     critter->data.critter.combat.maneuver |= CRITTER_MANEUVER_DISENGAGING;
-    critter->data.critter.combat.whoHitMe = NULL;
+    critter_set_who_hit_me(critter, NULL);
 }
 
 // 0x4525B8
