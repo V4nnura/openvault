@@ -2055,7 +2055,7 @@ static void op_critter_damage(Program* program)
 
     Object* self = scr_find_obj_from_program(program);
     if (object->data.critter.combat.whoHitMeCid == -1) {
-        object->data.critter.combat.whoHitMe = NULL;
+        critter_set_who_hit_me(object, NULL);
     }
 
     bool animate = (damageTypeWithFlags & 0x200) == 0;
