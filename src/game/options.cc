@@ -423,7 +423,7 @@ int do_options()
                 // FALLTHROUGH
             case 502:
                 // PREFERENCES
-                showPreferences = true;
+                do_prefscreen();
                 break;
             case KEY_PLUS:
             case KEY_EQUAL:
@@ -433,13 +433,6 @@ int do_options()
             case KEY_MINUS:
                 DecGamma();
                 break;
-            }
-        }
-
-        if (showPreferences) {
-            do_prefscreen();
-        } else {
-            switch (keyCode) {
             case KEY_F12:
                 dump_screen();
                 break;
