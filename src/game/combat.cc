@@ -1832,7 +1832,7 @@ static void combat_over()
         Object* critter = combat_list[index];
         critter->data.critter.combat.ap = 0;
         obj_remove_outline(critter, NULL);
-        critter->data.critter.combat.whoHitMe = NULL;
+        critter_set_who_hit_me(critter, NULL);
     }
 
     tile_refresh_display();
