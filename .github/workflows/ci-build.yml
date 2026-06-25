@@ -338,7 +338,7 @@ jobs:
     steps:
       - name: Search artifacts
         if: ${{ always() && github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-        uses: actions/download-artifact@v4.2.1
+        uses: actions/download-artifact@v4.3.0
         with:
           path: artifacts/
 
