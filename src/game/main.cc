@@ -231,7 +231,7 @@ int gnw_main(int argc, char** argv)
             case MAIN_MENU_OPTIONS:
                 // main_menu_hide(true);
                 // do_prefscreen();
-                // break;
+                break;
             case MAIN_MENU_CREDITS:
                 main_menu_hide(true);
                 credits("credits.txt", -1, false);
