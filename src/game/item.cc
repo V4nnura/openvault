@@ -540,8 +540,9 @@ static bool item_identical(Object* a1, Object* a2)
         a2->data.item.ammo.quantity = a1->data.item.ammo.quantity;
     }
 
-    // NOTE: Probably inlined memcmp, but I'm not sure why it only checks 32
-    // bytes.
+    // NOTE: Likely there was a comparison of ItemObjectData structs via inlined memcmp
+    // ItemObjectData are 24 bytes, but compared 32 bytes due to struct alignment or such.
+    // Another explanation is the presence of 8 more bytes of unknown data that was never used.
     int i;
     for (i = 0; i < 8; i++) {
         if (a1->field_2C_array[i] != a2->field_2C_array[i]) {
@@ -2102,8 +2103,11 @@ int item_c_curr_size(Object* container)
     return totalSize;
 }
 
+// Adds Drug event to event queue.
+// [duration] is in minutes
+//
 // 0x46BE20
-static int insert_drug_effect(Object* critter, Object* item, int a3, int* stats, int* mods)
+static int insert_drug_effect(Object* critter, Object* item, int duration, int* stats, int* mods)
 {
     int index;
     for (index = 0; index < 3; index++) {
@@ -2128,7 +2132,7 @@ static int insert_drug_effect(Object* critter, Object* item, int a3, int* stats,
         drugEffectEvent->modifiers[index] = mods[index];
     }
 
-    int delay = 600 * a3;
+    int delay = 600 * duration;
     if (critter == obj_dude) {
         if (trait_level(TRAIT_CHEM_RESISTANT)) {
             delay /= 2;
