@@ -2932,7 +2932,7 @@ static void talk_to_pressed_about(int btn, int keyCode)
         reaction = reaction_get(dialog_target);
         reaction_level = reaction_to_level(reaction);
         if (reaction_level != 0) {
-            if (map_data.field_34 != 35) {
+            if (map_data.index != 35) {
                 if (gdialog_speech_playing == 1) {
                     if (soundPlay(lip_info.sound)) {
                         gdialog_free_speech();
@@ -4048,7 +4048,7 @@ static int about_lookup_word(const char* search)
 
     if (found == -1) {
         message_list_id = 1;
-        for (message_id = 600 * map_data.field_34 + 1000; message_id < 600 * map_data.field_34 + 1100; message_id++) {
+        for (message_id = 600 * map_data.index + 1000; message_id < 600 * map_data.index + 1100; message_id++) {
             str = scr_get_msg_str(message_list_id, message_id);
             if (str != NULL && compat_stricmp(str, search) == 0) {
                 found = message_id + 100;
