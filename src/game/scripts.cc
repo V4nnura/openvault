@@ -802,7 +802,7 @@ int scripts_check_state()
     }
 
     if ((scriptState.requests & SCRIPT_REQUEST_ELEVATOR) != 0) {
-        int map = map_data.field_34;
+        int map = map_data.index;
         int elevation = map_elevation;
         int tile = -1;
 
@@ -811,7 +811,7 @@ int scripts_check_state()
         if (elevator_select(scriptState.elevatorType, &map, &elevation, &tile) != -1) {
             automap_pip_save();
 
-            if (map == map_data.field_34) {
+            if (map == map_data.index) {
                 if (elevation == map_elevation) {
                     register_clear(obj_dude);
                     obj_set_rotation(obj_dude, ROTATION_SE, 0);
@@ -909,14 +909,14 @@ int scripts_check_state()
 int scripts_check_state_in_combat()
 {
     if ((scriptState.requests & SCRIPT_REQUEST_ELEVATOR) != 0) {
-        int map = map_data.field_34;
+        int map = map_data.index;
         int elevation = map_elevation;
         int tile = -1;
 
         if (elevator_select(scriptState.elevatorType, &map, &elevation, &tile) != -1) {
             automap_pip_save();
 
-            if (map == map_data.field_34) {
+            if (map == map_data.index) {
                 if (elevation == map_elevation) {
                     register_clear(obj_dude);
                     obj_set_rotation(obj_dude, ROTATION_SE, 0);
