@@ -2345,10 +2345,9 @@ static int combat_turn(Object* obj, bool a2)
     }
 
     if (obj == obj_dude && combat_elev != obj_dude->elevation) {
+        combat_free_move = 0;
         return -1;
     }
-
-    combat_free_move = 0;
 
     return 0;
 }
