@@ -2229,28 +2229,28 @@ void combat_end_turn()
 }
 
 // 0x420798
-static int combat_turn(Object* a1, bool a2)
+static int combat_turn(Object* obj, bool a2)
 {
     int action_points;
     bool script_override = false;
     Script* script;
 
-    combat_turn_obj = a1;
+    combat_turn_obj = obj;
 
-    combat_ctd_init(&main_ctd, a1, NULL, HIT_MODE_PUNCH, HIT_LOCATION_TORSO);
+    combat_ctd_init(&main_ctd, obj, NULL, HIT_MODE_PUNCH, HIT_LOCATION_TORSO);
 
-    if ((a1->data.critter.combat.results & (DAM_KNOCKED_OUT | DAM_DEAD | DAM_LOSE_TURN)) != 0) {
-        a1->data.critter.combat.results &= ~DAM_LOSE_TURN;
+    if ((obj->data.critter.combat.results & (DAM_KNOCKED_OUT | DAM_DEAD | DAM_LOSE_TURN)) != 0) {
+        obj->data.critter.combat.results &= ~DAM_LOSE_TURN;
     } else {
         if (!a2) {
-            action_points = stat_level(a1, STAT_MAXIMUM_ACTION_POINTS);
+            action_points = stat_level(obj, STAT_MAXIMUM_ACTION_POINTS);
             if (gcsd != NULL) {
                 action_points += gcsd->actionPointsBonus;
             }
-            a1->data.critter.combat.ap = action_points;
+            obj->data.critter.combat.ap = action_points;
         }
 
-        if (a1 == obj_dude) {
+        if (obj == obj_dude) {
             kb_clear();
             intface_update_ac(true);
             combat_free_move = 2 * perk_level(PERK_BONUS_MOVE);
@@ -2259,12 +2259,12 @@ static int combat_turn(Object* a1, bool a2)
             soundUpdate();
         }
 
-        if (a1->sid != -1) {
-            scr_set_objs(a1->sid, NULL, NULL);
-            scr_set_ext_param(a1->sid, 4);
-            exec_script_proc(a1->sid, SCRIPT_PROC_COMBAT);
+        if (obj->sid != -1) {
+            scr_set_objs(obj->sid, NULL, NULL);
+            scr_set_ext_param(obj->sid, 4);
+            exec_script_proc(obj->sid, SCRIPT_PROC_COMBAT);
 
-            if (scr_ptr(a1->sid, &script) != -1) {
+            if (scr_ptr(obj->sid, &script) != -1) {
                 script_override = script->scriptOverrides;
             }
 
@@ -2275,12 +2275,12 @@ static int combat_turn(Object* a1, bool a2)
 
         if (!script_override) {
             if (!a2) {
-                if (critter_is_prone(a1)) {
-                    combat_standup(a1);
+                if (critter_is_prone(obj)) {
+                    combat_standup(obj);
                 }
             }
 
-            if (a1 == obj_dude) {
+            if (obj == obj_dude) {
                 game_ui_enable();
                 gmouse_3d_refresh();
 
@@ -2301,7 +2301,7 @@ static int combat_turn(Object* a1, bool a2)
                 if (combat_input() == -1) {
                     game_ui_disable(1);
                     gmouse_set_cursor(MOUSE_CURSOR_WAIT_WATCH);
-                    a1->data.critter.combat.damageLastTurn = 0;
+                    obj->data.critter.combat.damageLastTurn = 0;
                     intface_end_buttons_disable();
                     combat_outline_off();
                     intface_update_move_points(-1, -1);
@@ -2311,17 +2311,17 @@ static int combat_turn(Object* a1, bool a2)
                 }
             } else {
                 Rect rect;
-                if (obj_turn_on_outline(a1, &rect) == 0) {
-                    tile_refresh_rect(&rect, a1->elevation);
+                if (obj_turn_on_outline(obj, &rect) == 0) {
+                    tile_refresh_rect(&rect, obj->elevation);
                 }
 
-                combat_ai(a1, gcsd != NULL ? gcsd->defender : NULL);
+                combat_ai(obj, gcsd != NULL ? gcsd->defender : NULL);
             }
         }
 
         combat_turn_run();
 
-        if (a1 == obj_dude) {
+        if (obj == obj_dude) {
             game_ui_disable(1);
             gmouse_set_cursor(MOUSE_CURSOR_WAIT_WATCH);
             intface_end_buttons_disable();
@@ -2332,19 +2332,19 @@ static int combat_turn(Object* a1, bool a2)
             combat_turn_obj = obj_dude;
         } else {
             Rect rect;
-            if (obj_turn_off_outline(a1, &rect) == 0) {
-                tile_refresh_rect(&rect, a1->elevation);
+            if (obj_turn_off_outline(obj, &rect) == 0) {
+                tile_refresh_rect(&rect, obj->elevation);
             }
         }
     }
 
-    a1->data.critter.combat.damageLastTurn = 0;
+    obj->data.critter.combat.damageLastTurn = 0;
 
     if ((obj_dude->data.critter.combat.results & DAM_DEAD) != 0) {
         return -1;
     }
 
-    if (a1 == obj_dude && combat_elev != obj_dude->elevation) {
+    if (obj == obj_dude && combat_elev != obj_dude->elevation) {
         return -1;
     }
 
