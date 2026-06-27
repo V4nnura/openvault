@@ -712,13 +712,13 @@ char* map_get_description_idx(int map)
 // 0x474248
 char* map_get_description()
 {
-    return map_get_description_idx(map_data.field_34);
+    return map_get_description_idx(map_data.index);
 }
 
 // 0x47427C
 int map_get_index_number()
 {
-    return map_data.field_34;
+    return map_data.index;
 }
 
 // 0x474284
@@ -1308,7 +1308,7 @@ int map_check_state()
 
             memset(&map_state, 0, sizeof(map_state));
 
-            town = xlate_mapidx_to_town(map_data.field_34);
+            town = xlate_mapidx_to_town(map_data.index);
             if (worldmap_script_jump(town, 0) == -1) {
                 debug_printf("\nError: couldn't make jump on worldmap for map jump!");
             }
@@ -1590,14 +1590,14 @@ static void map_match_map_number()
     for (index = 0; index < MAP_COUNT; index++) {
         if (map_get_name_idx(candidate, index) == 0) {
             if (strcmp(temp, candidate) == 0) {
-                map_data.field_34 = index;
+                map_data.index = index;
                 return;
             }
         }
     }
 
     debug_printf("\nNote: Couldn't match name for map!");
-    map_data.field_34 = -1;
+    map_data.index = -1;
 }
 
 // 0x475C3C
@@ -1846,7 +1846,7 @@ static int map_write_MapData(MapHeader* ptr, DB_FILE* stream)
     if (db_fwriteInt32(stream, ptr->flags) == -1) return -1;
     if (db_fwriteInt32(stream, ptr->darkness) == -1) return -1;
     if (db_fwriteInt32(stream, ptr->globalVariablesCount) == -1) return -1;
-    if (db_fwriteInt32(stream, ptr->field_34) == -1) return -1;
+    if (db_fwriteInt32(stream, ptr->index) == -1) return -1;
     if (db_fwriteInt32(stream, ptr->lastVisitTime) == -1) return -1;
     if (db_fwriteInt32List(stream, ptr->field_3C, 44) == -1) return -1;
 
@@ -1866,7 +1866,7 @@ static int map_read_MapData(MapHeader* ptr, DB_FILE* stream)
     if (db_freadInt32(stream, &(ptr->flags)) == -1) return -1;
     if (db_freadInt32(stream, &(ptr->darkness)) == -1) return -1;
     if (db_freadInt32(stream, &(ptr->globalVariablesCount)) == -1) return -1;
-    if (db_freadInt32(stream, &(ptr->field_34)) == -1) return -1;
+    if (db_freadInt32(stream, &(ptr->index)) == -1) return -1;
     if (db_freadInt32(stream, &(ptr->lastVisitTime)) == -1) return -1;
     if (db_freadInt32List(stream, ptr->field_3C, 44) == -1) return -1;
 
