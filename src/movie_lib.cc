@@ -130,9 +130,6 @@ static int _sync_FrameDropped = 0;
 // 0x51EDF8
 static int gMovieLibVolume = 0;
 
-// 0x51EDFC
-static int gMovieLibPan = 0;
-
 // 0x51EE08
 static MovieShowFrameProc* _sf_ShowFrame = _do_nothing_2;
 
@@ -489,15 +486,6 @@ void movieLibSetVolume(int volume)
     }
 }
 
-// 0x4F4920
-void movieLibSetPan(int pan)
-{
-    gMovieLibPan = pan;
-
-    if (gMveSoundBuffer != -1) {
-        audioEngineSoundBufferSetPan(gMveSoundBuffer, pan);
-    }
-}
 
 // 0x4F4940
 void MveSetScreenSize(int width, int height)
@@ -1034,7 +1022,6 @@ static int _MVE_sndConfigure(int a1, int a2, int a3, int a4, int a5, int a6)
     }
 
     audioEngineSoundBufferSetVolume(gMveSoundBuffer, gMovieLibVolume);
-    audioEngineSoundBufferSetPan(gMveSoundBuffer, gMovieLibPan);
 
     dword_6B36A4 = 0;
 
