@@ -133,6 +133,9 @@ static int gMovieLibVolume = 0;
 // 0x51EE08
 static MovieShowFrameProc* _sf_ShowFrame = _do_nothing_2;
 
+// 0x51EE0C
+static int dword_51EE0C = 1;
+
 // 0x51EE14
 static MveSetPaletteFunc* pal_SetPalette;
 
@@ -312,7 +315,10 @@ static unsigned int _$$R0063[256] = {
 static int dword_6B3660;
 
 // 0x6B367C
-static int sf_ScreenWidth;
+static int _sf_ScreenWidth;
+
+// 0x6B3680
+static int dword_6B3680;
 
 // 0x6B3684
 static int _rm_FrameDropCount;
@@ -336,7 +342,10 @@ static unsigned int dword_6B36A4;
 static int _rm_FrameCount;
 
 // 0x6B36AC
-static int sf_ScreenHeight;
+static int _sf_ScreenHeight;
+
+// 0x6B36B0
+static int dword_6B36B0;
 
 // 0x6B36B8
 static unsigned char _palette_entries1[768];
@@ -377,6 +386,9 @@ static int dword_6B39E0[60];
 // 0x6B3AD0
 static int _sync_wait_quanta;
 
+// 0x6B3AD4
+static int dword_6B3AD4;
+
 // 0x6B3AD8
 static int rm_track_bit;
 
@@ -392,6 +404,12 @@ static int dword_6B3AE4;
 // 0x6B3CEC
 static int dword_6B3CEC;
 
+// 0x6B3CF0
+static int dword_6B3CF0;
+
+// 0x6B3CF4
+static int dword_6B3CF4;
+
 // 0x6B3CF8
 static int dword_6B3CF8;
 
@@ -401,8 +419,20 @@ static int _mveBW;
 // 0x6B3D00
 static int dword_6B3D00;
 
+// 0x6B3D04
+static int dword_6B3D04;
+
+// 0x6B3D08
+static int dword_6B3D08;
+
 // 0x6B3D0C
 static unsigned char _pal_tbl[768];
+
+// 0x6B400E
+static int dword_6B400E;
+
+// 0x6B4012
+static int dword_6B4012;
 
 // 0x6B4016
 static unsigned char byte_6B4016;
@@ -433,6 +463,12 @@ static unsigned char* gMovieDirectDrawSurfaceBuffer1;
 
 // 0x6B4037
 static unsigned char* gMovieDirectDrawSurfaceBuffer2;
+
+// 0x6B403B
+static int dword_6B403B;
+
+// 0x6B403F
+static int dword_6B403F;
 
 static SDL_Surface* gMovieSdlSurface1;
 static SDL_Surface* gMovieSdlSurface2;
@@ -487,10 +523,27 @@ void movieLibSetVolume(int volume)
 }
 
 // 0x4F4940
-void MveSetScreenSize(int width, int height)
+void _MVE_sfSVGA(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9)
 {
-    sf_ScreenWidth = width;
-    sf_ScreenHeight = height;
+    _sf_ScreenWidth = a1;
+    _sf_ScreenHeight = a2;
+    dword_6B3AD4 = a1;
+    dword_6B36B0 = a2;
+    dword_6B3D04 = a3;
+    if (dword_51EBD8 & 4)
+        dword_6B3D04 = 2 * a3;
+    dword_6B403F = a4;
+    dword_6B3CF4 = a6;
+    dword_6B400E = a5;
+    dword_6B403B = a7;
+    dword_6B3CF0 = a6 + a5;
+    dword_6B3D08 = a8;
+    if (a7)
+        dword_6B4012 = a6 / a7;
+    else
+        dword_6B4012 = 1;
+    dword_51EE0C = 0;
+    dword_6B3680 = a9;
 }
 
 // 0x4F49F0
@@ -800,7 +853,7 @@ LABEL_5:
                 v12 = 0;
             }
 
-            if (v11 + v12 > sf_ScreenWidth) {
+            if (v11 + v12 > _sf_ScreenWidth) {
                 v6 = -6;
                 break;
             }
@@ -810,12 +863,12 @@ LABEL_5:
                 v13 = 0;
             }
 
-            if (_mveBH + v13 > sf_ScreenHeight) {
+            if (_mveBH + v13 > _sf_ScreenHeight) {
                 v6 = -6;
                 break;
             }
 
-            if (dword_6B4027) {
+            if (dword_6B4027 && !dword_6B3680) {
                 v6 = -6;
                 break;
             }
@@ -830,7 +883,7 @@ LABEL_5:
             }
 
             v19 = v1[1];
-            if (v19 == 0 || v21) {
+            if (v19 == 0 || v21 || dword_6B3680) {
                 _SetPalette_1(v1[0], v19);
             } else {
                 _SetPalette_(v1[0], v19);
@@ -846,7 +899,7 @@ LABEL_5:
             }
 
             v20 = v1[1];
-            if (v20 && !v21) {
+            if (v20 && !v21 && !dword_6B3680) {
                 _SetPalette_1(v1[0], v20);
             }
 
@@ -866,7 +919,12 @@ LABEL_5:
             }
             continue;
         case 10:
+            if (!dword_51EE0C) {
+                continue;
+            }
+
             // TODO: Probably never reached.
+
         case 11:
             // some kind of palette rotation
             _palMakeSynthPalette(v1[0], v1[1], v1[2], v1[3], v1[4], v1[5]);
@@ -1448,9 +1506,9 @@ static void _sfShowFrame(int a1, int a2, int a3)
     v3 = a1;
     if (a1 < 0) {
         if (dword_6B4027) {
-            v3 = (sf_ScreenWidth - (v4 >> 1)) >> 1;
+            v3 = (_sf_ScreenWidth - (v4 >> 1)) >> 1;
         } else {
-            v3 = (sf_ScreenWidth - v4) >> 1;
+            v3 = (_sf_ScreenWidth - v4) >> 1;
         }
     }
 
@@ -1464,9 +1522,9 @@ static void _sfShowFrame(int a1, int a2, int a3)
     } else {
         v6 = _mveBH;
         if (dword_51EBD8 & 4) {
-            v5 = (sf_ScreenHeight - 2 * _mveBH) >> 1;
+            v5 = (_sf_ScreenHeight - 2 * _mveBH) >> 1;
         } else {
-            v5 = (sf_ScreenHeight - _mveBH) >> 1;
+            v5 = (_sf_ScreenHeight - _mveBH) >> 1;
         }
     }
 
