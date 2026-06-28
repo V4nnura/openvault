@@ -14,11 +14,11 @@
 
 namespace fallout {
 
-typedef struct STRUCT_6B3690 {
-    void* field_0;
-    unsigned int field_4;
-    int field_8;
-} STRUCT_6B3690;
+typedef struct MveMem {
+    void* ptr;
+    unsigned int size;
+    int alloced;
+} MveMem;
 
 #pragma pack(2)
 typedef struct Mve {
@@ -33,7 +33,7 @@ typedef struct Mve {
 typedef struct STRUCT_4F6930 {
     int field_0;
     MovieReadProc* readProc;
-    STRUCT_6B3690 field_8;
+    MveMem field_8;
     void* fileHandle;
     int field_18;
     SDL_Surface* field_24;
@@ -53,13 +53,13 @@ typedef struct STRUCT_4F6930 {
     int field_50;
 } STRUCT_4F6930;
 
-static void _MVE_MemInit(STRUCT_6B3690* a1, int a2, void* a3);
-static void _MVE_MemFree(STRUCT_6B3690* a1);
+static void MVE_MemInit(MveMem* mem, unsigned int size, void* ptr);
+static void MVE_MemFree(MveMem* mem);
 static void _do_nothing_2(SDL_Surface* a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9);
 static int _sub_4F4B5();
 static int _ioReset(void* handle);
 static void* _ioRead(int size);
-static void* _MVE_MemAlloc(STRUCT_6B3690* a1, unsigned int a2);
+static void* MVE_MemAlloc(MveMem* mem, unsigned int size);
 static unsigned char* _ioNextRecord();
 static void _sub_4F4DD();
 static int _MVE_rmHoldMovie();
@@ -86,7 +86,7 @@ static void _SetPalette_(int a1, int a2);
 static void _palMakeSynthPalette(int a1, int a2, int a3, int a4, int a5, int a6);
 static void _palLoadPalette(unsigned char* palette, int a2, int a3);
 static void _syncRelease();
-static void _ioRelease();
+static void ioRelease();
 static void _MVE_sndRelease();
 static void _nfRelease();
 static void _frLoad(STRUCT_4F6930* a1);
@@ -359,7 +359,7 @@ static int _rm_FrameDropCount;
 static int _snd_buf;
 
 // 0x6B3690
-static STRUCT_6B3690 _io_mem_buf;
+static MveMem io_mem_buf;
 
 // 0x6B369C
 static int _io_next_hdr;
@@ -530,27 +530,27 @@ void movieLibSetReadProc(MovieReadProc* readProc)
 }
 
 // 0x4F4890
-static void _MVE_MemInit(STRUCT_6B3690* a1, int a2, void* a3)
+static void MVE_MemInit(MveMem* mem, unsigned int size, void* ptr)
 {
-    if (a3 == NULL) {
+    if (ptr == NULL) {
         return;
     }
 
-    _MVE_MemFree(a1);
+    MVE_MemFree(mem);
 
-    a1->field_0 = a3;
-    a1->field_4 = a2;
-    a1->field_8 = 0;
+    mem->ptr = ptr;
+    mem->size = size;
+    mem->alloced = 0;
 }
 
 // 0x4F48C0
-static void _MVE_MemFree(STRUCT_6B3690* a1)
+static void MVE_MemFree(MveMem* mem)
 {
-    if (a1->field_8 && gMovieLibFreeProc != NULL) {
-        gMovieLibFreeProc(a1->field_0);
-        a1->field_8 = 0;
+    if (mem->alloced && gMovieLibFreeProc != NULL) {
+        gMovieLibFreeProc(mem->ptr);
+        mem->alloced = 0;
     }
-    a1->field_4 = 0;
+    mem->size = 0;
 }
 
 // 0x4F4900
@@ -717,7 +717,7 @@ static void* _ioRead(int size)
 {
     void* buf;
 
-    buf = _MVE_MemAlloc(&_io_mem_buf, size);
+    buf = MVE_MemAlloc(&io_mem_buf, size);
     if (buf == NULL) {
         return NULL;
     }
@@ -726,30 +726,30 @@ static void* _ioRead(int size)
 }
 
 // 0x4F4D40
-static void* _MVE_MemAlloc(STRUCT_6B3690* a1, unsigned int a2)
+static void* MVE_MemAlloc(MveMem* mem, unsigned int size)
 {
     void* ptr;
 
-    if (a1->field_4 >= a2) {
-        return a1->field_0;
+    if (mem->size >= size) {
+        return mem->ptr;
     }
 
     if (gMovieLibMallocProc == NULL) {
         return NULL;
     }
 
-    _MVE_MemFree(a1);
+    MVE_MemFree(mem);
 
-    ptr = gMovieLibMallocProc(a2 + 100);
+    ptr = gMovieLibMallocProc(size + 100);
     if (ptr == NULL) {
         return NULL;
     }
 
-    _MVE_MemInit(a1, a2 + 100, ptr);
+    MVE_MemInit(mem, size + 100, ptr);
 
-    a1->field_8 = 1;
+    mem->alloced = 1;
 
-    return a1->field_0;
+    return mem->ptr;
 }
 
 // 0x4F4DA0
@@ -1690,15 +1690,15 @@ static void _syncRelease()
 void _MVE_ReleaseMem()
 {
     _MVE_rmEndMovie();
-    _ioRelease();
+    ioRelease();
     _MVE_sndRelease();
     _nfRelease();
 }
 
 // 0x4F6370
-static void _ioRelease()
+static void ioRelease()
 {
-    _MVE_MemFree(&_io_mem_buf);
+    MVE_MemFree(&io_mem_buf);
 }
 
 // 0x4F6380
@@ -1748,7 +1748,7 @@ static void _frLoad(STRUCT_4F6930* a1)
 // 0x4F6610
 static void _frSave(STRUCT_4F6930* a1)
 {
-    STRUCT_6B3690* ptr;
+    MveMem* ptr;
 
     ptr = &(a1->field_8);
     a1->readProc = gMovieLibReadProc;
