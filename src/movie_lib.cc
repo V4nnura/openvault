@@ -1724,9 +1724,9 @@ static void _nfRelease()
 static void _frLoad(STRUCT_4F6930* a1)
 {
     gMovieLibReadProc = a1->readProc;
-    io_mem_buf.field_0 = a1->field_8.ptr;
-    io_mem_buf.field_4 = a1->field_8.size;
-    io_mem_buf.field_8 = a1->field_8.alloced;
+    io_mem_buf.ptr = a1->field_8.ptr;
+    io_mem_buf.size = a1->field_8.size;
+    io_mem_buf.alloced = a1->field_8.alloced;
     _io_handle = a1->fileHandle;
     _io_next_hdr = a1->field_18;
     gMovieSdlSurface1 = a1->field_24;
@@ -1752,9 +1752,9 @@ static void _frSave(STRUCT_4F6930* a1)
 
     ptr = &(a1->field_8);
     a1->readProc = gMovieLibReadProc;
-    ptr->ptr = io_mem_buf.field_0;
-    ptr->size = io_mem_buf.field_4;
-    ptr->alloced = io_mem_buf.field_8;
+    ptr->ptr = io_mem_buf.ptr;
+    ptr->size = io_mem_buf.size;
+    ptr->alloced = io_mem_buf.alloced;
     a1->fileHandle = _io_handle;
     a1->field_18 = _io_next_hdr;
     a1->field_24 = gMovieSdlSurface1;
