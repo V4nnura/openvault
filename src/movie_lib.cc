@@ -21,23 +21,23 @@ typedef struct MveMem {
 } MveMem;
 
 #pragma pack(2)
-typedef struct Mve {
+typedef struct MveHeader {
     char sig[20];
-    short field_14;
-    short field_16;
-    short field_18;
-    int field_1A;
-} Mve;
+    short size;
+    short ver;
+    short id;
+    unsigned int chunk_hdr;
+} MveHeader;
 #pragma pack()
 
 static void MVE_MemInit(MveMem* mem, unsigned int size, void* ptr);
 static void MVE_MemFree(MveMem* mem);
 static void _do_nothing_2(SDL_Surface* a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9);
 static int _sub_4F4B5();
-static int _ioReset(void* handle);
-static void* _ioRead(int size);
+static int ioReset(void* handle);
+static void* ioRead(int size);
 static void* MVE_MemAlloc(MveMem* mem, unsigned int size);
-static unsigned char* _ioNextRecord();
+static unsigned char* ioNextRecord();
 static int _MVE_rmHoldMovie();
 static int _syncWait();
 static void _MVE_sndPause();
@@ -324,7 +324,7 @@ static int _snd_buf;
 static MveMem io_mem_buf;
 
 // 0x6B369C
-static int _io_next_hdr;
+static unsigned int io_next_hdr;
 
 // 0x6B36A0
 static int dword_6B36A0;
@@ -357,7 +357,7 @@ static int rm_dy;
 static int _gSoundTimeBase;
 
 // 0x6B39CC
-static void* _io_handle;
+static void* io_handle;
 
 // 0x6B39D0
 static int rm_len;
@@ -486,7 +486,6 @@ void movieLibSetVolume(int volume)
     }
 }
 
-
 // 0x4F4940
 void MveSetScreenSize(int width, int height)
 {
@@ -551,12 +550,12 @@ int MVE_rmPrepMovie(void* handle, int dx, int dy, unsigned char track)
         rm_track_bit = 1;
     }
 
-    if (!_ioReset(handle)) {
+    if (!ioReset(handle)) {
         _MVE_rmEndMovie();
         return -8;
     }
 
-    rm_p = _ioNextRecord();
+    rm_p = ioNextRecord();
     rm_len = 0;
 
     if (rm_p == NULL) {
@@ -573,34 +572,25 @@ int MVE_rmPrepMovie(void* handle, int dx, int dy, unsigned char track)
 }
 
 // 0x4F4C90
-static int _ioReset(void* handle)
+static int ioReset(void* handle)
 {
-    Mve* mve;
+    MveHeader* mve;
 
-    _io_handle = handle;
+    io_handle = handle;
 
-    mve = (Mve*)_ioRead(sizeof(Mve));
+    mve = (MveHeader*)ioRead(sizeof(MveHeader));
     if (mve == NULL) {
         return 0;
     }
 
-    if (strncmp(mve->sig, "Interplay MVE File\x1A\x00", 20) != 0) {
+    if (strncmp(mve->sig, "Interplay MVE File\x1A\x00", 20) != 0
+        || mve->id != 4659 - mve->ver
+        || mve->ver != 256
+        || mve->size != 26) {
         return 0;
     }
 
-    if (~mve->field_16 - mve->field_18 != 0xFFFFEDCC) {
-        return 0;
-    }
-
-    if (mve->field_16 != 256) {
-        return 0;
-    }
-
-    if (mve->field_14 != 26) {
-        return 0;
-    }
-
-    _io_next_hdr = mve->field_1A;
+    io_next_hdr = mve->chunk_hdr;
 
     return 1;
 }
@@ -608,7 +598,7 @@ static int _ioReset(void* handle)
 // Reads data from movie file.
 //
 // 0x4F4D00
-static void* _ioRead(int size)
+static void* ioRead(int size)
 {
     void* buf;
 
@@ -617,7 +607,11 @@ static void* _ioRead(int size)
         return NULL;
     }
 
-    return gMovieLibReadProc(_io_handle, buf, size) < 1 ? NULL : buf;
+    if (gMovieLibReadProc(io_handle, buf, size) < 1) {
+        return NULL;
+    }
+
+    return buf;
 }
 
 // 0x4F4D40
@@ -648,16 +642,16 @@ static void* MVE_MemAlloc(MveMem* mem, unsigned int size)
 }
 
 // 0x4F4DA0
-static unsigned char* _ioNextRecord()
+static unsigned char* ioNextRecord()
 {
     unsigned char* buf;
 
-    buf = (unsigned char*)_ioRead((_io_next_hdr & 0xFFFF) + 4);
+    buf = (unsigned char*)ioRead((io_next_hdr & 0xFFFF) + 4);
     if (buf == NULL) {
         return NULL;
     }
 
-    _io_next_hdr = loadUInt32LE(buf + (_io_next_hdr & 0xFFFF));
+    io_next_hdr = loadUInt32LE(buf + (io_next_hdr & 0xFFFF));
 
     return buf;
 }
@@ -751,7 +745,7 @@ LABEL_5:
             return -1;
         case 1:
             v0 = 0;
-            v1 = (unsigned short*)_ioNextRecord();
+            v1 = (unsigned short*)ioNextRecord();
             goto LABEL_5;
         case 2:
             if (!_syncInit(v1[0], v1[2])) {
