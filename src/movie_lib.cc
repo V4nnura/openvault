@@ -38,7 +38,6 @@ static int _ioReset(void* handle);
 static void* _ioRead(int size);
 static void* MVE_MemAlloc(MveMem* mem, unsigned int size);
 static unsigned char* _ioNextRecord();
-static void _sub_4F4DD();
 static int _MVE_rmHoldMovie();
 static int _syncWait();
 static void _MVE_sndPause();
@@ -141,10 +140,10 @@ static MovieShowFrameProc* _sf_ShowFrame = _do_nothing_2;
 static MveSetPaletteFunc* pal_SetPalette;
 
 // 0x51EE18
-static int _rm_hold = 0;
+static int rm_hold = 0;
 
 // 0x51EE1C
-static int _rm_active = 0;
+static int rm_active = 0;
 
 // 0x51EE20
 static bool dword_51EE20 = false;
@@ -352,10 +351,10 @@ static MveMallocFunc* gMovieLibMallocProc;
 static int (*_rm_ctl)();
 
 // 0x6B39C0
-static int _rm_dx;
+static int rm_dx;
 
 // 0x6B39C4
-static int _rm_dy;
+static int rm_dy;
 
 // 0x6B39C8
 static int _gSoundTimeBase;
@@ -364,7 +363,7 @@ static int _gSoundTimeBase;
 static void* _io_handle;
 
 // 0x6B39D0
-static int _rm_len;
+static int rm_len;
 
 // 0x6B39D4
 static MveFreeFunc* gMovieLibFreeProc;
@@ -373,7 +372,7 @@ static MveFreeFunc* gMovieLibFreeProc;
 static int _snd_comp;
 
 // 0x6B39DC
-static unsigned char* _rm_p;
+static unsigned char* rm_p;
 
 // 0x6B39E0
 static int dword_6B39E0[60];
@@ -382,7 +381,7 @@ static int dword_6B39E0[60];
 static int _sync_wait_quanta;
 
 // 0x6B3AD8
-static int _rm_track_bit;
+static int rm_track_bit;
 
 // 0x6B3ADC
 static int _sync_time;
@@ -554,16 +553,14 @@ void _MVE_rmFrameCounts(int* frame_count_ptr, int* frame_drop_count_ptr)
 }
 
 // 0x4F4BF0
-int _MVE_rmPrepMovie(void* handle, int a2, int a3, char a4)
+int MVE_rmPrepMovie(void* handle, int dx, int dy, unsigned char track)
 {
-    _sub_4F4DD();
+    rm_dx = dx;
+    rm_dy = dy;
+    rm_track_bit = 1 << track;
 
-    _rm_dx = a2;
-    _rm_dy = a3;
-    _rm_track_bit = 1 << a4;
-
-    if (_rm_track_bit == 0) {
-        _rm_track_bit = 1;
+    if (rm_track_bit == 0) {
+        rm_track_bit = 1;
     }
 
     if (!_ioReset(handle)) {
@@ -571,16 +568,16 @@ int _MVE_rmPrepMovie(void* handle, int a2, int a3, char a4)
         return -8;
     }
 
-    _rm_p = _ioNextRecord();
-    _rm_len = 0;
+    rm_p = _ioNextRecord();
+    rm_len = 0;
 
-    if (!_rm_p) {
+    if (rm_p == NULL) {
         _MVE_rmEndMovie();
         return -2;
     }
 
-    _rm_active = 1;
-    _rm_hold = 0;
+    rm_active = 1;
+    rm_hold = 0;
     _rm_FrameCount = 0;
     _rm_FrameDropCount = 0;
 
@@ -677,24 +674,12 @@ static unsigned char* _ioNextRecord()
     return buf;
 }
 
-// 0x4F4DD0
-static void _sub_4F4DD()
-{
-    if (dword_51EE20) {
-        return;
-    }
-
-    // TODO: Incomplete.
-
-    dword_51EE20 = true;
-}
-
 // 0x4F4E20
 static int _MVE_rmHoldMovie()
 {
-    if (!_rm_hold) {
+    if (!rm_hold) {
         _MVE_sndPause();
-        _rm_hold = 1;
+        rm_hold = 1;
     }
     _syncWait();
     return 0;
@@ -747,16 +732,16 @@ int _MVE_rmStepMovie()
     int v20;
     unsigned char* v14;
 
-    v0 = _rm_len;
-    v1 = (unsigned short*)_rm_p;
+    v0 = rm_len;
+    v1 = (unsigned short*)rm_p;
 
-    if (!_rm_active) {
+    if (!rm_active) {
         return -10;
     }
 
-    if (_rm_hold) {
+    if (rm_hold) {
         _MVE_sndResume();
-        _rm_hold = 0;
+        rm_hold = 0;
     }
 
 LABEL_5:
@@ -828,7 +813,7 @@ LABEL_5:
                 v11 >>= 1;
             }
 
-            v12 = _rm_dx;
+            v12 = rm_dx;
             if (v12 < 0) {
                 v12 = 0;
             }
@@ -838,7 +823,7 @@ LABEL_5:
                 break;
             }
 
-            v13 = _rm_dy;
+            v13 = rm_dy;
             if (v13 < 0) {
                 v13 = 0;
             }
@@ -870,9 +855,9 @@ LABEL_5:
             }
 
             if (v21) {
-                _do_nothing_(_rm_dx, _rm_dy, v21);
+                _do_nothing_(rm_dx, rm_dy, v21);
             } else if (!_sync_late || v1[1]) {
-                _sfShowFrame(_rm_dx, _rm_dy, v18);
+                _sfShowFrame(rm_dx, rm_dy, v18);
             } else {
                 _sync_FrameDropped = 1;
                 ++_rm_FrameDropCount;
@@ -883,14 +868,14 @@ LABEL_5:
                 _SetPalette_1(v1[0], v20);
             }
 
-            _rm_p = (unsigned char*)v1;
-            _rm_len = v0;
+            rm_p = (unsigned char*)v1;
+            rm_len = v0;
 
             return 0;
         case 8:
         case 9:
             // push data to audio buffers?
-            if (v1[1] & _rm_track_bit) {
+            if (v1[1] & rm_track_bit) {
                 v14 = (unsigned char*)v1 + 6;
                 if ((v5 >> 16) != 8) {
                     v14 = NULL;
@@ -1572,11 +1557,11 @@ static void _palLoadPalette(unsigned char* palette, int a2, int a3)
 // 0x4F6240
 void _MVE_rmEndMovie()
 {
-    if (_rm_active) {
+    if (rm_active) {
         _syncWait();
         _syncRelease();
         _MVE_sndReset();
-        _rm_active = 0;
+        rm_active = 0;
     }
 }
 
