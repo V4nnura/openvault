@@ -33,7 +33,7 @@ typedef struct Mve {
 typedef struct STRUCT_4F6930 {
     int field_0;
     MovieReadProc* readProc;
-    MveMem alloced;
+    MveMem field_8;
     void* fileHandle;
     int field_18;
     SDL_Surface* field_24;
