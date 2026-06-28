@@ -836,13 +836,13 @@ static int movieStart(int win, char* filePath, int (*a3)())
         win_get_rect(GNWWin, &winRect);
         debug_printf("Playing at (%d, %d)  ", movieX + winRect.ulx, movieY + winRect.uly);
         _MVE_rmCallbacks(a3);
-        MveSetShowFrame(movie_MVE_ShowFrame);
+        _MVE_sfCallbacks(movie_MVE_ShowFrame);
 
         MVE_rmPrepMovie(handle, movieX + winRect.ulx, movieY + winRect.uly, 0);
     } else {
         debug_printf("Buffered ");
         _MVE_rmCallbacks(a3);
-        MveSetShowFrame(movieShowFrame);
+        _MVE_sfCallbacks(movieShowFrame);
         MVE_rmPrepMovie(handle, 0, 0, 0);
     }
 
@@ -958,7 +958,7 @@ void movieSetSubtitleFunc(MovieSubtitleFunc* func)
 void movieSetVolume(int volume)
 {
     int normalized_volume = soundVolumeHMItoDirectSound(volume);
-    movieLibSetVolume(normalized_volume);
+    MveSetVolume(normalized_volume);
 }
 
 // 0x4799F0
