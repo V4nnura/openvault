@@ -487,7 +487,7 @@ static int noop()
 void initMovie()
 {
     movieLibSetMemoryProcs(movieMalloc, movieFree);
-    movieLibSetPaletteEntriesProc(movieSetPalette);
+    MveSetPalette(movieSetPalette);
     _MVE_sfSVGA(640, 480, 480, 0, 0, 0, 0, 0, 0);
     movieLibSetReadProc(movieRead);
 }
