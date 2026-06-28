@@ -33,7 +33,7 @@ typedef struct Mve {
 typedef struct STRUCT_4F6930 {
     int field_0;
     MovieReadProc* readProc;
-    MveMem field_8;
+    MveMem alloced;
     void* fileHandle;
     int field_18;
     SDL_Surface* field_24;
@@ -1724,9 +1724,9 @@ static void _nfRelease()
 static void _frLoad(STRUCT_4F6930* a1)
 {
     gMovieLibReadProc = a1->readProc;
-    _io_mem_buf.field_0 = a1->field_8.field_0;
-    _io_mem_buf.field_4 = a1->field_8.field_4;
-    _io_mem_buf.field_8 = a1->field_8.field_8;
+    io_mem_buf.field_0 = a1->field_8.ptr;
+    io_mem_buf.field_4 = a1->field_8.size;
+    io_mem_buf.field_8 = a1->field_8.alloced;
     _io_handle = a1->fileHandle;
     _io_next_hdr = a1->field_18;
     gMovieSdlSurface1 = a1->field_24;
@@ -1752,9 +1752,9 @@ static void _frSave(STRUCT_4F6930* a1)
 
     ptr = &(a1->field_8);
     a1->readProc = gMovieLibReadProc;
-    ptr->field_0 = _io_mem_buf.field_0;
-    ptr->field_4 = _io_mem_buf.field_4;
-    ptr->field_8 = _io_mem_buf.field_8;
+    ptr->ptr = io_mem_buf.field_0;
+    ptr->size = io_mem_buf.field_4;
+    ptr->alloced = io_mem_buf.field_8;
     a1->fileHandle = _io_handle;
     a1->field_18 = _io_next_hdr;
     a1->field_24 = gMovieSdlSurface1;
@@ -1780,7 +1780,7 @@ static void _MVE_frClose(STRUCT_4F6930* a1)
 
     _frSave(&v1);
     _frLoad(a1);
-    _ioRelease();
+    ioRelease();
     _nfRelease();
     _frLoad(&v1);
 
