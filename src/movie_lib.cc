@@ -32,6 +32,7 @@ typedef struct MveHeader {
 
 static void MVE_MemInit(MveMem* mem, unsigned int size, void* ptr);
 static void MVE_MemFree(MveMem* mem);
+static void _do_nothing_2(SDL_Surface* a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9);
 static int _sub_4F4B5();
 static int ioReset(void* handle);
 static void* ioRead(int size);
@@ -127,10 +128,10 @@ static int _sync_late = 0;
 static int _sync_FrameDropped = 0;
 
 // 0x51EDF8
-static int gMovieLibVolume = 0;
+static int mve_volume = 0;
 
 // 0x51EE08
-static MveShowFrameFunc* sf_ShowFrame;
+static MovieShowFrameProc* _sf_ShowFrame = _do_nothing_2;
 
 // 0x51EE0C
 static int dword_51EE0C = 1;
@@ -512,9 +513,9 @@ static void MVE_MemFree(MveMem* mem)
 }
 
 // 0x4F4900
-void movieLibSetVolume(int volume)
+void MveSetVolume(int volume)
 {
-    gMovieLibVolume = volume;
+    mve_volume = volume;
 
     if (gMveSoundBuffer != -1) {
         audioEngineSoundBufferSetVolume(gMveSoundBuffer, volume);
@@ -546,9 +547,14 @@ void _MVE_sfSVGA(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8,
 }
 
 // 0x4F49F0
-void MveSetShowFrame(MveShowFrameFunc* show_frame_func)
+void _MVE_sfCallbacks(MovieShowFrameProc* proc)
 {
-    sf_ShowFrame = show_frame_func;
+    _sf_ShowFrame = proc;
+}
+
+// 0x4F4A00
+static void _do_nothing_2(SDL_Surface* a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9)
+{
 }
 
 // 0x4F4A10
@@ -1067,7 +1073,7 @@ static int _MVE_sndConfigure(int a1, int a2, int a3, int a4, int a5, int a6)
         return 0;
     }
 
-    audioEngineSoundBufferSetVolume(gMveSoundBuffer, gMovieLibVolume);
+    audioEngineSoundBufferSetVolume(gMveSoundBuffer, mve_volume);
 
     dword_6B36A4 = 0;
 
@@ -1531,9 +1537,9 @@ static void _sfShowFrame(int a1, int a2, int a3)
         // TODO: Incomplete.
         // _mve_ShowFrameField(off_6B4033, _mveBW, v6, dword_6B401B, dword_6B401F, dword_6B4017, dword_6B4023, v7, v5, a3);
     } else if (dword_51EBDC == 4) {
-        sf_ShowFrame(gMovieSdlSurface1, _mveBW, v6, dword_6B401B, dword_6B401F, dword_6B4017, dword_6B4023, v7, v5);
+        _sf_ShowFrame(gMovieSdlSurface1, _mveBW, v6, dword_6B401B, dword_6B401F, dword_6B4017, dword_6B4023, v7, v5);
     } else {
-        sf_ShowFrame(gMovieSdlSurface1, _mveBW, v6, 0, dword_6B401F, ((4 * _mveBW / dword_51EBDC - 12) & 0xFFFFFFF0) + 12, dword_6B4023, v7, v5);
+        _sf_ShowFrame(gMovieSdlSurface1, _mveBW, v6, 0, dword_6B401F, ((4 * _mveBW / dword_51EBDC - 12) & 0xFFFFFFF0) + 12, dword_6B4023, v7, v5);
     }
 }
 
