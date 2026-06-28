@@ -812,10 +812,6 @@ static void doSubtitle()
 // 0x479514
 static int movieStart(int win, char* filePath, int (*a3)())
 {
-    int v15;
-    int v16;
-    int v17;
-
     if (running) {
         return 1;
     }
@@ -842,19 +838,13 @@ static int movieStart(int win, char* filePath, int (*a3)())
         _MVE_rmCallbacks(a3);
         _MVE_sfCallbacks(movie_MVE_ShowFrame);
 
-        v17 = 0;
-        v16 = movieY + winRect.uly;
-        v15 = movieX + winRect.ulx;
+        MVE_rmPrepMovie(handle, movieX + winRect.ulx, movieY + winRect.uly, 0);
     } else {
         debug_printf("Buffered ");
         _MVE_rmCallbacks(a3);
         _MVE_sfCallbacks(movieShowFrame);
-        v17 = 0;
-        v16 = 0;
-        v15 = 0;
+        MVE_rmPrepMovie(handle, 0, 0, 0);
     }
-
-    _MVE_rmPrepMovie(handle, v15, v16, v17);
 
     if (movieScaleFlag) {
         debug_printf("scaled\n");
