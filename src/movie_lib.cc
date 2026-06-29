@@ -75,9 +75,6 @@ static int getOffset(uint16_t v);
 // 0x51EBD8
 static int dword_51EBD8 = 0;
 
-// 0x51EBDC
-static int dword_51EBDC = 4;
-
 // 0x51EBE0
 static unsigned short word_51EBE0[256] = {
     // clang-format off
