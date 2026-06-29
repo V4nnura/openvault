@@ -794,7 +794,7 @@ LABEL_5:
 
             if (rm_dx + _mveBW > _sf_ScreenWidth
                 || rm_dy + _mveBH > _sf_ScreenHeight) {
-                MVE_rmEndMovie();
+                _MVE_rmEndMovie();
                 return -6;
             }
 
