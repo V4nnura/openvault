@@ -60,7 +60,7 @@ static void palLoadPalette(unsigned char* palette, int start, int count);
 static void syncRelease();
 static void ioRelease();
 static void _MVE_sndRelease();
-static void _nfRelease();
+static void nfRelease();
 static int _MVE_sndDecompM16(unsigned short* a1, unsigned char* a2, int a3, int a4);
 static int _MVE_sndDecompS16(unsigned short* a1, unsigned char* a2, int a3, int a4);
 static void _nfPkConfig();
@@ -443,9 +443,9 @@ static int dword_6B402B;
 static int _mveBH;
 
 static MveMem nf_mem_cur;
-static unsigned char* nf_buf_cur;
+static SDL_Surface* nf_buf_cur;
 static MveMem nf_mem_prv;
-static unsigned char* nf_buf_prv;
+static SDL_Surface* nf_buf_prv;
 
 // 0x6B403B
 static int dword_6B403B;
@@ -1369,7 +1369,7 @@ void _MVE_ReleaseMem()
     _MVE_rmEndMovie();
     ioRelease();
     _MVE_sndRelease();
-    _nfRelease();
+    nfRelease();
 }
 
 // 0x4F6370
@@ -1384,7 +1384,7 @@ static void _MVE_sndRelease()
 }
 
 // 0x4F6390
-static void _nfRelease()
+static void nfRelease()
 {
     MVE_MemFree(&nf_mem_cur);
     nf_buf_cur = NULL;
