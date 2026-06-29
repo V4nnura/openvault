@@ -7,12 +7,12 @@ namespace fallout {
 
 typedef void*(MveMallocFunc)(size_t size);
 typedef void(MveFreeFunc)(void* ptr);
-typedef bool(MovieReadProc)(void* handle, void* buffer, int count);
+typedef bool(MveReadFunc)(void* handle, void* buffer, int count);
 typedef void(MveShowFrameFunc)(SDL_Surface*, int, int, int, int, int, int, int, int);
 typedef void(MveSetPaletteFunc)(unsigned char* palette, int start, int count);
 
 void movieLibSetMemoryProcs(MveMallocFunc* mallocProc, MveFreeFunc* freeProc);
-void movieLibSetReadProc(MovieReadProc* readProc);
+void MveSetIO(MveReadFunc* read_func);
 void MveSetVolume(int volume);
 void movieLibSetPan(int pan);
 void _MVE_sfSVGA(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9);
