@@ -553,16 +553,6 @@ static int _sub_4F4B5()
     return 0;
 }
 
-// 0x4F4BB0
-void _sub_4F4BB(int a1)
-{
-    if (a1 == 3) {
-        dword_51EBDC = 3;
-    } else {
-        dword_51EBDC = 4;
-    }
-}
-
 // 0x4F4BD0
 void _MVE_rmFrameCounts(int* frame_count_ptr, int* frame_drop_count_ptr)
 {
