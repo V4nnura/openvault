@@ -481,7 +481,7 @@ void initMovie()
 {
     MveSetMemory(movieMalloc, movieFree);
     MveSetPalette(movieSetPalette);
-    _MVE_sfSVGA(640, 480, 480, 0, 0, 0, 0);
+    _MVE_sfSVGA(640, 480, 480, 0);
     MveSetIO(movieRead);
 }
 
