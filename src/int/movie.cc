@@ -44,13 +44,12 @@ static int blitAlpha(int win, unsigned char* data, int width, int height, int pi
 static int movieScaleWindow(int win, unsigned char* data, int width, int height, int pitch);
 static int blitNormal(int win, unsigned char* data, int width, int height, int pitch);
 static void movieSetPalette(unsigned char* palette, int start, int end);
-static int noop();
 static void cleanupMovie(int a1);
 static void cleanupLast();
 static DB_FILE* openFile(char* filePath);
 static void openSubtitle(char* filePath);
 static void doSubtitle();
-static int movieStart(int win, char* filePath, int (*a3)());
+static int movieStart(int win, char* filePath);
 static bool localMovieCallback();
 static int stepMovie();
 
@@ -477,12 +476,6 @@ static void movieSetPalette(unsigned char* palette, int start, int end)
     }
 }
 
-// 0x478C18
-static int noop()
-{
-    return 0;
-}
-
 // 0x478C1C
 void initMovie()
 {
@@ -810,7 +803,7 @@ static void doSubtitle()
 }
 
 // 0x479514
-static int movieStart(int win, char* filePath, int (*a3)())
+static int movieStart(int win, char* filePath)
 {
     if (running) {
         return 1;
@@ -835,13 +828,11 @@ static int movieStart(int win, char* filePath, int (*a3)())
         debug_printf("Direct ");
         win_get_rect(GNWWin, &winRect);
         debug_printf("Playing at (%d, %d)  ", movieX + winRect.ulx, movieY + winRect.uly);
-        _MVE_rmCallbacks(a3);
         MveSetShowFrame(movieDirect);
 
         MVE_rmPrepMovie(handle, movieX + winRect.ulx, movieY + winRect.uly, 0);
     } else {
         debug_printf("Buffered ");
-        _MVE_rmCallbacks(a3);
         MveSetShowFrame(movieBuffered);
         MVE_rmPrepMovie(handle, 0, 0, 0);
     }
