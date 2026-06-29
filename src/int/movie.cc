@@ -507,14 +507,8 @@ static void cleanupMovie(int a1)
     }
 
     if (gMovieSdlSurface != NULL) {
-        if (SDL_LockSurface(gMovieSdlSurface) == 0) {
-            lastMovieBuffer = (unsigned char*)mymalloc(lastMovieBH * lastMovieBW, __FILE__, __LINE__); // "..\\int\\MOVIE.C", 802
-            buf_to_buf((unsigned char*)gMovieSdlSurface->pixels + gMovieSdlSurface->pitch * lastMovieSX + lastMovieSY, lastMovieBW, lastMovieBH, gMovieSdlSurface->pitch, lastMovieBuffer, lastMovieBW);
-            SDL_UnlockSurface(gMovieSdlSurface);
-        } else {
-            debug_printf("Couldn't lock movie surface\n");
-        }
-
+        lastMovieBuffer = (unsigned char*)mymalloc(lastMovieBH * lastMovieBW, __FILE__, __LINE__); // "..\\int\\MOVIE.C", 802
+        memcpy(lastMovieBuffer, gMovieSdlSurface, lastMovieBW * lastMovieBH);
         gMovieSdlSurface = NULL;
     }
 
@@ -596,16 +590,10 @@ int movieSetFlags(int flags)
 
     if ((flags & MOVIE_FLAG_0x01) != 0) {
         movieScaleFlag = 1;
-
-        if ((movieFlags & MOVIE_EXTENDED_FLAG_0x04) != 0) {
-            _sub_4F4BB(3);
-        }
     } else {
         movieScaleFlag = 0;
 
-        if ((movieFlags & MOVIE_EXTENDED_FLAG_0x04) != 0) {
-            _sub_4F4BB(4);
-        } else {
+        if ((MovieFlags & MOVIE_EXTENDED_FLAG_0x04) == 0) {
             movieFlags &= ~MOVIE_EXTENDED_FLAG_0x08;
         }
     }
