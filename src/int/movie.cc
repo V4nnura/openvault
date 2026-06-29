@@ -479,7 +479,7 @@ static void movieSetPalette(unsigned char* palette, int start, int end)
 // 0x478C1C
 void initMovie()
 {
-    movieLibSetMemoryProcs(movieMalloc, movieFree);
+    MveSetMemory(movieMalloc, movieFree);
     MveSetPalette(movieSetPalette);
     _MVE_sfSVGA(640, 480, 480, 0, 0, 0, 0, 0, 0);
     MveSetIO(movieRead);
