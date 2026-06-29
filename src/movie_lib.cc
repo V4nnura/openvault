@@ -49,7 +49,9 @@ static int syncWaitLevel(int wait);
 static void _CallsSndBuff_Loc(unsigned char* a1, int a2);
 static int _MVE_sndAdd(unsigned char* dest, unsigned char** src_ptr, int a3, int a4, int a5);
 static void _MVE_sndResume();
-static int nfConfig(int width, int height, int a3, int a4);
+static int _nfConfig(int a1, int a2, int a3, int a4);
+static bool movieLockSurfaces();
+static void movieUnlockSurfaces();
 static void movieSwapSurfaces();
 static void sfShowFrame(int dst_x, int dst_y, int a3);
 static void _do_nothing_(int a1, int a2, unsigned short* a3);
@@ -60,7 +62,7 @@ static void palLoadPalette(unsigned char* palette, int start, int count);
 static void syncRelease();
 static void ioRelease();
 static void _MVE_sndRelease();
-static void nfRelease();
+static void _nfRelease();
 static int _MVE_sndDecompM16(unsigned short* a1, unsigned char* a2, int a3, int a4);
 static int _MVE_sndDecompS16(unsigned short* a1, unsigned char* a2, int a3, int a4);
 static void _nfPkConfig();
@@ -442,10 +444,11 @@ static int dword_6B402B;
 // 0x6B402F
 static int _mveBH;
 
-static MveMem nf_mem_cur;
-static unsigned char* nf_buf_cur;
-static MveMem nf_mem_prv;
-static unsigned char* nf_buf_prv;
+// 0x6B4033
+static unsigned char* gMovieDirectDrawSurfaceBuffer1;
+
+// 0x6B4037
+static unsigned char* gMovieDirectDrawSurfaceBuffer2;
 
 // 0x6B403B
 static int dword_6B403B;
@@ -453,6 +456,8 @@ static int dword_6B403B;
 // 0x6B403F
 static int dword_6B403F;
 
+static SDL_Surface* gMovieSdlSurface1;
+static SDL_Surface* gMovieSdlSurface2;
 static int gMveSoundBuffer = -1;
 static unsigned int gMveBufferBytes;
 
@@ -776,7 +781,7 @@ LABEL_5:
                 v10 = v1[2];
             }
 
-            if (!nfConfig(v1[0], v1[1], v10, v9)) {
+            if (!_nfConfig(v1[0], v1[1], v10, v9)) {
                 _MVE_rmEndMovie();
                 return -5;
             }
@@ -872,8 +877,69 @@ LABEL_5:
                 movieSwapSurfaces();
             }
 
+            if (dword_6B4027) {
+                if (dword_51EBD8) {
+                    v6 = -8;
+                    break;
+                }
+
+                // lock
+                if (!movieLockSurfaces()) {
+                    v6 = -12;
+                    break;
+                }
+
+                // TODO: Incomplete.
+                assert(false);
+                // _nfHPkDecomp(v3, v1[7], v1[2], v1[3], v1[4], v1[5]);
+
+                // unlock
+                movieUnlockSurfaces();
+                continue;
+            }
+
+            if ((dword_51EBD8 & 3) == 1) {
+                // lock
+                if (!movieLockSurfaces()) {
+                    v6 = -12;
+                    break;
+                }
+
+                // TODO: Incomplete.
+                assert(false);
+                // _nfPkDecompH(v3, v1[7], v1[2], v1[3], v1[4], v1[5]);
+
+                // unlock
+                movieUnlockSurfaces();
+                continue;
+            }
+
+            if ((dword_51EBD8 & 3) == 2) {
+                // lock
+                if (!movieLockSurfaces()) {
+                    v6 = -12;
+                    break;
+                }
+
+                // TODO: Incomplete.
+                assert(false);
+                // _nfPkDecompH(v3, v1[7], v1[2], v1[3], v1[4], v1[5]);
+
+                // unlock
+                movieUnlockSurfaces();
+                continue;
+            }
+
+            // lock
+            if (!movieLockSurfaces()) {
+                v6 = -12;
+                break;
+            }
+
             _nfPkDecomp((unsigned char*)v3, (unsigned char*)&v1[7], v1[2], v1[3], v1[4], v1[5]);
 
+            // unlock
+            movieUnlockSurfaces();
             continue;
         default:
             // unknown chunk
@@ -1250,20 +1316,56 @@ static void _MVE_sndResume()
 }
 
 // 0x4F5CB0
-static int nfConfig(int width, int height, int a3, int a4)
+static int _nfConfig(int a1, int a2, int a3, int a4)
 {
-    byte_6B4016 = a3;
-    _mveBW = 8 * width;
-    _mveBH = 8 * height * a3;
+    if (gMovieSdlSurface1 != NULL) {
+        SDL_FreeSurface(gMovieSdlSurface1);
+        gMovieSdlSurface1 = NULL;
+    }
 
-    nf_buf_cur = (unsigned char*)MVE_MemAlloc(&nf_mem_cur, _mveBW * _mveBH);
-    if (nf_buf_cur == nullptr) {
+    if (gMovieSdlSurface2 != NULL) {
+        SDL_FreeSurface(gMovieSdlSurface2);
+        gMovieSdlSurface2 = NULL;
+    }
+
+    byte_6B4016 = a3;
+    _mveBW = 8 * a1;
+    _mveBH = 8 * a2 * a3;
+
+    if (dword_51EBD8) {
+        _mveBH >>= 1;
+    }
+
+    int depth;
+    int rmask;
+    int gmask;
+    int bmask;
+    if (a4) {
+        depth = 16;
+        rmask = 0x7C00;
+        gmask = 0x3E0;
+        bmask = 0x1F;
+    } else {
+        depth = 8;
+        rmask = 0;
+        gmask = 0;
+        bmask = 0;
+    }
+
+    gMovieSdlSurface1 = SDL_CreateRGBSurface(0, _mveBW, _mveBH, depth, rmask, gmask, bmask, 0);
+    if (gMovieSdlSurface1 == NULL) {
         return 0;
     }
 
-    nf_buf_prv = (unsigned char*)MVE_MemAlloc(&nf_mem_cur, _mveBW * _mveBH);
-    if (nf_buf_prv == nullptr) {
+    gMovieSdlSurface2 = SDL_CreateRGBSurface(0, _mveBW, _mveBH, depth, rmask, gmask, bmask, 0);
+    if (gMovieSdlSurface2 == NULL) {
         return 0;
+    }
+
+    dword_6B4027 = a4;
+
+    if (a4) {
+        _mveBW *= 2;
     }
 
     dword_6B3D00 = 8 * a3 * _mveBW;
@@ -1274,12 +1376,39 @@ static int nfConfig(int width, int height, int a3, int a4)
     return 1;
 }
 
+// 0x4F5E60
+static bool movieLockSurfaces()
+{
+    if (gMovieSdlSurface1 != NULL && gMovieSdlSurface2 != NULL) {
+        if (SDL_LockSurface(gMovieSdlSurface1) != 0) {
+            return false;
+        }
+
+        gMovieDirectDrawSurfaceBuffer1 = (unsigned char*)gMovieSdlSurface1->pixels;
+
+        if (SDL_LockSurface(gMovieSdlSurface2) != 0) {
+            return false;
+        }
+
+        gMovieDirectDrawSurfaceBuffer2 = (unsigned char*)gMovieSdlSurface2->pixels;
+    }
+
+    return true;
+}
+
+// 0x4F5EF0
+static void movieUnlockSurfaces()
+{
+    SDL_UnlockSurface(gMovieSdlSurface1);
+    SDL_UnlockSurface(gMovieSdlSurface2);
+}
+
 // 0x4F5F20
 static void movieSwapSurfaces()
 {
-    unsigned char* tmp = nf_buf_prv;
-    nf_buf_prv = nf_buf_cur;
-    nf_buf_cur = tmp;
+    SDL_Surface* tmp = gMovieSdlSurface2;
+    gMovieSdlSurface2 = gMovieSdlSurface1;
+    gMovieSdlSurface1 = tmp;
 }
 
 // 0x4F5F40
@@ -1289,7 +1418,7 @@ static void sfShowFrame(int dst_x, int dst_y, int a3)
     dst_y = (_sf_ScreenHeight - _mveBH) / 2;
 
     if (a3 == 0) {
-        sf_ShowFrame(nf_buf_cur, _mveBW, _mveBH, 0, 0, _mveBW, _mveBH, dst_x, dst_y);
+        sf_ShowFrame(gMovieSdlSurface1, _mveBW, _mveBH, 0, 0, _mveBW, _mveBH, dst_x, dst_y);
     }
 }
 
@@ -1369,7 +1498,7 @@ void _MVE_ReleaseMem()
     _MVE_rmEndMovie();
     ioRelease();
     _MVE_sndRelease();
-    nfRelease();
+    _nfRelease();
 }
 
 // 0x4F6370
@@ -1384,13 +1513,17 @@ static void _MVE_sndRelease()
 }
 
 // 0x4F6390
-static void nfRelease()
+static void _nfRelease()
 {
-    MVE_MemFree(&nf_mem_cur);
-    nf_buf_cur = NULL;
+    if (gMovieSdlSurface1 != NULL) {
+        SDL_FreeSurface(gMovieSdlSurface1);
+        gMovieSdlSurface1 = NULL;
+    }
 
-    MVE_MemFree(&nf_mem_prv);
-    nf_buf_prv = NULL;
+    if (gMovieSdlSurface2 != NULL) {
+        SDL_FreeSurface(gMovieSdlSurface2);
+        gMovieSdlSurface2 = NULL;
+    }
 }
 
 // 0x4F697C
@@ -1494,12 +1627,12 @@ static void _nfPkDecomp(unsigned char* a1, unsigned char* a2, int a3, int a4, in
     dword_6B4023 = 8 * a6 * byte_6B4016;
 
     var_8 = dword_6B3D00 - dword_6B4017;
-    dest = nf_buf_cur;
+    dest = gMovieDirectDrawSurfaceBuffer1;
 
     var_10 = dword_6B3CEC - 8;
 
     if (a3 || a4) {
-        dest = nf_buf_cur + dword_6B401B + _mveBW * dword_6B401F;
+        dest = gMovieDirectDrawSurfaceBuffer1 + dword_6B401B + _mveBW * dword_6B401F;
     }
 
     while (a6--) {
@@ -1522,7 +1655,7 @@ static void _nfPkDecomp(unsigned char* a1, unsigned char* a2, int a3, int a4, in
                 case 5:
                     switch (v7) {
                     case 0:
-                        v10 = nf_buf_prv - nf_buf_cur;
+                        v10 = gMovieDirectDrawSurfaceBuffer2 - gMovieDirectDrawSurfaceBuffer1;
                         break;
                     case 2:
                     case 3:
@@ -1547,7 +1680,7 @@ static void _nfPkDecomp(unsigned char* a1, unsigned char* a2, int a3, int a4, in
                                 a2 += 2;
                             }
 
-                            v10 = getOffset(offset) + (nf_buf_prv - nf_buf_cur);
+                            v10 = getOffset(offset) + (gMovieDirectDrawSurfaceBuffer2 - gMovieDirectDrawSurfaceBuffer1);
                         }
                         break;
                     }
