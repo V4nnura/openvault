@@ -357,7 +357,7 @@ static void movieBuffered(SDL_Surface* surface, int srcWidth, int srcHeight, int
         }
     }
 
-    SDL_UnlockSurface(a1);
+    SDL_UnlockSurface(surface);
 }
 
 // 0x4788A8
