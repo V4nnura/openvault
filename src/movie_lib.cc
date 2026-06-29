@@ -509,7 +509,7 @@ void MveSetVolume(int volume)
 }
 
 // 0x4F4940
-void _MVE_sfSVGA(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9)
+void _MVE_sfSVGA(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
 {
     _sf_ScreenWidth = a1;
     _sf_ScreenHeight = a2;
@@ -523,13 +523,11 @@ void _MVE_sfSVGA(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8,
     dword_6B400E = a5;
     dword_6B403B = a7;
     dword_6B3CF0 = a6 + a5;
-    dword_6B3D08 = a8;
     if (a7)
         dword_6B4012 = a6 / a7;
     else
         dword_6B4012 = 1;
     dword_51EE0C = 0;
-    dword_6B3680 = a9;
 }
 
 // 0x4F49F0
@@ -792,7 +790,7 @@ LABEL_5:
                 return -6;
             }
 
-            if (dword_6B4027 && !dword_6B3680) {
+            if (dword_6B4027) {
                 v6 = -6;
                 break;
             }
@@ -807,7 +805,7 @@ LABEL_5:
             }
 
             v12 = v1[1];
-            if (v12 == 0 || v18 || dword_6B3680) {
+            if (v12 == 0 || v18) {
                 palSetPalette(v1[0], v12);
             } else {
                 palClrPalette(v1[0], v12);
@@ -823,7 +821,7 @@ LABEL_5:
             }
 
             v13 = v1[1];
-            if (v13 && !v18 && !dword_6B3680) {
+            if (v13 && !v18) {
                 palSetPalette(v1[0], v13);
             }
 
