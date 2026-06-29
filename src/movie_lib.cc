@@ -443,9 +443,9 @@ static int dword_6B402B;
 static int _mveBH;
 
 static MveMem nf_mem_cur;
-static SDL_Surface* nf_buf_cur;
+static unsigned char* nf_buf_cur;
 static MveMem nf_mem_prv;
-static SDL_Surface* nf_buf_prv;
+static unsigned char* nf_buf_prv;
 
 // 0x6B403B
 static int dword_6B403B;
@@ -1289,7 +1289,7 @@ static void sfShowFrame(int dst_x, int dst_y, int a3)
     dst_y = (_sf_ScreenHeight - _mveBH) / 2;
 
     if (a3 == 0) {
-        sf_ShowFrame(nf_buf_cur, _mveBW, _mveBH, 0, 0, _mveBW, _mveBH, dst_x, dst_y);
+        (unsigned char*)sf_ShowFrame(nf_buf_cur, _mveBW, _mveBH, 0, 0, _mveBW, _mveBH, dst_x, dst_y);
     }
 }
 
