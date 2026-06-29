@@ -340,7 +340,7 @@ static int _sf_ScreenHeight;
 static int dword_6B36B0;
 
 // 0x6B39B8
-static MveMallocFunc* gMovieLibMallocProc;
+static MveMallocFunc* mve_malloc_func;
 
 // 0x6B39C0
 static int rm_dx;
@@ -358,7 +358,7 @@ static void* io_handle;
 static int rm_len;
 
 // 0x6B39D4
-static MveFreeFunc* gMovieLibFreeProc;
+static MveFreeFunc* mve_free_func;
 
 // 0x6B39D8
 static int _snd_comp;
@@ -462,10 +462,10 @@ static int gMveSoundBuffer = -1;
 static unsigned int gMveBufferBytes;
 
 // 0x4F4800
-void movieLibSetMemoryProcs(MveMallocFunc* mallocProc, MveFreeFunc* freeProc)
+void MveSetMemory(MveMallocFunc* malloc_func, MveFreeFunc* free_func)
 {
-    gMovieLibMallocProc = mallocProc;
-    gMovieLibFreeProc = freeProc;
+    mve_malloc_func = malloc_func;
+    mve_free_func = free_func;
 }
 
 // 0x4F4860
@@ -491,8 +491,8 @@ static void MVE_MemInit(MveMem* mem, unsigned int size, void* ptr)
 // 0x4F48C0
 static void MVE_MemFree(MveMem* mem)
 {
-    if (mem->alloced && gMovieLibFreeProc != NULL) {
-        gMovieLibFreeProc(mem->ptr);
+    if (mem->alloced && mve_free_func != NULL) {
+        mve_free_func(mem->ptr);
         mem->alloced = 0;
     }
     mem->size = 0;
@@ -640,13 +640,13 @@ static void* MVE_MemAlloc(MveMem* mem, unsigned int size)
         return mem->ptr;
     }
 
-    if (gMovieLibMallocProc == NULL) {
+    if (mve_malloc_func == NULL) {
         return NULL;
     }
 
     MVE_MemFree(mem);
 
-    ptr = gMovieLibMallocProc(size + 100);
+    ptr = mve_malloc_func(size + 100);
     if (ptr == NULL) {
         return NULL;
     }
