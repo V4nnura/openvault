@@ -11,7 +11,7 @@ typedef bool(MveReadFunc)(void* handle, void* buffer, int count);
 typedef void(MveShowFrameFunc)(SDL_Surface*, int, int, int, int, int, int, int, int);
 typedef void(MveSetPaletteFunc)(unsigned char* palette, int start, int count);
 
-void movieLibSetMemoryProcs(MveMallocFunc* mallocProc, MveFreeFunc* freeProc);
+void MveSetMemory(MveMallocFunc* malloc_func, MveFreeFunc* free_func);
 void MveSetIO(MveReadFunc* read_func);
 void MveSetVolume(int volume);
 void movieLibSetPan(int pan);
