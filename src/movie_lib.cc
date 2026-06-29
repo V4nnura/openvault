@@ -53,7 +53,7 @@ static int _nfConfig(int a1, int a2, int a3, int a4);
 static bool movieLockSurfaces();
 static void movieUnlockSurfaces();
 static void movieSwapSurfaces();
-static void _sfShowFrame(int a1, int a2, int a3);
+static void sfShowFrame(int dst_x, int dst_y, int a3);
 static void _do_nothing_(int a1, int a2, unsigned short* a3);
 static void palSetPalette(int start, int count);
 static void palClrPalette(int start, int count);
@@ -788,33 +788,14 @@ LABEL_5:
             }
 
             if (!_nfConfig(v1[0], v1[1], v10, v9)) {
-                v6 = -5;
-                break;
+                _MVE_rmEndMovie();
+                return -5;
             }
 
-            v11 = 4 * _mveBW / dword_51EBDC & 0xFFFFFFF0;
-            if (dword_6B4027) {
-                v11 >>= 1;
-            }
-
-            v12 = rm_dx;
-            if (v12 < 0) {
-                v12 = 0;
-            }
-
-            if (v11 + v12 > _sf_ScreenWidth) {
-                v6 = -6;
-                break;
-            }
-
-            v13 = rm_dy;
-            if (v13 < 0) {
-                v13 = 0;
-            }
-
-            if (_mveBH + v13 > _sf_ScreenHeight) {
-                v6 = -6;
-                break;
+            if (rm_dx + _mveBW > _sf_ScreenWidth
+                || rm_dy + _mveBH > _sf_ScreenHeight) {
+                MVE_rmEndMovie();
+                return -6;
             }
 
             if (dword_6B4027 && !dword_6B3680) {
@@ -1437,55 +1418,13 @@ static void movieSwapSurfaces()
 }
 
 // 0x4F5F40
-static void _sfShowFrame(int a1, int a2, int a3)
+static void sfShowFrame(int dst_x, int dst_y, int a3)
 {
-    int v3;
-    int v4;
-    int v5;
-    int v6;
-    int v7;
+    dst_x = (_sf_ScreenWidth - _mveBW) / 2;
+    dst_y = (_sf_ScreenHeight - _mveBH) / 2;
 
-    v4 = ((4 * _mveBW / dword_51EBDC - 12) & 0xFFFFFFF0) + 12;
-
-    dword_6B3CF8 = _mveBW - dword_51EBDC * (v4 >> 2);
-
-    v3 = a1;
-    if (a1 < 0) {
-        if (dword_6B4027) {
-            v3 = (_sf_ScreenWidth - (v4 >> 1)) >> 1;
-        } else {
-            v3 = (_sf_ScreenWidth - v4) >> 1;
-        }
-    }
-
-    if (dword_6B4027) {
-        v3 *= 2;
-    }
-
-    v5 = a2;
-    if (a2 >= 0) {
-        v6 = _mveBH;
-    } else {
-        v6 = _mveBH;
-        if (dword_51EBD8 & 4) {
-            v5 = (_sf_ScreenHeight - 2 * _mveBH) >> 1;
-        } else {
-            v5 = (_sf_ScreenHeight - _mveBH) >> 1;
-        }
-    }
-
-    v7 = v3 & 0xFFFFFFFC;
-    if (dword_51EBD8 & 4) {
-        v5 >>= 1;
-    }
-
-    if (a3) {
-        // TODO: Incomplete.
-        // _mve_ShowFrameField(off_6B4033, _mveBW, v6, dword_6B401B, dword_6B401F, dword_6B4017, dword_6B4023, v7, v5, a3);
-    } else if (dword_51EBDC == 4) {
-        sf_ShowFrame(gMovieSdlSurface1, _mveBW, v6, dword_6B401B, dword_6B401F, dword_6B4017, dword_6B4023, v7, v5);
-    } else {
-        sf_ShowFrame(gMovieSdlSurface1, _mveBW, v6, 0, dword_6B401F, ((4 * _mveBW / dword_51EBDC - 12) & 0xFFFFFFF0) + 12, dword_6B4023, v7, v5);
+    if (a3 == 0) {
+        sf_ShowFrame(gMovieSdlSurface1, _mveBW, _mveBH, 0, 0, _mveBW, _mveBH, dst_x, dst_y);
     }
 }
 
@@ -1582,15 +1521,11 @@ static void _MVE_sndRelease()
 // 0x4F6390
 static void _nfRelease()
 {
-    if (gMovieSdlSurface1 != NULL) {
-        SDL_FreeSurface(gMovieSdlSurface1);
-        gMovieSdlSurface1 = NULL;
-    }
+    MVE_MemFree(&gMovieSdlSurface1);
+    gMovieSdlSurface1 = NULL;
 
-    if (gMovieSdlSurface2 != NULL) {
-        SDL_FreeSurface(gMovieSdlSurface2);
-        gMovieSdlSurface2 = NULL;
-    }
+    MVE_MemFree(&gMovieSdlSurface2);
+    gMovieSdlSurface2 = NULL;
 }
 
 // 0x4F697C
