@@ -1,14 +1,14 @@
 #ifndef MOVIE_LIB_H
 #define MOVIE_LIB_H
 
-#include <SDL.h>
+#include <stddef.h>
 
 namespace fallout {
 
 typedef void*(MveMallocFunc)(size_t size);
 typedef void(MveFreeFunc)(void* ptr);
 typedef bool(MveReadFunc)(void* handle, void* buffer, int count);
-typedef void(MveShowFrameFunc)(SDL_Surface*, int, int, int, int, int, int, int, int);
+typedef void(MveShowFrameFunc)(unsigned char* pixels, unsigned char* pixels, int src_width, int src_height, int src_x, int src_y, int dst_width, int dst_height, int dst_x, int dst_y);
 typedef void(MveSetPaletteFunc)(unsigned char* palette, int start, int count);
 
 void MveSetMemory(MveMallocFunc* malloc_func, MveFreeFunc* free_func);
