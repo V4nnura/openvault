@@ -34,7 +34,7 @@ typedef struct MovieSubtitleListNode {
 
 static void* movieMalloc(size_t size);
 static void movieFree(void* ptr);
-static bool movieRead(int fileHandle, void* buf, int count);
+static bool movieRead(void* handle, void* buf, int count);
 static void movieDirect(SDL_Surface* surface, int srcWidth, int srcHeight, int srcX, int srcY, int destWidth, int destHeight, int a8, int a9);
 static void movieBuffered(SDL_Surface* surface, int srcWidth, int srcHeight, int srcX, int srcY, int destWidth, int destHeight, int a8, int a9);
 static int movieScaleSubRect(int win, unsigned char* data, int width, int height, int pitch);
@@ -489,7 +489,7 @@ void initMovie()
     movieLibSetMemoryProcs(movieMalloc, movieFree);
     MveSetPalette(movieSetPalette);
     _MVE_sfSVGA(640, 480, 480, 0, 0, 0, 0, 0, 0);
-    movieLibSetReadProc(movieRead);
+    MveSetIO(movieRead);
 }
 
 // 0x478CA8
