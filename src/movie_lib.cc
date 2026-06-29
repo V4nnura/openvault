@@ -1289,7 +1289,7 @@ static void sfShowFrame(int dst_x, int dst_y, int a3)
     dst_y = (_sf_ScreenHeight - _mveBH) / 2;
 
     if (a3 == 0) {
-        sf_ShowFrame(nf_mem_cur, _mveBW, _mveBH, 0, 0, _mveBW, _mveBH, dst_x, dst_y);
+        sf_ShowFrame(nf_buf_cur, _mveBW, _mveBH, 0, 0, _mveBW, _mveBH, dst_x, dst_y);
     }
 }
 
