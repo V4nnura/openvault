@@ -822,7 +822,7 @@ LABEL_5:
             if (v21) {
                 _do_nothing_(rm_dx, rm_dy, v21);
             } else if (!sync_late || v1[1]) {
-                _sfShowFrame(rm_dx, rm_dy, v18);
+                sfShowFrame(rm_dx, rm_dy, v18);
             } else {
                 sync_FrameDropped = 1;
                 ++_rm_FrameDropCount;
@@ -1521,11 +1521,15 @@ static void _MVE_sndRelease()
 // 0x4F6390
 static void _nfRelease()
 {
-    MVE_MemFree(&gMovieSdlSurface1);
-    gMovieSdlSurface1 = NULL;
+    if (gMovieSdlSurface1 != NULL) {
+        SDL_FreeSurface(gMovieSdlSurface1);
+        gMovieSdlSurface1 = NULL;
+    }
 
-    MVE_MemFree(&gMovieSdlSurface2);
-    gMovieSdlSurface2 = NULL;
+    if (gMovieSdlSurface2 != NULL) {
+        SDL_FreeSurface(gMovieSdlSurface2);
+        gMovieSdlSurface2 = NULL;
+    }
 }
 
 // 0x4F697C
