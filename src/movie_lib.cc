@@ -453,7 +453,6 @@ static int dword_6B403B;
 // 0x6B403F
 static int dword_6B403F;
 
-static SDL_Surface* gMovieSdlSurface1;
 static int gMveSoundBuffer = -1;
 static unsigned int gMveBufferBytes;
 
@@ -1290,7 +1289,7 @@ static void sfShowFrame(int dst_x, int dst_y, int a3)
     dst_y = (_sf_ScreenHeight - _mveBH) / 2;
 
     if (a3 == 0) {
-        sf_ShowFrame(gMovieSdlSurface1, _mveBW, _mveBH, 0, 0, _mveBW, _mveBH, dst_x, dst_y);
+        sf_ShowFrame(nf_mem_cur, _mveBW, _mveBH, 0, 0, _mveBW, _mveBH, dst_x, dst_y);
     }
 }
 
