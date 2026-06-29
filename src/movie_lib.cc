@@ -708,14 +708,11 @@ int _MVE_rmStepMovie()
     int v8;
     int v9;
     int v10;
+    unsigned short* v3;
+    unsigned short* v18;
     int v11;
     int v12;
     int v13;
-    unsigned short* v3;
-    unsigned short* v21;
-    int v18;
-    int v19;
-    int v20;
     unsigned char* v14;
 
     v0 = rm_len;
@@ -726,7 +723,7 @@ int _MVE_rmStepMovie()
     }
 
 LABEL_5:
-    v21 = NULL;
+    v18 = NULL;
     v3 = NULL;
     if (!v1) {
         v6 = -2;
@@ -804,30 +801,30 @@ LABEL_5:
         case 7:
             ++_rm_FrameCount;
 
-            v18 = 0;
+            v11 = 0;
             if ((v5 >> 24) >= 1) {
-                v18 = v1[2];
+                v11 = v1[2];
             }
 
-            v19 = v1[1];
-            if (v19 == 0 || v21 || dword_6B3680) {
-                palSetPalette(v1[0], v19);
+            v12 = v1[1];
+            if (v12 == 0 || v18 || dword_6B3680) {
+                palSetPalette(v1[0], v12);
             } else {
-                palClrPalette(v1[0], v19);
+                palClrPalette(v1[0], v12);
             }
 
-            if (v21) {
-                _do_nothing_(rm_dx, rm_dy, v21);
+            if (v18) {
+                _do_nothing_(rm_dx, rm_dy, v18);
             } else if (!sync_late || v1[1]) {
-                sfShowFrame(rm_dx, rm_dy, v18);
+                sfShowFrame(rm_dx, rm_dy, v11);
             } else {
                 sync_FrameDropped = 1;
                 ++_rm_FrameDropCount;
             }
 
-            v20 = v1[1];
-            if (v20 && !v21 && !dword_6B3680) {
-                palSetPalette(v1[0], v20);
+            v13 = v1[1];
+            if (v13 && !v18 && !dword_6B3680) {
+                palSetPalette(v1[0], v13);
             }
 
             rm_p = (unsigned char*)v1;
@@ -862,7 +859,7 @@ LABEL_5:
             continue;
         case 14:
             // save current position
-            v21 = v1;
+            v18 = v1;
             continue;
         case 15:
             // save current position
