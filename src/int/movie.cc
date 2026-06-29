@@ -900,7 +900,7 @@ int movieRun(int win, char* filePath)
     movieW = win_width(win);
     movieH = win_height(win);
     movieSubRectFlag = 0;
-    return movieStart(win, filePath, noop);
+    return movieStart(win, filePath);
 }
 
 // 0x479920
@@ -917,7 +917,7 @@ int movieRunRect(int win, char* filePath, int a3, int a4, int a5, int a6)
     movieH = a6;
     movieSubRectFlag = 1;
 
-    return movieStart(win, filePath, noop);
+    return movieStart(win, filePath);
 }
 
 // 0x479980
