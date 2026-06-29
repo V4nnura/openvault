@@ -387,12 +387,6 @@ static int dword_6B3AE4;
 // 0x6B3CEC
 static int dword_6B3CEC;
 
-// 0x6B3CF0
-static int dword_6B3CF0;
-
-// 0x6B3CF4
-static int dword_6B3CF4;
-
 // 0x6B3CF8
 static int dword_6B3CF8;
 
@@ -407,9 +401,6 @@ static int dword_6B3D04;
 
 // 0x6B3D0C
 static unsigned char pal_tbl[768];
-
-// 0x6B400E
-static int dword_6B400E;
 
 // 0x6B4012
 static int dword_6B4012;
@@ -440,9 +431,6 @@ static unsigned char* gMovieDirectDrawSurfaceBuffer1;
 
 // 0x6B4037
 static unsigned char* gMovieDirectDrawSurfaceBuffer2;
-
-// 0x6B403B
-static int dword_6B403B;
 
 // 0x6B403F
 static int dword_6B403F;
@@ -500,7 +488,7 @@ void MveSetVolume(int volume)
 }
 
 // 0x4F4940
-void _MVE_sfSVGA(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
+void _MVE_sfSVGA(int a1, int a2, int a3, int a4)
 {
     _sf_ScreenWidth = a1;
     _sf_ScreenHeight = a2;
@@ -510,14 +498,7 @@ void _MVE_sfSVGA(int a1, int a2, int a3, int a4, int a5, int a6, int a7)
     if (dword_51EBD8 & 4)
         dword_6B3D04 = 2 * a3;
     dword_6B403F = a4;
-    dword_6B3CF4 = a6;
-    dword_6B400E = a5;
-    dword_6B403B = a7;
-    dword_6B3CF0 = a6 + a5;
-    if (a7)
-        dword_6B4012 = a6 / a7;
-    else
-        dword_6B4012 = 1;
+    dword_6B4012 = 1;
     dword_51EE0C = 0;
 }
 
