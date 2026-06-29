@@ -18,7 +18,6 @@ void movieLibSetPan(int pan);
 void _MVE_sfSVGA(int a1, int a2, int a3, int a4, int a5, int a6, int a7, int a8, int a9);
 void MveSetShowFrame(MveShowFrameFunc* proc);
 void MveSetPalette(MveSetPaletteFunc* set_palette_func);
-void _MVE_rmCallbacks(int (*fn)());
 void _sub_4F4BB(int a1);
 void _MVE_rmFrameCounts(int* frame_count_ptr, int* frame_drop_count_ptr);
 int MVE_rmPrepMovie(void* handle, int dx, int dy, unsigned char track);
