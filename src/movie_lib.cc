@@ -776,7 +776,7 @@ LABEL_5:
                 v10 = v1[2];
             }
 
-            if (!_nfConfig(v1[0], v1[1], v10, v9)) {
+            if (!nfConfig(v1[0], v1[1], v10, v9)) {
                 _MVE_rmEndMovie();
                 return -5;
             }
@@ -1256,12 +1256,12 @@ static int nfConfig(int width, int height, int a3, int a4)
     _mveBW = 8 * width;
     _mveBH = 8 * height * a3;
 
-    nf_buf_cur = (unsigned char*)MVE_MemAlloc(&nf_mem_cur, nf_width * nf_height);
+    nf_buf_cur = (unsigned char*)MVE_MemAlloc(&nf_mem_cur, _mveBW * _mveBH);
     if (nf_buf_cur == nullptr) {
         return 0;
     }
 
-    nf_buf_prv = (unsigned char*)MVE_MemAlloc(&nf_mem_prv, nf_width * nf_height);
+    nf_buf_prv = (unsigned char*)MVE_MemAlloc(&nf_mem_cur, _mveBW * _mveBH);
     if (nf_buf_prv == nullptr) {
         return 0;
     }
@@ -1369,7 +1369,7 @@ void _MVE_ReleaseMem()
     _MVE_rmEndMovie();
     ioRelease();
     _MVE_sndRelease();
-    nfRelease();
+    _nfRelease();
 }
 
 // 0x4F6370
@@ -1384,7 +1384,7 @@ static void _MVE_sndRelease()
 }
 
 // 0x4F6390
-static void nfRelease()
+static void _nfRelease()
 {
     MVE_MemFree(&nf_mem_cur);
     nf_buf_cur = NULL;
