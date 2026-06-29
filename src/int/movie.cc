@@ -836,13 +836,13 @@ static int movieStart(int win, char* filePath, int (*a3)())
         win_get_rect(GNWWin, &winRect);
         debug_printf("Playing at (%d, %d)  ", movieX + winRect.ulx, movieY + winRect.uly);
         _MVE_rmCallbacks(a3);
-        _MVE_sfCallbacks(movieDirect);
+        MveSetShowFrame(movieDirect);
 
         MVE_rmPrepMovie(handle, movieX + winRect.ulx, movieY + winRect.uly, 0);
     } else {
         debug_printf("Buffered ");
         _MVE_rmCallbacks(a3);
-        _MVE_sfCallbacks(movieBuffered);
+        MveSetShowFrame(movieBuffered);
         MVE_rmPrepMovie(handle, 0, 0, 0);
     }
 
