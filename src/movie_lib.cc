@@ -392,7 +392,7 @@ static int rm_track_bit;
 static int sync_time;
 
 // 0x6B3AE0
-static MovieReadProc* gMovieLibReadProc;
+static MveReadFunc* mve_read_func;
 
 // 0x6B3AE4
 static int dword_6B3AE4;
@@ -479,9 +479,9 @@ void movieLibSetMemoryProcs(MveMallocFunc* mallocProc, MveFreeFunc* freeProc)
 }
 
 // 0x4F4860
-void movieLibSetReadProc(MovieReadProc* readProc)
+void MveSetIO(MveReadFunc* read_func)
 {
-    gMovieLibReadProc = readProc;
+    mve_read_func = read_func;
 }
 
 // 0x4F4890
@@ -651,7 +651,7 @@ static void* ioRead(int size)
         return NULL;
     }
 
-    if (gMovieLibReadProc(io_handle, buf, size) < 1) {
+    if (mve_read_func(io_handle, buf, size) < 1) {
         return NULL;
     }
 
