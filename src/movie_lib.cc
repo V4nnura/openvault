@@ -309,9 +309,6 @@ static int dword_6B3660;
 // 0x6B367C
 static int _sf_ScreenWidth;
 
-// 0x6B3680
-static int dword_6B3680;
-
 // 0x6B3684
 static int _rm_FrameDropCount;
 
@@ -407,9 +404,6 @@ static int dword_6B3D00;
 
 // 0x6B3D04
 static int dword_6B3D04;
-
-// 0x6B3D08
-static int dword_6B3D08;
 
 // 0x6B3D0C
 static unsigned char pal_tbl[768];
