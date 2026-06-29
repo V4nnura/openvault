@@ -593,7 +593,7 @@ int movieSetFlags(int flags)
     } else {
         movieScaleFlag = 0;
 
-        if ((MovieFlags & MOVIE_EXTENDED_FLAG_0x04) == 0) {
+        if ((movieFlags & MOVIE_EXTENDED_FLAG_0x04) == 0) {
             movieFlags &= ~MOVIE_EXTENDED_FLAG_0x08;
         }
     }
