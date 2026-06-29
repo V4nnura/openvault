@@ -713,7 +713,7 @@ static int _MVE_rmHoldMovie()
         _MVE_sndPause();
         rm_hold = 1;
     }
-    _syncWait();
+    syncWait();
     return 0;
 }
 
