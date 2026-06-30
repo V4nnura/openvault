@@ -396,9 +396,6 @@ static int _mveBW;
 // 0x6B3D00
 static int dword_6B3D00;
 
-// 0x6B3D04
-static int dword_6B3D04;
-
 // 0x6B3D0C
 static unsigned char pal_tbl[768];
 
@@ -485,15 +482,12 @@ void MveSetVolume(int volume)
 }
 
 // 0x4F4940
-void _MVE_sfSVGA(int a1, int a2, int a3)
+void MveSetScreenSize(int width, int height)
 {
-    sf_ScreenWidth = a1;
-    sf_ScreenHeight = a2;
-    dword_6B3AD4 = a1;
-    dword_6B36B0 = a2;
-    dword_6B3D04 = a3;
-    if (dword_51EBD8 & 4)
-        dword_6B3D04 = 2 * a3;
+    sf_ScreenWidth = width;
+    sf_ScreenHeight = height;
+    dword_6B3AD4 = width;
+    dword_6B36B0 = height;
     dword_6B4012 = 1;
     dword_51EE0C = 0;
 }
