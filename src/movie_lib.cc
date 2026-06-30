@@ -310,7 +310,7 @@ static int dword_6B3660;
 static int sf_ScreenWidth;
 
 // 0x6B3684
-static int _rm_FrameDropCount;
+static int rm_FrameDropCount;
 
 // 0x6B3688
 static int _snd_buf;
@@ -328,7 +328,7 @@ static int dword_6B36A0;
 static unsigned int dword_6B36A4;
 
 // 0x6B36A8
-static int _rm_FrameCount;
+static int rm_FrameCount;
 
 // 0x6B36AC
 static int sf_ScreenHeight;
@@ -503,10 +503,10 @@ static int _sub_4F4B5()
 }
 
 // 0x4F4BD0
-void _MVE_rmFrameCounts(int* frame_count_ptr, int* frame_drop_count_ptr)
+void MVE_rmFrameCounts(int* frame_count_ptr, int* frame_drop_count_ptr)
 {
-    *frame_count_ptr = _rm_FrameCount;
-    *frame_drop_count_ptr = _rm_FrameDropCount;
+    *frame_count_ptr = rm_FrameCount;
+    *frame_drop_count_ptr = rm_FrameDropCount;
 }
 
 // 0x4F4BF0
@@ -534,8 +534,8 @@ int MVE_rmPrepMovie(void* handle, int dx, int dy, unsigned char track)
     }
 
     rm_active = 1;
-    _rm_FrameCount = 0;
-    _rm_FrameDropCount = 0;
+    rm_FrameCount = 0;
+    rm_FrameDropCount = 0;
 
     return 0;
 }
@@ -746,7 +746,7 @@ LABEL_5:
 
             continue;
         case 7:
-            ++_rm_FrameCount;
+            ++rm_FrameCount;
 
             v11 = 0;
             if ((v5 >> 24) >= 1) {
@@ -766,7 +766,7 @@ LABEL_5:
                 sfShowFrame(rm_dx, rm_dy, v11);
             } else {
                 sync_FrameDropped = 1;
-                ++_rm_FrameDropCount;
+                ++rm_FrameDropCount;
             }
 
             v13 = v1[1];
