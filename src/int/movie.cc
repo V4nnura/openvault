@@ -498,7 +498,7 @@ static void cleanupMovie(int a1)
 
     int frame;
     int dropped;
-    _MVE_rmFrameCounts(&frame, &dropped);
+    MVE_rmFrameCounts(&frame, &dropped);
     debug_printf("Frames %d, dropped %d\n", frame, dropped);
 
     if (lastMovieBuffer != NULL) {
@@ -752,7 +752,7 @@ static void doSubtitle()
 
     int frame;
     int dropped;
-    _MVE_rmFrameCounts(&frame, &dropped);
+    MVE_rmFrameCounts(&frame, &dropped);
 
     while (subtitleList != NULL) {
         if (frame < subtitleList->num) {
@@ -967,7 +967,7 @@ void movieUpdate()
     if (updateCallbackFunc != NULL) {
         int frame;
         int dropped;
-        _MVE_rmFrameCounts(&frame, &dropped);
+        MVE_rmFrameCounts(&frame, &dropped);
         updateCallbackFunc(frame);
     }
 }
