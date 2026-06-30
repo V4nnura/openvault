@@ -307,7 +307,7 @@ static unsigned int _$$R0063[256] = {
 static int dword_6B3660;
 
 // 0x6B367C
-static int _sf_ScreenWidth;
+static int sf_ScreenWidth;
 
 // 0x6B3684
 static int _rm_FrameDropCount;
@@ -331,7 +331,7 @@ static unsigned int dword_6B36A4;
 static int _rm_FrameCount;
 
 // 0x6B36AC
-static int _sf_ScreenHeight;
+static int sf_ScreenHeight;
 
 // 0x6B36B0
 static int dword_6B36B0;
@@ -432,9 +432,6 @@ static unsigned char* gMovieDirectDrawSurfaceBuffer1;
 // 0x6B4037
 static unsigned char* gMovieDirectDrawSurfaceBuffer2;
 
-// 0x6B403F
-static int dword_6B403F;
-
 static SDL_Surface* gMovieSdlSurface1;
 static SDL_Surface* gMovieSdlSurface2;
 static int gMveSoundBuffer = -1;
@@ -488,16 +485,15 @@ void MveSetVolume(int volume)
 }
 
 // 0x4F4940
-void _MVE_sfSVGA(int a1, int a2, int a3, int a4)
+void _MVE_sfSVGA(int a1, int a2, int a3)
 {
-    _sf_ScreenWidth = a1;
-    _sf_ScreenHeight = a2;
+    sf_ScreenWidth = a1;
+    sf_ScreenHeight = a2;
     dword_6B3AD4 = a1;
     dword_6B36B0 = a2;
     dword_6B3D04 = a3;
     if (dword_51EBD8 & 4)
         dword_6B3D04 = 2 * a3;
-    dword_6B403F = a4;
     dword_6B4012 = 1;
     dword_51EE0C = 0;
 }
@@ -756,8 +752,8 @@ LABEL_5:
                 return -5;
             }
 
-            if (rm_dx + _mveBW > _sf_ScreenWidth
-                || rm_dy + _mveBH > _sf_ScreenHeight) {
+            if (rm_dx + _mveBW > sf_ScreenWidth
+                || rm_dy + _mveBH > sf_ScreenHeight) {
                 _MVE_rmEndMovie();
                 return -6;
             }
@@ -1336,8 +1332,8 @@ static void movieSwapSurfaces()
 // 0x4F5F40
 static void sfShowFrame(int dst_x, int dst_y, int a3)
 {
-    dst_x = (_sf_ScreenWidth - _mveBW) / 2;
-    dst_y = (_sf_ScreenHeight - _mveBH) / 2;
+    dst_x = (sf_ScreenWidth - _mveBW) / 2;
+    dst_y = (sf_ScreenHeight - _mveBH) / 2;
 
     if (a3 == 0) {
         sf_ShowFrame(gMovieSdlSurface1, _mveBW, _mveBH, 0, 0, _mveBW, _mveBH, dst_x, dst_y);
