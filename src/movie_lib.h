@@ -18,7 +18,7 @@ void movieLibSetPan(int pan);
 void MveSetScreenSize(int width, int height);
 void MveSetShowFrame(MveShowFrameFunc* proc);
 void MveSetPalette(MveSetPaletteFunc* set_palette_func);
-void _MVE_rmFrameCounts(int* frame_count_ptr, int* frame_drop_count_ptr);
+void MVE_rmFrameCounts(int* frame_count_ptr, int* frame_drop_count_ptr);
 int MVE_rmPrepMovie(void* handle, int dx, int dy, unsigned char track);
 int _MVE_rmStepMovie();
 void _MVE_rmEndMovie();
