@@ -333,9 +333,6 @@ static int _rm_FrameCount;
 // 0x6B36AC
 static int sf_ScreenHeight;
 
-// 0x6B36B0
-static int dword_6B36B0;
-
 // 0x6B39B8
 static MveMallocFunc* mve_malloc_func;
 
@@ -368,9 +365,6 @@ static int dword_6B39E0[60];
 
 // 0x6B3AD0
 static int sync_wait_quanta;
-
-// 0x6B3AD4
-static int dword_6B3AD4;
 
 // 0x6B3AD8
 static int rm_track_bit;
@@ -486,8 +480,6 @@ void MveSetScreenSize(int width, int height)
 {
     sf_ScreenWidth = width;
     sf_ScreenHeight = height;
-    dword_6B3AD4 = width;
-    dword_6B36B0 = height;
     dword_6B4012 = 1;
     dword_51EE0C = 0;
 }
