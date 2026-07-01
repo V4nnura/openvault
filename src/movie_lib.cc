@@ -1393,7 +1393,7 @@ static void syncRelease()
 }
 
 // 0x4F6350
-void _MVE_ReleaseMem()
+void MVE_ReleaseMem()
 {
     _MVE_rmEndMovie();
     ioRelease();
