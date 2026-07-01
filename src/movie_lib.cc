@@ -822,48 +822,7 @@ LABEL_5:
                 movieSwapSurfaces();
             }
 
-            if ((dword_51EBD8 & 3) == 1) {
-                // lock
-                if (!SDL_LockSurface()) {
-                    v6 = -12;
-                    break;
-                }
-
-                // TODO: Incomplete.
-                assert(false);
-                // _nfPkDecompH(v3, v1[7], v1[2], v1[3], v1[4], v1[5]);
-
-                // unlock
-                SDL_UnlockSurface();
-                continue;
-            }
-
-            if ((dword_51EBD8 & 3) == 2) {
-                // lock
-                if (!SDL_LockSurface()) {
-                    v6 = -12;
-                    break;
-                }
-
-                // TODO: Incomplete.
-                assert(false);
-                // _nfPkDecompH(v3, v1[7], v1[2], v1[3], v1[4], v1[5]);
-
-                // unlock
-                SDL_UnlockSurface();
-                continue;
-            }
-
-            // lock
-            if (!SDL_LockSurface()) {
-                v6 = -12;
-                break;
-            }
-
             _nfPkDecomp((unsigned char*)v3, (unsigned char*)&v1[7], v1[2], v1[3], v1[4], v1[5]);
-
-            // unlock
-            SDL_UnlockSurface();
             continue;
         default:
             // unknown chunk
