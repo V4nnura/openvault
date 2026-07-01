@@ -2,13 +2,6 @@
 
 OpenVault is a re-implementation of Fallout 1 Engine, the idea is to have more fidelity but also enhance with engine bugfixes, and some quality of life improvements, that works (mostly) hassle-free on multiple platforms.
 
-## Progress
-| Fallout 1 Version | Status | Text |
-|---|---|---|
-| Vanilla v1.0 | :red_circle: | Not Working |
-| Steam & GOG v1.1 | :yellow_circle: | It mostly works, but still has some bugs that need to fix... |
-| TeamX v1.2 | :orange_circle: | Works, but has some code incompatibility that need to be fixed. |
-
 ## Installation
 
 You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/game/fallout), [Epic Games](https://store.epicgames.com/p/fallout) or [Steam](https://store.steampowered.com/app/38400). Download latest [release](https://github.com/V4nnura/openvault/releases) or build from source.
@@ -128,7 +121,13 @@ Recommendations:
 
 In time this stuff will receive in-game interface, right now you have to do it manually.
 
-## Contributing
+## Contributing and Progress
+
+| Fallout 1 Version | Status | Text |
+|---|---|---|
+| Vanilla v1.0 | :red_circle: | Not Working |
+| Steam & GOG v1.1 | :yellow_circle: | It mostly works, but still has some bugs that need to fix... |
+| TeamX v1.2 | :orange_circle: | Works, but has some code incompatibility that need to be fixed. |
 
 Here is a couple of current goals. Open up an issue if you have suggestion or feature request.
 
