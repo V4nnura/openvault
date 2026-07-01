@@ -516,7 +516,7 @@ static void cleanupMovie(int a1)
         _MVE_rmEndMovie();
     }
 
-    _MVE_ReleaseMem();
+    MVE_ReleaseMem();
 
     db_fclose(handle);
 
