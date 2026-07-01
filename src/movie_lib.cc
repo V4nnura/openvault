@@ -50,6 +50,8 @@ static void _CallsSndBuff_Loc(unsigned char* a1, int a2);
 static int _MVE_sndAdd(unsigned char* dest, unsigned char** src_ptr, int a3, int a4, int a5);
 static void _MVE_sndResume();
 static int _nfConfig(int a1, int a2, int a3, int is_16_bpp);
+static bool movieLockSurfaces();
+static void movieUnlockSurfaces();
 static void movieSwapSurfaces();
 static void sfShowFrame(int dst_x, int dst_y, int a3);
 static void _do_nothing_(int a1, int a2, unsigned short* a3);
@@ -822,7 +824,48 @@ LABEL_5:
                 movieSwapSurfaces();
             }
 
+            if ((dword_51EBD8 & 3) == 1) {
+                // lock
+                if (!movieLockSurfaces()) {
+                    v6 = -12;
+                    break;
+                }
+
+                // TODO: Incomplete.
+                assert(false);
+                // _nfPkDecompH(v3, v1[7], v1[2], v1[3], v1[4], v1[5]);
+
+                // unlock
+                movieUnlockSurfaces();
+                continue;
+            }
+
+            if ((dword_51EBD8 & 3) == 2) {
+                // lock
+                if (!movieLockSurfaces()) {
+                    v6 = -12;
+                    break;
+                }
+
+                // TODO: Incomplete.
+                assert(false);
+                // _nfPkDecompH(v3, v1[7], v1[2], v1[3], v1[4], v1[5]);
+
+                // unlock
+                movieUnlockSurfaces();
+                continue;
+            }
+
+            // lock
+            if (!movieLockSurfaces()) {
+                v6 = -12;
+                break;
+            }
+
             _nfPkDecomp((unsigned char*)v3, (unsigned char*)&v1[7], v1[2], v1[3], v1[4], v1[5]);
+
+            // unlock
+            movieUnlockSurfaces();
             continue;
         default:
             // unknown chunk
@@ -1235,6 +1278,33 @@ static int _nfConfig(int a1, int a2, int a3, int is_16_bpp)
     _nfPkConfig();
 
     return 1;
+}
+
+// 0x4F5E60
+static bool movieLockSurfaces()
+{
+    if (gMovieSdlSurface1 != NULL && gMovieSdlSurface2 != NULL) {
+        if (SDL_LockSurface(gMovieSdlSurface1) != 0) {
+            return false;
+        }
+
+        gMovieDirectDrawSurfaceBuffer1 = (unsigned char*)gMovieSdlSurface1->pixels;
+
+        if (SDL_LockSurface(gMovieSdlSurface2) != 0) {
+            return false;
+        }
+
+        gMovieDirectDrawSurfaceBuffer2 = (unsigned char*)gMovieSdlSurface2->pixels;
+    }
+
+    return true;
+}
+
+// 0x4F5EF0
+static void movieUnlockSurfaces()
+{
+    SDL_UnlockSurface(gMovieSdlSurface1);
+    SDL_UnlockSurface(gMovieSdlSurface2);
 }
 
 // 0x4F5F20
