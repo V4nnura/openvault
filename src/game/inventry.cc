@@ -256,6 +256,7 @@ static CacheEntry* mt_key[8];
 // 0x59CD4C
 CacheEntry* ikey[OFF_59E7BC_COUNT];
 
+// Scroll offsets to target inventory for every container nesting level (stack).
 // 0x59CD9C
 static int target_stack_offset[10];
 
@@ -264,18 +265,22 @@ static int target_stack_offset[10];
 // 0x059CDC4
 static MessageList inventry_message_file;
 
+// Current target critter or container for every nesting level (stack).
 // 0x59CDF4
 static Object* target_stack[10];
 
+// Scroll offsets to main inventory for every container nesting level (stack).
 // 0x59CD74
 static int stack_offset[10];
 
+// Current critter or container for every nesting level (stack).
 // 0x59CDCC
 static Object* stack[10];
 
 // 0x59CE1C
 static int mt_wid;
 
+// Current barter price modifier, set from scripts.
 // 0x59CE24
 static int barter_mod;
 
@@ -306,6 +311,7 @@ static int immode;
 // 0x59CED8
 static Object* btable;
 
+// Current nesting level for viewing target's bag/backpack contents.
 // 0x59CEDC
 static int target_curr_stack;
 
@@ -335,6 +341,7 @@ static int i_wid;
 // 0x059CEFC
 static Object* i_rhand;
 
+// Current nesting level for viewing bag/backpack contents.
 // 0x59CEC8
 static int curr_stack;
 
