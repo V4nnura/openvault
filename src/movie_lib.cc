@@ -1284,16 +1284,11 @@ static int _nfConfig(int a1, int a2, int a3, int is_16_bpp)
 static bool movieLockSurfaces()
 {
     if (gMovieSdlSurface1 != NULL && gMovieSdlSurface2 != NULL) {
-        if (SDL_LockSurface(gMovieSdlSurface1) != 0) {
+        if (SDL_LockSurface(gMovieSdlSurface1) != 0 && SDL_LockSurface(gMovieSdlSurface2) != 0) {
             return false;
         }
 
         gMovieDirectDrawSurfaceBuffer1 = (unsigned char*)gMovieSdlSurface1->pixels;
-
-        if (SDL_LockSurface(gMovieSdlSurface2) != 0) {
-            return false;
-        }
-
         gMovieDirectDrawSurfaceBuffer2 = (unsigned char*)gMovieSdlSurface2->pixels;
     }
 
