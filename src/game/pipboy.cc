@@ -192,14 +192,14 @@ static int PrintAMelevList(int a1);
 static int PrintAMList(int a1);
 static void PipArchives(int a1);
 static int ListArchive(int a1);
-static void PipAlarm(int a1);
+static void PipAlarm(int event_code);
 static void DrawAlarmText(int a1);
 static void DrawAlrmHitPnts();
 static void NewFuncDsply();
 static void AddHotLines(int start, int count, bool add_back_button);
 static void NixHotLines();
 static bool TimedRest(int hours, int minutes, int kind);
-static bool Check4Health(int a1);
+static bool Check4Health(int minutes);
 static bool AddHealth();
 static void ClacTime(int* hours, int* minutes, int wakeUpHour);
 static int ScreenSaver();
@@ -1813,9 +1813,9 @@ static int ListArchive(int a1)
 }
 
 // 0x488E94
-static void PipAlarm(int a1)
+static void PipAlarm(int event_code)
 {
-    if (a1 == 1024) {
+    if (event_code == 1024) {
         if (critter_can_obj_dude_rest()) {
             NixHotLines();
             DrawAlarmText(0);
@@ -1827,12 +1827,12 @@ static void PipAlarm(int a1)
             const char* text = getmsg(&pipboy_message_file, &pipmesg, 215);
             dialog_out(text, NULL, 0, 192, 135, colorTable[32328], 0, colorTable[32328], DIALOG_BOX_LARGE);
         }
-    } else if (a1 >= 4 && a1 <= 17) {
+    } else if (event_code >= 4 && event_code <= 17) {
         gsound_play_sfx_file("ib1p1xx1");
 
-        DrawAlarmText(a1 - 3);
+        DrawAlarmText(event_code - 3);
 
-        int duration = a1 - 4;
+        int duration = event_code - 4;
         int minutes = 0;
         int hours = 0;
 
@@ -2239,9 +2239,9 @@ static bool TimedRest(int hours, int minutes, int duration)
 }
 
 // 0x4898E8
-static bool Check4Health(int a1)
+static bool Check4Health(int minutes)
 {
-    rest_time += a1;
+    rest_time += minutes;
 
     if (rest_time < 180) {
         return false;
