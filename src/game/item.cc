@@ -31,8 +31,8 @@
 namespace fallout {
 
 static void item_compact(int inventoryItemIndex, Inventory* inventory);
-static int item_move_func(Object* a1, Object* a2, Object* a3, int quantity, bool a5);
-static bool item_identical(Object* a1, Object* a2);
+static int item_move_func(Object* source, Object* target, Object* item, int quantity, bool force);
+static bool item_identical(Object* item1, Object* item2);
 static int item_m_stealth_effect_on(Object* object);
 static int item_m_stealth_effect_off(Object* critter, Object* item);
 static int insert_drug_effect(Object* critter_obj, Object* item_obj, int a3, int* stats, int* mods);
@@ -381,36 +381,36 @@ static void item_compact(int inventoryItemIndex, Inventory* inventory)
 }
 
 // 0x46A148
-static int item_move_func(Object* a1, Object* a2, Object* a3, int quantity, bool a5)
+static int item_move_func(Object* source, Object* target, Object* item, int quantity, bool force)
 {
-    if (item_remove_mult(a1, a3, quantity) == -1) {
+    if (item_remove_mult(source, item, quantity) == -1) {
         return -1;
     }
 
     int rc;
-    if (a5) {
-        rc = item_add_force(a2, a3, quantity);
+    if (force) {
+        rc = item_add_force(target, item, quantity);
     } else {
-        rc = item_add_mult(a2, a3, quantity);
+        rc = item_add_mult(target, item, quantity);
     }
 
     if (rc != 0) {
-        if (item_add_force(a1, a3, quantity) != 0) {
-            Object* owner = obj_top_environment(a1);
+        if (item_add_force(source, item, quantity) != 0) {
+            Object* owner = obj_top_environment(source);
             if (owner == NULL) {
-                owner = a1;
+                owner = source;
             }
 
             if (owner->tile != -1) {
                 Rect updatedRect;
-                obj_connect(a3, owner->tile, owner->elevation, &updatedRect);
+                obj_connect(item, owner->tile, owner->elevation, &updatedRect);
                 tile_refresh_rect(&updatedRect, map_elevation);
             }
         }
         return -1;
     }
 
-    a3->owner = a2;
+    item->owner = target;
 
     return 0;
 }
@@ -504,40 +504,40 @@ int item_drop_all(Object* critter, int tile)
 }
 
 // 0x46A34C
-static bool item_identical(Object* a1, Object* a2)
+static bool item_identical(Object* item1, Object* item2)
 {
-    if (a1->pid != a2->pid) {
+    if (item1->pid != item2->pid) {
         return false;
     }
 
-    if (a1->sid != a2->sid) {
+    if (item1->sid != item2->sid) {
         return false;
     }
 
-    if ((a1->flags & (OBJECT_EQUIPPED | OBJECT_USED)) != 0) {
+    if ((item1->flags & (OBJECT_EQUIPPED | OBJECT_USED)) != 0) {
         return false;
     }
 
-    if ((a2->flags & (OBJECT_EQUIPPED | OBJECT_USED)) != 0) {
+    if ((item2->flags & (OBJECT_EQUIPPED | OBJECT_USED)) != 0) {
         return false;
     }
 
     Proto* proto;
-    proto_ptr(a1->pid, &proto);
+    proto_ptr(item1->pid, &proto);
     if (proto->item.type == ITEM_TYPE_CONTAINER) {
         return false;
     }
 
-    Inventory* inventory1 = &(a1->data.inventory);
-    Inventory* inventory2 = &(a2->data.inventory);
+    Inventory* inventory1 = &(item1->data.inventory);
+    Inventory* inventory2 = &(item2->data.inventory);
     if (inventory1->length != 0 || inventory2->length != 0) {
         return false;
     }
 
     int v1;
-    if (proto->item.type == ITEM_TYPE_AMMO || a1->pid == PROTO_ID_MONEY) {
-        v1 = a2->data.item.ammo.quantity;
-        a2->data.item.ammo.quantity = a1->data.item.ammo.quantity;
+    if (proto->item.type == ITEM_TYPE_AMMO || item1->pid == PROTO_ID_MONEY) {
+        v1 = item2->data.item.ammo.quantity;
+        item2->data.item.ammo.quantity = item1->data.item.ammo.quantity;
     }
 
     // NOTE: Likely there was a comparison of ItemObjectData structs via inlined memcmp
@@ -545,13 +545,13 @@ static bool item_identical(Object* a1, Object* a2)
     // Another explanation is the presence of 8 more bytes of unknown data that was never used.
     int i;
     for (i = 0; i < 8; i++) {
-        if (a1->field_2C_array[i] != a2->field_2C_array[i]) {
+        if (item1->field_2C_array[i] != item2->field_2C_array[i]) {
             break;
         }
     }
 
-    if (proto->item.type == ITEM_TYPE_AMMO || a1->pid == PROTO_ID_MONEY) {
-        a2->data.item.ammo.quantity = v1;
+    if (proto->item.type == ITEM_TYPE_AMMO || item1->pid == PROTO_ID_MONEY) {
+        item2->data.item.ammo.quantity = v1;
     }
 
     return i == 8;
