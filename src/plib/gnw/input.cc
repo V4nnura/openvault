@@ -1243,7 +1243,6 @@ static void GNW95_process_key(KeyboardData* data)
 #else
     data->key = GNW95_key_map[data->key];
 #endif
-    data->key = GNW95_key_map[data->key];
 
     if (vcr_state == VCR_STATE_PLAYING) {
         if ((vcr_terminate_flags & VCR_TERMINATE_ON_KEY_PRESS) != 0) {
