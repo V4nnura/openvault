@@ -939,7 +939,7 @@ static int ai_switch_weapons(Object* critter, int* hit_mode, Object** weapon)
     }
 
     if (*weapon != NULL) {
-        inven_wield(critter, *weapon, 1);
+        inven_wield(critter, *weapon, HAND_RIGHT);
         combat_turn_run();
         if (item_w_mp_cost(critter, *hit_mode, 0) <= critter->data.critter.combat.ap) {
             return 0;
