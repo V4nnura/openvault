@@ -865,7 +865,7 @@ bool mouse_is_disabled()
 // 0x4B54C4
 void mouse_set_sensitivity(double value)
 {
-    if (value > 0 && value < 2.0) {
+    if (value >= 1.0 && value <= 2.5) {
         mouse_sensitivity = value;
     }
 }
