@@ -80,6 +80,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // handled by SDL yet.
     SDL_PumpEvents();
 
+    // This will be an temporary solution.
 #if defined(__ANDROID__) && defined(__APPLE__) && TARGET_OS_IOS
     int system_x, system_y;
     Uint32 mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
@@ -140,8 +141,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     gMouseWheelDeltaX = 0;
     gMouseWheelDeltaY = 0;
     return true;
-#endif
-
+#else
     // Get absolute window mouse position
     Uint32 buttons = SDL_GetMouseState(&(mouseState->x), &(mouseState->y));
 
@@ -182,6 +182,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     gMouseWheelDeltaY = 0;
 
     return true;
+#endif
 }
 
 // 0x4E05A8
