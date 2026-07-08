@@ -118,8 +118,7 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
         int delta_x = mapped_x - game_x;
         int delta_y = mapped_y - game_y;
 
-        if (mapped_x >= 0 && mapped_x < screenGetWidth() && 
-            mapped_y >= 0 && mapped_y < screenGetHeight()) {
+        if (mapped_x >= 0 && mapped_x < screenGetWidth() && mapped_y >= 0 && mapped_y < screenGetHeight()) {
             mouseState->x = delta_x;
             mouseState->y = delta_y;
         } else {
