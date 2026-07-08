@@ -24,6 +24,9 @@ static bool gMousePrevInitialized = false;
 
 #if defined(__APPLE__) && TARGET_OS_IOS
 static bool last_input_was_mouse = false;
+static int last_system_x = -1;
+static int last_system_y = -1;
+static Uint32 last_mouse_buttons = 0;
 #endif
 
 // 0x4E0400
@@ -77,28 +80,28 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // handled by SDL yet.
     SDL_PumpEvents();
 
-#if defined(__APPLE__) && TARGET_OS_IOS
-    SDL_Event event;
-    Uint32 current_time = SDL_GetTicks();
-
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEMOTION, SDL_MOUSEMOTION) == 1) {
-        last_input_was_mouse = true;
-    }
-
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_MOUSEBUTTONDOWN, SDL_MOUSEBUTTONUP) == 1) {
-        last_input_was_mouse = true;
-    }
-
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERDOWN, SDL_FINGERUP) == 1) {
-        last_input_was_mouse = false;
-    }
-
-    while (SDL_PeepEvents(&event, 1, SDL_GETEVENT, SDL_FINGERMOTION, SDL_FINGERMOTION) == 1) {
-        last_input_was_mouse = false;
-    }
-
+#if defined(__ANDROID__) && defined(__APPLE__) && TARGET_OS_IOS
     int system_x, system_y;
     Uint32 mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
+
+    bool mouse_activity = false;
+    if (last_system_x == -1 && last_system_y == -1) {
+        last_system_x = system_x;
+        last_system_y = system_y;
+        last_mouse_buttons = mouse_buttons;
+    }
+
+    if (system_x != last_system_x || system_y != last_system_y || mouse_buttons != last_mouse_buttons) {
+        mouse_activity = true;
+    }
+
+    if (mouse_activity) {
+        last_input_was_mouse = true;
+    }
+
+    last_system_x = system_x;
+    last_system_y = system_y;
+    last_mouse_buttons = mouse_buttons;
 
     if (last_input_was_mouse) {
         int game_x, game_y;
@@ -242,6 +245,21 @@ void handleMouseEvent(SDL_Event* event)
         gMouseWheelDeltaX += event->wheel.x;
         gMouseWheelDeltaY += event->wheel.y;
     }
+}
+
+
+void dxinput_notify_mouse()
+{
+#if defined(__ANDROID__) && defined(__APPLE__) && TARGET_OS_IOS
+    last_input_was_mouse = true;
+#endif
+}
+
+void dxinput_notify_touch()
+{
+#if defined(__ANDROID__) && defined(__APPLE__) && TARGET_OS_IOS
+    last_input_was_mouse = false;
+#endif
 }
 
 } // namespace fallout
