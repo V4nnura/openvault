@@ -247,7 +247,6 @@ void handleMouseEvent(SDL_Event* event)
     }
 }
 
-
 void dxinput_notify_mouse()
 {
 #if defined(__ANDROID__) && defined(__APPLE__) && TARGET_OS_IOS
