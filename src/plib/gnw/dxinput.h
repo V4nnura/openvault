@@ -31,6 +31,8 @@ bool dxinput_flush_keyboard_buffer();
 bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData);
 
 void handleMouseEvent(SDL_Event* event);
+void dxinput_notify_mouse();
+void dxinput_notify_touch();
 
 } // namespace fallout
 
