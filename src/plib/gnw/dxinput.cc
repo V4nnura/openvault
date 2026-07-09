@@ -248,18 +248,4 @@ void handleMouseEvent(SDL_Event* event)
     }
 }
 
-void dxinput_notify_mouse()
-{
-#if defined(__ANDROID__) && defined(__APPLE__) && TARGET_OS_IOS
-    last_input_was_mouse = true;
-#endif
-}
-
-void dxinput_notify_touch()
-{
-#if defined(__ANDROID__) && defined(__APPLE__) && TARGET_OS_IOS
-    last_input_was_mouse = false;
-#endif
-}
-
 } // namespace fallout
