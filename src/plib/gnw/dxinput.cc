@@ -4,9 +4,6 @@
 #include "plib/gnw/mouse.h"
 #include "plib/gnw/svga.h"
 #include <SDL.h>
-#if defined(__APPLE__)
-#include <TargetConditionals.h>
-#endif
 
 namespace fallout {
 
