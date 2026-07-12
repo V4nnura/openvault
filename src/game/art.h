@@ -149,7 +149,7 @@ int art_alias_fid(int fid);
 int art_data_size(int a1, int* out_size);
 int art_data_load(int a1, int* a2, unsigned char* data);
 void art_data_free(void* ptr);
-int art_id(int objectType, int frmId, int animType, int a4, int rotation);
+int art_id(int objectType, int frmId, int animType, int weaponCode, int rotation);
 Art* load_frame(const char* path);
 int load_frame_into(const char* path, unsigned char* data);
 int save_frame(const char* path, unsigned char* data);
