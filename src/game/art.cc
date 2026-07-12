@@ -983,45 +983,27 @@ void art_data_free(void* ptr)
     mem_free(ptr);
 }
 
-// 0x4192C8
-int art_id(int objectType, int frmId, int animType, int a3, int rotation)
+static int art_id_internal(unsigned short frmId, unsigned char weaponCode, unsigned char animType, unsigned char objectType, unsigned char rotation)
 {
-    int v7, v8, v9, v10;
-
-    v10 = rotation;
-
-    if (objectType != OBJ_TYPE_CRITTER) {
-        goto zero;
+    return ((rotation << 28) & 0x70000000) | (objectType << 24) | ((animType << 16) & 0xFF0000) | ((weaponCode << 12) & 0xF000) | (frmId & 0xFFF);
+}
+// 0x4192C8
+int art_id(int objectType, int frmId, int animType, int weaponCode, int rotation)
+{
+    // Always use rotation 0 (NE) for non-critters, for certain critter animations.
+    // For other critter animations, check if art for the given rotation exists, if not try rotation 1 (E) and if that also doesn't exist, then default to 0 (NE).
+    if (objectType != OBJ_TYPE_CRITTER
+        || animType == ANIM_FIRE_DANCE
+        || animType < ANIM_FALL_BACK
+        || animType > ANIM_FALL_FRONT_BLOOD) {
+        rotation = ROTATION_NE;
+    } else if (!art_exists(art_id_internal(frmId, weaponCode, animType, OBJ_TYPE_CRITTER, rotation))) {
+        rotation = rotation != ROTATION_E
+                && art_exists(art_id_internal(frmId, weaponCode, animType, OBJ_TYPE_CRITTER, ROTATION_E))
+            ? ROTATION_E
+            : ROTATION_NE;
     }
-
-    if (animType == ANIM_FIRE_DANCE || animType < ANIM_FALL_BACK || animType > ANIM_FALL_FRONT_BLOOD) {
-        goto zero;
-    }
-
-    v7 = ((a3 << 12) & 0xF000) | ((animType << 16) & 0xFF0000) | 0x1000000;
-    v8 = ((rotation << 28) & 0x70000000) | v7;
-    v9 = frmId & 0xFFF;
-
-    if (art_exists(v9 | v8) != 0) {
-        goto out;
-    }
-
-    if (objectType == rotation) {
-        goto zero;
-    }
-
-    v10 = objectType;
-    if (art_exists(v9 | v7 | 0x10000000) != 0) {
-        goto out;
-    }
-
-zero:
-
-    v10 = 0;
-
-out:
-
-    return ((v10 << 28) & 0x70000000) | (objectType << 24) | ((animType << 16) & 0xFF0000) | ((a3 << 12) & 0xF000) | (frmId & 0xFFF);
+    return art_id_internal(frmId, weaponCode, animType, objectType, rotation);
 }
 
 // 0x4193A0
