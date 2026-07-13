@@ -696,9 +696,9 @@ static void op_cancel(Program* program)
     }
 
     Procedure* proc = (Procedure*)(program->procedures + 4 + data * sizeof(*proc));
-    proc->field_4 = 0;
-    proc->field_8 = 0;
-    proc->field_C = 0;
+    proc->flags = 0;
+    proc->time = 0;
+    proc->conditionOffset = 0;
 }
 
 // 0x45C3B4
@@ -710,9 +710,9 @@ static void op_cancelall(Program* program)
         // TODO: Original code uses different approach, check.
         Procedure* proc = (Procedure*)(program->procedures + 4 + index * sizeof(*proc));
 
-        proc->field_4 = 0;
-        proc->field_8 = 0;
-        proc->field_C = 0;
+        proc->flags = 0;
+        proc->time = 0;
+        proc->conditionOffset = 0;
     }
 }
 
@@ -2755,7 +2755,7 @@ int interpretFindProcedure(Program* program, const char* name)
 
     unsigned char* ptr = program->procedures + 4;
     for (int index = 0; index < procedureCount; index++) {
-        int identifierOffset = fetchLong(ptr, offsetof(Procedure, field_0));
+        int identifierOffset = fetchLong(ptr, offsetof(Procedure, nameOffset));
         if (compat_stricmp((char*)(program->identifiers + identifierOffset), name) == 0) {
             return index;
         }
