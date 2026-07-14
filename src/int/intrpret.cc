@@ -231,17 +231,17 @@ static const char* findCurrentProc(Program* program)
     int procedureCount = fetchLong(program->procedures, 0);
     unsigned char* ptr = program->procedures + 4;
 
-    int procedureOffset = fetchLong(ptr, 16);
-    int identifierOffset = fetchLong(ptr, 0);
+    int procedureOffset = fetchLong(ptr, offsetof(Procedure, bodyOffset));
+    int identifierOffset = fetchLong(ptr, offsetof(Procedure, nameOffset));
 
     for (int index = 0; index < procedureCount; index++) {
-        int nextProcedureOffset = fetchLong(ptr + sizeof(Procedure), 16);
+        int nextProcedureOffset = fetchLong(ptr + sizeof(Procedure), offsetof(Procedure, bodyOffset));
         if (program->instructionPointer >= procedureOffset && program->instructionPointer < nextProcedureOffset) {
             return (const char*)(program->identifiers + identifierOffset);
         }
 
         ptr += sizeof(Procedure);
-        identifierOffset = fetchLong(ptr, 0);
+        identifierOffset = fetchLong(ptr, offsetof(Procedure, nameOffset));
     }
 
     return "<couldn't find proc>";
@@ -653,10 +653,10 @@ static void op_call_at(Program* program)
     unsigned char* procedure_ptr = program->procedures + 4 + sizeof(Procedure) * data[0];
 
     int delay = 1000 * data[1] + 1000 * timerFunc() / timerTick;
-    int flags = fetchLong(procedure_ptr, 4);
+    int flags = fetchLong(procedure_ptr, offsetof(Procedure, flags));
 
-    storeLong(delay, procedure_ptr, 8);
-    storeLong(flags | PROCEDURE_FLAG_TIMED, procedure_ptr, 4);
+    storeLong(delay, procedure_ptr, offsetof(Procedure, time));
+    storeLong(flags | PROCEDURE_FLAG_TIMED, procedure_ptr, offsetof(Procedure, flags));
 }
 
 // 0x45C0DC
@@ -669,10 +669,10 @@ static void op_call_condition(Program* program)
     }
 
     unsigned char* procedure_ptr = program->procedures + 4 + sizeof(Procedure) * data[0];
-    int flags = fetchLong(procedure_ptr, 4);
+    int flags = fetchLong(procedure_ptr, offsetof(Procedure, flags));
 
-    storeLong(flags | PROCEDURE_FLAG_CONDITIONAL, procedure_ptr, 4);
-    storeLong(data[1], procedure_ptr, 12);
+    storeLong(flags | PROCEDURE_FLAG_CONDITIONAL, procedure_ptr, offsetof(Procedure, flags));
+    storeLong(data[1], procedure_ptr, offsetof(Procedure, conditionOffset));
 }
 
 // 0x45C210
@@ -1923,7 +1923,7 @@ static void op_call(Program* program)
 
     procedurePtr = program->procedures + 4 + sizeof(Procedure) * data;
 
-    procedureFlags = fetchLong(procedurePtr, 4);
+    procedureFlags = fetchLong(procedurePtr, offsetof(Procedure, flags));
     if ((procedureFlags & PROCEDURE_FLAG_IMPORTED) != 0) {
         // procedureIdentifier = interpretGetName(program, fetchLong(procedurePtr, 0));
         // externalProgram = exportFindProcedure(procedureIdentifier, &externalProcedureAddress, &externalProcedureArgumentCount);
@@ -1995,7 +1995,7 @@ static void op_call(Program* program)
         //     op_critical_start(externalProgram);
         // }
     } else {
-        program->instructionPointer = fetchLong(procedurePtr, 16);
+        program->instructionPointer = fetchLong(procedurePtr, offsetof(Procedure, bodyOffset));
         if ((procedureFlags & PROCEDURE_FLAG_CRITICAL) != 0) {
             // NOTE: Uninline.
             op_critical_start(program);
@@ -2185,7 +2185,7 @@ static void op_fetch_proc_address(Program* program)
 {
     int procedureIndex = programStackPopInteger(program);
 
-    int address = fetchLong(program->procedures + 4 + sizeof(Procedure) * procedureIndex, 16);
+    int address = fetchLong(program->procedures + 4 + sizeof(Procedure) * procedureIndex, offsetof(Procedure, bodyOffset));
     programStackPushInteger(program, address);
 }
 
@@ -2245,8 +2245,8 @@ static void op_export_proc(Program* program)
 
     unsigned char* proc_ptr = program->procedures + 4 + sizeof(Procedure) * procedureIndex;
 
-    char* procedureName = interpretGetName(program, fetchLong(proc_ptr, 0));
-    int procedureAddress = fetchLong(proc_ptr, 16);
+    char* procedureName = interpretGetName(program, fetchLong(proc_ptr, offsetof(Procedure, nameOffset)));
+    int procedureAddress = fetchLong(proc_ptr, offsetof(Procedure, bodyOffset));
 
     if (exportExportProcedure(program, procedureName, procedureAddress, argumentCount) != 0) {
         char err[256];
@@ -2387,9 +2387,9 @@ static void op_check_arg_count(Program* program)
     int expectedArgumentCount = programStackPopInteger(program);
     int procedureIndex = programStackPopInteger(program);
 
-    int actualArgumentCount = fetchLong(program->procedures + 4 + sizeof(Procedure) * procedureIndex, 20);
+    int actualArgumentCount = fetchLong(program->procedures + 4 + sizeof(Procedure) * procedureIndex, offsetof(Procedure, argCount));
     if (actualArgumentCount != expectedArgumentCount) {
-        const char* identifier = interpretGetName(program, fetchLong(program->procedures + 4 + sizeof(Procedure) * procedureIndex, 0));
+        const char* identifier = interpretGetName(program, fetchLong(program->procedures + 4 + sizeof(Procedure) * procedureIndex, offsetof(Procedure, nameOffset)));
         char err[260];
         snprintf(err, sizeof(err), "Wrong number of args to procedure %s\n", identifier);
         interpretError(err);
@@ -2409,7 +2409,7 @@ static void op_lookup_string_proc(Program* program)
     // Start with 1 since we've skipped main procedure, which is always at
     // index 0.
     for (int index = 1; index < procedureCount; index++) {
-        int offset = fetchLong(procedurePtr, 0);
+        int offset = fetchLong(procedurePtr, offsetof(Procedure, nameOffset));
         const char* procedureName = interpretGetName(program, offset);
         if (compat_stricmp(procedureName, procedureNameToLookup) == 0) {
             programStackPushInteger(program, index);
@@ -2705,9 +2705,9 @@ void executeProc(Program* program, int procedureIndex)
     char err[256];
 
     procedurePtr = program->procedures + 4 + sizeof(Procedure) * procedureIndex;
-    procedureFlags = fetchLong(procedurePtr, 4);
+    procedureFlags = fetchLong(procedurePtr, offsetof(Procedure, flags));
     if ((procedureFlags & PROCEDURE_FLAG_IMPORTED) != 0) {
-        procedureIdentifier = interpretGetName(program, fetchLong(procedurePtr, 0));
+        procedureIdentifier = interpretGetName(program, fetchLong(procedurePtr, offsetof(Procedure, nameOffset)));
         externalProgram = exportFindProcedure(procedureIdentifier, &externalProcedureAddress, &externalProcedureArgumentCount);
         if (externalProgram != NULL) {
             if (externalProcedureArgumentCount == 0) {
@@ -2724,7 +2724,7 @@ void executeProc(Program* program, int procedureIndex)
         setupExternalCall(program, externalProgram, externalProcedureAddress, 28);
 
         procedurePtr = externalProgram->procedures + 4 + sizeof(Procedure) * procedureIndex;
-        procedureFlags = fetchLong(procedurePtr, 4);
+        procedureFlags = fetchLong(procedurePtr, offsetof(Procedure, flags));
 
         if ((procedureFlags & PROCEDURE_FLAG_CRITICAL) != 0) {
             // NOTE: Uninline.
@@ -2732,7 +2732,7 @@ void executeProc(Program* program, int procedureIndex)
             interpret(externalProgram, 0);
         }
     } else {
-        procedureAddress = fetchLong(procedurePtr, 16);
+        procedureAddress = fetchLong(procedurePtr, offsetof(Procedure, bodyOffset));
 
         // NOTE: Uninline.
         setupCall(program, procedureAddress, 20);
@@ -2780,10 +2780,10 @@ void executeProcedure(Program* program, int procedureIndex)
     jmp_buf env = {};
 
     procedurePtr = program->procedures + 4 + sizeof(Procedure) * procedureIndex;
-    procedureFlags = fetchLong(procedurePtr, 4);
+    procedureFlags = fetchLong(procedurePtr, offsetof(Procedure, flags));
 
     if ((procedureFlags & PROCEDURE_FLAG_IMPORTED) != 0) {
-        procedureIdentifier = interpretGetName(program, fetchLong(procedurePtr, 0));
+        procedureIdentifier = interpretGetName(program, fetchLong(procedurePtr, offsetof(Procedure, nameOffset)));
         externalProgram = exportFindProcedure(procedureIdentifier, &externalProcedureAddress, &externalProcedureArgumentCount);
         if (externalProgram != NULL) {
             if (externalProcedureArgumentCount == 0) {
@@ -2801,7 +2801,7 @@ void executeProcedure(Program* program, int procedureIndex)
             interpretOutput(err);
         }
     } else {
-        procedureAddress = fetchLong(procedurePtr, 16);
+        procedureAddress = fetchLong(procedurePtr, offsetof(Procedure, bodyOffset));
 
         // NOTE: Uninline.
         setupCall(program, procedureAddress, 24);
@@ -2837,14 +2837,14 @@ static void doEvents()
 
         procedurePtr = programListNode->program->procedures + 4;
         for (procedureIndex = 0; procedureIndex < procedureCount; procedureIndex++) {
-            procedureFlags = fetchLong(procedurePtr, 4);
+            procedureFlags = fetchLong(procedurePtr, offsetof(Procedure, flags));
             if ((procedureFlags & PROCEDURE_FLAG_CONDITIONAL) != 0) {
                 memcpy(env, programListNode->program->env, sizeof(env));
                 oldProgramFlags = programListNode->program->flags;
                 oldInstructionPointer = programListNode->program->instructionPointer;
 
                 programListNode->program->flags = 0;
-                programListNode->program->instructionPointer = fetchLong(procedurePtr, 12);
+                programListNode->program->instructionPointer = fetchLong(procedurePtr, offsetof(Procedure, conditionOffset));
                 interpret(programListNode->program, -1);
 
                 if ((programListNode->program->flags & PROGRAM_FLAG_0x04) == 0) {
@@ -2855,16 +2855,16 @@ static void doEvents()
 
                     if (data != 0) {
                         // NOTE: Uninline.
-                        storeLong(0, procedurePtr, 4);
+                        storeLong(0, procedurePtr, offsetof(Procedure, flags));
                         executeProc(programListNode->program, procedureIndex);
                     }
                 }
 
                 memcpy(programListNode->program->env, env, sizeof(env));
             } else if ((procedureFlags & PROCEDURE_FLAG_TIMED) != 0) {
-                if ((unsigned int)fetchLong(procedurePtr, 8) < time) {
+                if ((unsigned int)fetchLong(procedurePtr, offsetof(Procedure, time)) < time) {
                     // NOTE: Uninline.
-                    storeLong(0, procedurePtr, 4);
+                    storeLong(0, procedurePtr, offsetof(Procedure, flags));
                     executeProc(programListNode->program, procedureIndex);
                 }
             }
