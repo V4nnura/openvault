@@ -217,9 +217,7 @@ int queue_add(int delay, Object* obj, void* data, int eventType)
         return -1;
     }
 
-    int v1 = game_time();
-    int v2 = v1 + delay;
-    newQueueListNode->time = v2;
+    newQueueListNode->time = game_time() + delay;
     newQueueListNode->type = eventType;
     newQueueListNode->owner = obj;
     newQueueListNode->data = data;
@@ -228,22 +226,18 @@ int queue_add(int delay, Object* obj, void* data, int eventType)
         obj->flags |= OBJECT_USED;
     }
 
-    QueueListNode** v3 = &queue;
+    QueueListNode** queueListNodePtr = &queue;
 
-    if (queue != NULL) {
-        QueueListNode* v4;
+    while (*queueListNodePtr != NULL) {
+        if (newQueueListNode->time < (*queueListNodePtr)->time) {
+            break;
+        }
 
-        do {
-            v4 = *v3;
-            if (v2 < v4->time) {
-                break;
-            }
-            v3 = &(v4->next);
-        } while (v4->next != NULL);
+        queueListNodePtr = &((*queueListNodePtr)->next);
     }
 
-    newQueueListNode->next = *v3;
-    *v3 = newQueueListNode;
+    newQueueListNode->next = *queueListNodePtr;
+    *queueListNodePtr = newQueueListNode;
 
     return 0;
 }
