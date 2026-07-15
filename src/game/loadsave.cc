@@ -359,6 +359,17 @@ int SaveGame(int mode)
             db_fclose(flptr);
         }
 
+        
+        if (!message_init(&lsgame_msgfl)) {
+            return -1;
+        }
+
+        char path[COMPAT_MAX_PATH];
+        snprintf(path, sizeof(path), "%s%s", msg_path, "LSGAME.MSG");
+        if (!message_load(&lsgame_msgfl, path)) {
+            return -1;
+        }
+
         thumbnail_image[1] = NULL;
         int v6 = QuickSnapShot();
         if (v6 == 1) {
@@ -376,16 +387,6 @@ int SaveGame(int mode)
 
         if (v6 != -1) {
             return 1;
-        }
-
-        if (!message_init(&lsgame_msgfl)) {
-            return -1;
-        }
-
-        char path[COMPAT_MAX_PATH];
-        snprintf(path, sizeof(path), "%s%s", msg_path, "LSGAME.MSG");
-        if (!message_load(&lsgame_msgfl, path)) {
-            return -1;
         }
 
         gsound_play_sfx_file("iisxxxx1");
