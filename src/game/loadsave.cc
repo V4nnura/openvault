@@ -359,7 +359,6 @@ int SaveGame(int mode)
             db_fclose(flptr);
         }
 
-        
         if (!message_init(&lsgame_msgfl)) {
             return -1;
         }
