@@ -143,7 +143,7 @@ int debug_printf(const char* format, ...)
 
         rc = debug_func(string);
     } else {
-#ifdef _DEBUG
+#ifndef NDEBUG
         SDL_LogMessageV(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO, format, args);
 #endif
         rc = -1;
