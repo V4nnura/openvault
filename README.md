@@ -126,7 +126,7 @@ In time this stuff will receive in-game interface, right now you have to do it m
 | Fallout 1 Version | Status | Text |
 |---|---|---|
 | Vanilla v1.0 | :red_circle: | Not Working |
-| Steam & GOG v1.1 | :yellow_circle: | It mostly works, but still has some bugs that need to fix... |
+| Steam & GOG v1.1 | :yellow_circle: | Almost playable, but still has bugs that need to fix... |
 | TeamX v1.2 | :orange_circle: | Works, but has some code incompatibility that need to be fixed. |
 
 Here is a couple of current goals. Open up an issue if you have suggestion or feature request.
