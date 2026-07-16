@@ -1761,9 +1761,9 @@ int obj_attempt_placement(Object* obj, int tile, int elevation, int radius)
         while (dist < 7) {
             for (int rotation = 0; rotation < ROTATION_COUNT; rotation++) {
                 newTile = tile_num_in_direction(tile, rotation, dist);
-                if (obj_blocking_at(NULL, newTile, elevation) == NULL 
-                    && dist > 1 
-                    && make_path(obj_dude, obj_dude->tile, newTile, NULL, 0) != 0) {
+                if (obj_blocking_at(NULL, newTile, elevation) == NULL &&
+                    dist > 1 &&
+                    make_path(obj_dude, obj_dude->tile, newTile, NULL, 0) != 0) {
                     break;
                 }
             }
