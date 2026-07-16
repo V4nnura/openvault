@@ -1747,7 +1747,7 @@ int obj_unjam_all_locks()
 }
 
 // 0x48C1A8
-int obj_attempt_placement(Object* obj, int tile, int elevation, int a4)
+int obj_attempt_placement(Object* obj, int tile, int elevation, int radius)
 {
     if (tile == -1) {
         return -1;
@@ -1755,23 +1755,24 @@ int obj_attempt_placement(Object* obj, int tile, int elevation, int a4)
 
     int newTile = tile;
     if (obj_blocking_at(NULL, tile, elevation) != NULL) {
-        int v6 = a4;
-        if (a4 < 1) {
-            v6 = 1;
-        }
+        // Find a suitable alternative tile where the dude can get to.
+        int dist = radius >= 1 ? radius : 1;
 
-        while (v6 < 7) {
+        while (dist < 7) {
             for (int rotation = 0; rotation < ROTATION_COUNT; rotation++) {
-                newTile = tile_num_in_direction(tile, rotation, v6);
-                if (obj_blocking_at(NULL, newTile, elevation) == NULL && v6 > 1 && make_path(obj_dude, obj_dude->tile, newTile, NULL, 0) != 0) {
+                newTile = tile_num_in_direction(tile, rotation, dist);
+                if (obj_blocking_at(NULL, newTile, elevation) == NULL 
+                    && dist > 1 
+                    && make_path(obj_dude, obj_dude->tile, newTile, NULL, 0) != 0) {
                     break;
                 }
             }
 
-            v6++;
+            dist++;
         }
 
-        if (a4 != 1 && v6 > a4 + 2) {
+        // If location is too far (or not found at all), find any free adjacent tile, regardless if it's reachable or not.
+        if (radius != 1 && dist > radius + 2) {
             for (int rotation = 0; rotation < ROTATION_COUNT; rotation++) {
                 int candidate = tile_num_in_direction(tile, rotation, 1);
                 if (obj_blocking_at(NULL, candidate, elevation) == NULL) {
