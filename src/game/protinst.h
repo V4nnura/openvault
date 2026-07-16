@@ -40,7 +40,7 @@ bool obj_lock_is_jammed(Object* obj);
 int obj_jam_lock(Object* obj);
 int obj_unjam_lock(Object* obj);
 int obj_unjam_all_locks();
-int obj_attempt_placement(Object* obj, int tile, int elevation, int a4);
+int obj_attempt_placement(Object* obj, int tile, int elevation, int radius);
 
 } // namespace fallout
 
