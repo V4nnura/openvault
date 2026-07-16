@@ -4070,19 +4070,13 @@ int loot_container(Object* a1, Object* a2)
     // NOTE: Uninline.
     inven_exit();
 
-    if (gIsSteal) {
-        if (isCaughtStealing) {
-            if (gStealCount > 0) {
-                if (obj_sid(a2, &sid) != -1) {
-                    scr_set_objs(sid, a1, NULL);
-                    exec_script_proc(sid, SCRIPT_PROC_PICKUP);
+    if (gIsSteal && isCaughtStealing && gStealCount > 0 && obj_sid(a2, &sid) != -1) {
+        scr_set_objs(sid, a1, NULL);
+        exec_script_proc(sid, SCRIPT_PROC_PICKUP);
 
-                    // TODO: Looks like inlining, script is not used.
-                    Script* script;
-                    scr_ptr(sid, &script);
-                }
-            }
-        }
+        // TODO: Looks like inlining, script is not used.
+        Script* script;
+        scr_ptr(sid, &script);
     }
 
     return 0;
