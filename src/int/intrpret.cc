@@ -1027,7 +1027,12 @@ static void op_less_equal(Program* program)
     case VALUE_TYPE_PTR:
         switch (value[0].opcode) {
         case VALUE_TYPE_INT:
-            result = (intptr_t)value[1].pointerValue <= (intptr_t)value[0].integerValue;
+            if (value[0].integerValue > 0) {
+                result = (uintptr_t)value[1].pointerValue <= (uintptr_t)value[0].integerValue;
+            } else {
+                // (ptr <= int{0 or negative}) means (ptr == nullptr)
+                result = nullptr == value[1].pointerValue;
+            }
             break;
         default:
             assert(false && "Should be unreachable");
@@ -1281,7 +1286,12 @@ static void op_greater(Program* program)
     case VALUE_TYPE_PTR:
         switch (value[0].opcode) {
         case VALUE_TYPE_INT:
-            result = (intptr_t)value[1].pointerValue > (intptr_t)value[0].integerValue;
+            if (value[0].integerValue > 0) {
+                result = (uintptr_t)value[1].pointerValue > (uintptr_t)value[0].integerValue;
+            } else {
+                // (ptr > int{0 or negative}) means (ptr != nullptr)
+                result = nullptr != value[1].pointerValue;
+            }
             break;
         default:
             assert(false && "Should be unreachable");
