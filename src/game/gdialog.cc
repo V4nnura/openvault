@@ -3152,7 +3152,7 @@ static int talk_to_create_background_window()
         GAME_DIALOG_WINDOW_WIDTH,
         GAME_DIALOG_WINDOW_HEIGHT,
         256,
-        WINDOW_DONT_MOVE_TOP);
+        WINDOW_DONT_MOVE_TOP | WINDOW_MODAL);
 
     if (dialogueBackWindow != -1) {
         return 0;
