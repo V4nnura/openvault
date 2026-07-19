@@ -809,7 +809,7 @@ static void ShadeScreen(bool is_world_map)
         mouse_hide();
         tile_refresh_display();
 
-        int windowWidth = 640;
+        int windowWidth = win_width(display_win);
         int windowHeight = win_height(display_win);
         unsigned char* windowBuffer = win_get_buf(display_win);
         grey_buf(windowBuffer, windowWidth, windowHeight, windowWidth);
