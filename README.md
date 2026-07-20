@@ -1,6 +1,6 @@
 # OpenVault
 
-OpenVault is a re-implementation of Fallout 1 Engine, the idea is to have more fidelity but also make some enhancements, add some engine bugfixes, and some quality of life improvements, that works (mostly) hassle-free on multiple platforms.
+OpenVault is a re-implementation of Fallout 1 & 2 Engine, the main idea is to support Fallout 1, focusing about gameplay fidelity balanced with some enhancements and bugfixes that does not affect or change the game entirely, also adds some quality of life improvements that works (mostly) hassle-free on multiple platforms.
 
 ## Installation
 
