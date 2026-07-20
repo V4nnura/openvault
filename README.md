@@ -2,6 +2,22 @@
 
 OpenVault is a re-implementation of Fallout 1 & 2 Engine, the main idea is to support Fallout 1, focusing about gameplay fidelity balanced with some enhancements and bugfixes that does not affect or change the game entirely, also adds some quality of life improvements that works (mostly) hassle-free on multiple platforms.
 
+## Main Progress and Goals
+
+| Fallout 1 Version | Status | Text |
+|---|---|---|
+| Vanilla v1.0 | :red_circle: | Not Working |
+| Steam & GOG v1.1 | :yellow_circle: | Almost playable, but still has bugs that need to fix... |
+| TeamX v1.2 | :orange_circle: | Works, but has some code incompatibility that need to be fixed. |
+
+Here is a couple of current goals. Open up an issue if you have suggestion or feature request.
+
+- **Update to v1.2**. This project is based on Reference Edition which implements v1.1 released in November 1997. There is a newer v1.2 released in March 1998 which at least contains important multilingual support.
+
+- **Support for v1.0**. The idea is also support the Original Version launched in October 10, 1997 (v1.0) for specific playtroughs.
+
+- **Backport some Fallout 2 features**. Fallout 2 (with some Sfall additions) added many great improvements and quality of life enhancements to the original Fallout engine. Only the ones that not affect directly the fidelity purposed on this project will be backported.
+
 ## Installation
 
 You must own the game to play. Purchase your copy on [GOG](https://www.gog.com/game/fallout), [Epic Games](https://store.epicgames.com/p/fallout) or [Steam](https://store.steampowered.com/app/38400). Download latest [release](https://github.com/V4nnura/openvault/releases) or build from source.
@@ -120,22 +136,6 @@ Recommendations:
 - **Mobile phones**: Set height to 480, calculate width according to your device screen (aspect) ratio, for example Samsung S21 is 20:9 device, so the width should be 480 * 20 / 9 = 1067.
 
 In time this stuff will receive in-game interface, right now you have to do it manually.
-
-## Contributing and Progress
-
-| Fallout 1 Version | Status | Text |
-|---|---|---|
-| Vanilla v1.0 | :red_circle: | Not Working |
-| Steam & GOG v1.1 | :yellow_circle: | Almost playable, but still has bugs that need to fix... |
-| TeamX v1.2 | :orange_circle: | Works, but has some code incompatibility that need to be fixed. |
-
-Here is a couple of current goals. Open up an issue if you have suggestion or feature request.
-
-- **Update to v1.2**. This project is based on Reference Edition which implements v1.1 released in November 1997. There is a newer v1.2 released in March 1998 which at least contains important multilingual support.
-
-- **Support for v1.0**. The idea is also support the Original Version launched in October 10, 1997 (v1.0) for specific playtroughs.
-
-- **Backport some Fallout 2 features**. Fallout 2 (with some Sfall additions) added many great improvements and quality of life enhancements to the original Fallout engine. Only the ones that not affect directly the fidelity purposed on this project will be backported.
 
 ## License
 
