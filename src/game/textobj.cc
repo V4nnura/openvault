@@ -2,6 +2,8 @@
 
 #include <string.h>
 
+#include <algorithm>
+
 #include "game/gconfig.h"
 #include "game/object.h"
 #include "game/tile.h"
