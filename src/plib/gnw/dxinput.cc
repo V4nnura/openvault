@@ -77,68 +77,9 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     // handled by SDL yet.
     SDL_PumpEvents();
 
-    // This will be an temporary solution.
-#if defined(__ANDROID__) && defined(__APPLE__) && TARGET_OS_IOS
-    int system_x, system_y;
-    Uint32 mouse_buttons = SDL_GetMouseState(&system_x, &system_y);
+    // FIXME: Need to know a workaround between the Mouse not being locked
+    // inside window in PC and the Touch not being broken on Mobile devices.
 
-    bool mouse_activity = false;
-    if (last_system_x == -1 && last_system_y == -1) {
-        last_system_x = system_x;
-        last_system_y = system_y;
-        last_mouse_buttons = mouse_buttons;
-    }
-
-    if (system_x != last_system_x || system_y != last_system_y || mouse_buttons != last_mouse_buttons) {
-        mouse_activity = true;
-    }
-
-    if (mouse_activity) {
-        last_input_was_mouse = true;
-    }
-
-    last_system_x = system_x;
-    last_system_y = system_y;
-    last_mouse_buttons = mouse_buttons;
-
-    if (last_input_was_mouse) {
-        int game_x, game_y;
-        mouse_get_position(&game_x, &game_y);
-
-        float logical_x, logical_y;
-        SDL_RenderWindowToLogical(gSdlRenderer, system_x, system_y, &logical_x, &logical_y);
-
-        int mapped_x = (int)logical_x;
-        int mapped_y = (int)logical_y;
-
-        if (mapped_x < 0) mapped_x = 0;
-        if (mapped_x >= screenGetWidth()) mapped_x = screenGetWidth() - 1;
-        if (mapped_y < 0) mapped_y = 0;
-        if (mapped_y >= screenGetHeight()) mapped_y = screenGetHeight() - 1;
-
-        int delta_x = mapped_x - game_x;
-        int delta_y = mapped_y - game_y;
-
-        if (mapped_x >= 0 && mapped_x < screenGetWidth() && mapped_y >= 0 && mapped_y < screenGetHeight()) {
-            mouseState->x = delta_x;
-            mouseState->y = delta_y;
-        } else {
-            mouseState->x = 0;
-            mouseState->y = 0;
-        }
-    } else {
-        mouseState->x = 0;
-        mouseState->y = 0;
-    }
-
-    mouseState->buttons[0] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0;
-    mouseState->buttons[1] = (mouse_buttons & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0;
-    mouseState->wheelX = gMouseWheelDeltaX;
-    mouseState->wheelY = gMouseWheelDeltaY;
-    gMouseWheelDeltaX = 0;
-    gMouseWheelDeltaY = 0;
-    return true;
-#else
     // Get absolute window mouse position
     Uint32 buttons = SDL_GetMouseState(&(mouseState->x), &(mouseState->y));
 
@@ -179,7 +120,6 @@ bool dxinput_get_mouse_state(MouseData* mouseState)
     gMouseWheelDeltaY = 0;
 
     return true;
-#endif
 }
 
 // 0x4E05A8
@@ -210,12 +150,8 @@ bool dxinput_read_keyboard_buffer(KeyboardData* keyboardData)
 // 0x4E070C
 bool dxinput_mouse_init()
 {
-#if defined(__APPLE__) && TARGET_OS_IOS
-    return true;
-#else
     SDL_ShowCursor(SDL_DISABLE);
     return true;
-#endif
 }
 
 // 0x4E078C
