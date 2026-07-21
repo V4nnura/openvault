@@ -77,7 +77,7 @@ bool queue_find(Object* owner, int eventType);
 int queue_process();
 void queue_clear();
 void queue_clear_type(int eventType, QueueEventHandler* fn);
-int queue_next_time();
+unsigned int queue_next_time();
 void queue_leaving_map();
 
 } // namespace fallout
