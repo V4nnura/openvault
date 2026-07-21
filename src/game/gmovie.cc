@@ -114,7 +114,8 @@ int gmovie_play(int game_movie, int game_movie_flags)
         palette_fade_to(black_palette);
     }
 
-    int win = win_add(0, 0, screenGetWidth(), screenGetHeight(), 0, WINDOW_MODAL | WINDOW_MOVE_ON_TOP);
+    // TODO: Find a way to scale movies.
+    int win = win_add((screenGetWidth() - 640) / 2, (screenGetHeight() - 480) / 2, 640, 480, 0, WINDOW_MODAL);
     if (win == -1) {
         return -1;
     }
