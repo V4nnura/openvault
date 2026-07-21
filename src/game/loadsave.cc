@@ -108,7 +108,7 @@ typedef struct LoadSaveSlotData {
     short gameMonth;
     short gameDay;
     short gameYear;
-    int gameTime;
+    unsigned int gameTime;
     short elevation;
     short map;
     char fileName[16];
@@ -1753,7 +1753,7 @@ static int SaveHeader(int slot)
         return -1;
     }
 
-    if (db_fwriteInt32(flptr, ptr->gameTime) == -1) {
+    if (db_fwriteUInt32(flptr, ptr->gameTime) == -1) {
         return -1;
     }
 
@@ -1847,7 +1847,7 @@ static int LoadHeader(int slot)
     ptr->gameDay = v8[1];
     ptr->gameYear = v8[2];
 
-    if (db_freadInt32(flptr, &(ptr->gameTime)) == -1) {
+    if (db_freadUInt32(flptr, &(ptr->gameTime)) == -1) {
         return -1;
     }
 
