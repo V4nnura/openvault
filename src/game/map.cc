@@ -1847,7 +1847,7 @@ static int map_write_MapData(MapHeader* ptr, DB_FILE* stream)
     if (db_fwriteInt32(stream, ptr->darkness) == -1) return -1;
     if (db_fwriteInt32(stream, ptr->globalVariablesCount) == -1) return -1;
     if (db_fwriteInt32(stream, ptr->index) == -1) return -1;
-    if (db_fwriteInt32(stream, ptr->lastVisitTime) == -1) return -1;
+    if (db_fwriteUInt32(stream, ptr->lastVisitTime) == -1) return -1;
     if (db_fwriteInt32List(stream, ptr->field_3C, 44) == -1) return -1;
 
     return 0;
@@ -1867,7 +1867,7 @@ static int map_read_MapData(MapHeader* ptr, DB_FILE* stream)
     if (db_freadInt32(stream, &(ptr->darkness)) == -1) return -1;
     if (db_freadInt32(stream, &(ptr->globalVariablesCount)) == -1) return -1;
     if (db_freadInt32(stream, &(ptr->index)) == -1) return -1;
-    if (db_freadInt32(stream, &(ptr->lastVisitTime)) == -1) return -1;
+    if (db_freadUInt32(stream, &(ptr->lastVisitTime)) == -1) return -1;
     if (db_freadInt32List(stream, ptr->field_3C, 44) == -1) return -1;
 
     return 0;
