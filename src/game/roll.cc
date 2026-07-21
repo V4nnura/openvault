@@ -81,7 +81,7 @@ int roll_check(int difficulty, int criticalSuccessModifier, int* howMuchPtr)
 // 0x491440
 int roll_check_critical(int delta, int criticalSuccessModifier)
 {
-    int gameTime = game_time();
+    unsigned int gameTime = game_time();
 
     int roll;
     if (delta < 0) {
