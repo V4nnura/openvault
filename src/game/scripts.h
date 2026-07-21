@@ -131,13 +131,13 @@ extern int num_script_indexes;
 extern MessageList script_dialog_msgs[SCRIPT_DIALOG_MESSAGE_LIST_CAPACITY];
 extern MessageList script_message_file;
 
-int game_time();
+unsigned int game_time();
 void game_time_date(int* monthPtr, int* dayPtr, int* yearPtr);
 int game_time_hour();
 char* game_time_hour_str();
 void inc_game_time(int inc);
 void inc_game_time_in_seconds(int inc);
-void set_game_time(int time);
+void set_game_time(unsigned int time);
 void set_game_time_in_seconds(int time);
 int gtime_q_add();
 int gtime_q_process(Object* obj, void* data);
