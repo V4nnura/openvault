@@ -899,7 +899,7 @@ static int skill_use_slot_available(int skill)
         }
     }
 
-    int time = game_time();
+    unsigned int time = game_time();
     int hoursSinceLastUsage = (time - timesSkillUsed[skill][0]) / GAME_TIME_TICKS_PER_HOUR;
     if (hoursSinceLastUsage <= 24) {
         return -1;
