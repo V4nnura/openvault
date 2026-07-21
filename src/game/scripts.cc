@@ -122,7 +122,7 @@ static int script_engine_game_mode = 0;
 // Game time in ticks (1/10 second).
 //
 // 0x5078C0
-static int fallout_game_time = (GAME_TIME_START_HOUR * 60 * 60 + GAME_TIME_START_MINUTE * 60) * 10;
+static unsigned int fallout_game_time = (GAME_TIME_START_HOUR * 60 * 60 + GAME_TIME_START_MINUTE * 60) * 10;
 
 // 0x5078C4
 static int days_in_month[12] = {
@@ -182,12 +182,10 @@ MessageList script_dialog_msgs[SCRIPT_DIALOG_MESSAGE_LIST_CAPACITY];
 // 0x664F14
 MessageList script_message_file;
 
-// TODO: Make unsigned.
-//
 // Returns game time in ticks (1/10 second).
 //
 // 0x491740
-int game_time()
+unsigned int game_time()
 {
     return fallout_game_time;
 }
@@ -253,10 +251,8 @@ char* game_time_hour_str()
     return hour_str;
 }
 
-// TODO: Make unsigned.
-//
 // 0x49188C
-void set_game_time(int time)
+void set_game_time(unsigned int time)
 {
     if (time == 0) {
         time = 1;
