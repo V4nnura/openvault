@@ -23,9 +23,6 @@
 
 namespace fallout {
 
-#define GAME_MOVIE_WINDOW_WIDTH 640
-#define GAME_MOVIE_WINDOW_HEIGHT 480
-
 static char* gmovie_subtitle_func(char* movieFilePath);
 
 // 0x5053FC
@@ -117,14 +114,7 @@ int gmovie_play(int game_movie, int game_movie_flags)
         palette_fade_to(black_palette);
     }
 
-    int gameMovieWindowX = (screenGetWidth() - GAME_MOVIE_WINDOW_WIDTH) / 2;
-    int gameMovieWindowY = (screenGetHeight() - GAME_MOVIE_WINDOW_HEIGHT) / 2;
-    int win = win_add(gameMovieWindowX,
-        gameMovieWindowY,
-        GAME_MOVIE_WINDOW_WIDTH,
-        GAME_MOVIE_WINDOW_HEIGHT,
-        0,
-        WINDOW_MODAL);
+    int win = win_add(0, 0, screenGetWidth(), screenGetHeight(), 0, WINDOW_MODAL | WINDOW_MOVE_ON_TOP);
     if (win == -1) {
         return -1;
     }
@@ -144,13 +134,13 @@ int gmovie_play(int game_movie, int game_movie_flags)
         configGetBool(&game_config, GAME_CONFIG_PREFERENCES_KEY, GAME_CONFIG_SUBTITLES_KEY, &subtitlesEnabled);
     }
 
-    int movie_flags = 4;
+    int movie_flags = MOVIE_FLAG_0x04;
 
     if (subtitlesEnabled) {
         char* subtitlesFilePath = gmovie_subtitle_func(movieFilePath);
 
         if (db_dir_entry(subtitlesFilePath, &de) == 0) {
-            movie_flags |= 0x8;
+            movie_flags |= MOVIE_FLAG_0x08;
         } else {
             subtitlesEnabled = false;
         }
