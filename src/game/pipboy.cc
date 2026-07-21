@@ -2048,7 +2048,7 @@ static bool TimedRest(int hours, int minutes, int duration)
         double v2 = v1 * (1.0 / 1440.0) * 3.5 + 0.25;
         double v3 = (double)minutes / v1 * v2;
         if (minutes != 0) {
-            int gameTime = game_time();
+            unsigned int gameTime = game_time();
 
             double v4 = v3 * 20.0;
             int v5 = 0;
@@ -2113,7 +2113,7 @@ static bool TimedRest(int hours, int minutes, int duration)
         }
 
         if (hours != 0 && !rc) {
-            int gameTime = game_time();
+            unsigned int gameTime = game_time();
             double v7 = (v2 - v3) * 20.0;
 
             for (int hour = 0; hour < (int)v7; hour++) {
@@ -2218,9 +2218,7 @@ static bool TimedRest(int hours, int minutes, int duration)
         }
     }
 
-    int gameTime = game_time();
-    int nextEventGameTime = queue_next_time();
-    if (gameTime > nextEventGameTime) {
+    if (game_time() > queue_next_time()) {
         if (queue_process()) {
             debug_printf("PIPBOY: Returning from Queue trigger...\n");
             proc_bail_flag = 1;
