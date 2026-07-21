@@ -18,8 +18,7 @@
 namespace fallout {
 
 typedef struct QueueListNode {
-    // TODO: Make unsigned.
-    int time;
+    unsigned int time;
     int type;
     Object* owner;
     void* data;
@@ -92,7 +91,7 @@ int queue_load(DB_FILE* stream)
             break;
         }
 
-        if (db_freadInt(stream, &(queueListNode->time)) == -1) {
+        if (db_freadUInt32(stream, &(queueListNode->time)) == -1) {
             mem_free(queueListNode);
             rc = -1;
             break;
@@ -184,7 +183,7 @@ int queue_save(DB_FILE* stream)
         Object* object = queueListNode->owner;
         int objectId = object != NULL ? object->id : -2;
 
-        if (db_fwriteInt(stream, queueListNode->time) == -1) {
+        if (db_fwriteUInt32(stream, queueListNode->time) == -1) {
             return -1;
         }
 
@@ -318,7 +317,7 @@ bool queue_find(Object* owner, int eventType)
 // 0x4909E4
 int queue_process()
 {
-    int time = game_time();
+    unsigned int time = game_time();
     int v1 = 0;
 
     while (queue != NULL) {
@@ -393,10 +392,8 @@ void queue_clear_type(int eventType, QueueEventHandler* fn)
     }
 }
 
-// TODO: Make unsigned.
-//
 // 0x490B1C
-int queue_next_time()
+unsigned int queue_next_time()
 {
     if (queue == NULL) {
         return 0;
