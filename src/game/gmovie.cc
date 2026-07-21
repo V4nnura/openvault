@@ -177,7 +177,7 @@ int gmovie_play(int game_movie, int game_movie_flags)
 
     movieRun(win, movieFilePath);
 
-    int v11 = 0;
+    int pressed = 0;
     int buttons;
     do {
         if (!moviePlaying() || game_user_wants_to_quit || get_input() != -1) {
@@ -193,8 +193,10 @@ int gmovie_play(int game_movie, int game_movie_flags)
         int y;
         mouse_get_raw_state(&x, &y, &buttons);
 
-        v11 |= buttons;
-    } while (((v11 & 1) == 0 && (v11 & 2) == 0) || (buttons & 1) != 0 || (buttons & 2) != 0);
+        pressed |= buttons;
+        // Exit on mouse only after a click cycle: observe left/right down at
+        // least once, then wait until both are released.
+    } while (((pressed & 1) == 0 && (pressed & 2) == 0) || (buttons & 1) != 0 || (buttons & 2) != 0);
 
     movieStop();
     moviefx_stop();
