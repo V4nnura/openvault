@@ -95,6 +95,7 @@ int obj_load_obj(DB_FILE* stream, Object** objectPtr, int elevation, Object* own
 int obj_save_dude(DB_FILE* stream);
 int obj_load_dude(DB_FILE* stream);
 void obj_fix_violence_settings(int* fid);
+Object* obj_find_by_id(int id, int type);
 
 } // namespace fallout
 
