@@ -2137,7 +2137,7 @@ Object* obj_find_next()
     while (true) {
         if (objectListNode == NULL) {
             find_tile++;
-            if (find_tile < HEX_GRID_SIZE) {
+            if (find_tile >= HEX_GRID_SIZE) {
                 break;
             }
 
@@ -2194,7 +2194,7 @@ Object* obj_find_next_at()
     while (true) {
         if (objectListNode == NULL) {
             find_tile++;
-            if (find_tile < HEX_GRID_SIZE) {
+            if (find_tile >= HEX_GRID_SIZE) {
                 break;
             }
 
