@@ -2109,25 +2109,16 @@ Object* obj_find_first()
 {
     find_elev = 0;
 
-    ObjectListNode* objectListNode;
     for (find_tile = 0; find_tile < HEX_GRID_SIZE; find_tile++) {
-        objectListNode = objectTable[find_tile];
-        if (objectListNode) {
-            break;
+        ObjectListNode* objectListNode = objectTable[find_tile];
+        while (objectListNode != NULL) {
+            Object* object = objectListNode->obj;
+            if (!art_get_disable(FID_TYPE(object->fid))) {
+                find_ptr = objectListNode;
+                return object;
+            }
+            objectListNode = objectListNode->next;
         }
-    }
-
-    if (find_tile == HEX_GRID_SIZE) {
-        find_ptr = NULL;
-        return NULL;
-    }
-
-    while (objectListNode != NULL) {
-        if (art_get_disable(FID_TYPE(objectListNode->obj->fid)) == 0) {
-            find_ptr = objectListNode;
-            return objectListNode->obj;
-        }
-        objectListNode = objectListNode->next;
     }
 
     find_ptr = NULL;
@@ -2143,9 +2134,14 @@ Object* obj_find_next()
 
     ObjectListNode* objectListNode = find_ptr->next;
 
-    while (find_tile < HEX_GRID_SIZE) {
+    while (true) {
         if (objectListNode == NULL) {
-            objectListNode = objectTable[find_tile++];
+            find_tile++
+            if (find_tile < HEX_GRID_SIZE) {
+                break;
+            }
+
+            objectListNode = objectTable[find_tile];
         }
 
         while (objectListNode != NULL) {
@@ -2195,9 +2191,14 @@ Object* obj_find_next_at()
 
     ObjectListNode* objectListNode = find_ptr->next;
 
-    while (find_tile < HEX_GRID_SIZE) {
+    while (true) {
         if (objectListNode == NULL) {
-            objectListNode = objectTable[find_tile++];
+            find_tile++
+            if (find_tile < HEX_GRID_SIZE) {
+                break;
+            }
+
+            objectListNode = objectTable[find_tile];
         }
 
         while (objectListNode != NULL) {
