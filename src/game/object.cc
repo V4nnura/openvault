@@ -4938,4 +4938,17 @@ static int obj_preload_sort(const void* a1, const void* a2)
     return cmp;
 }
 
+Object* obj_find_by_id(int id, int type)
+{
+    Object* obj = obj_find_first();
+    while (obj != NULL) {
+        if (obj->id == id && PID_TYPE(obj->pid) == type) {
+            return obj;
+        }
+        obj = obj_find_next();
+    }
+
+    return NULL;
+}
+
 } // namespace fallout
