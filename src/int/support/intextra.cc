@@ -1532,8 +1532,8 @@ static void op_attack(Program* program)
         // are applied to defender because of the bug in 0x422F3C?
         if (data[1] == data[0]) {
             attack.overrideAttackResults = 1;
-            attack.field_24 = data[0];
-            attack.field_20 = data[1];
+            attack.targetResults = data[0];
+            attack.attackerResults = data[1];
         } else {
             attack.overrideAttackResults = 0;
         }
