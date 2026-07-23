@@ -95,8 +95,8 @@ typedef struct STRUCT_664980 {
     int minDamage;
     int maxDamage;
     int overrideAttackResults;
-    int field_20; // flags on attacker
-    int field_24; // flags on defender
+    int attackerResults;
+    int targetResults;
 } STRUCT_664980;
 
 typedef struct Attack {
