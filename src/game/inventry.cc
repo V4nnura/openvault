@@ -1392,7 +1392,7 @@ void exit_inventory(bool shouldEnableIso)
                 v3.damageBonus = 0;
                 v3.minDamage = 0;
                 v3.maxDamage = INT_MAX;
-                v3.field_1C = 0;
+                v3.overrideAttackResults = 0;
                 scripts_request_combat(&v3);
             }
         }
