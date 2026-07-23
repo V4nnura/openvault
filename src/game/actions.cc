@@ -1754,7 +1754,7 @@ static int report_explosion(Attack* attack, Object* a2)
                 combat.damageBonus = 0;
                 combat.minDamage = 0;
                 combat.maxDamage = INT_MAX;
-                combat.field_1C = 0;
+                combat.overrideAttackResults = 0;
                 scripts_request_combat(&combat);
             }
         }
