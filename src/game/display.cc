@@ -210,7 +210,7 @@ void display_print(char* str)
     }
 
     // TODO: Refactor these two loops.
-    char* v1 = NULL;
+    char* split_pos = NULL;
     while (true) {
         while (text_width(str) < DISPLAY_MONITOR_WIDTH - max_disp_ptr - knobWidth) {
             char* temp = disp_str[disp_start];
@@ -227,16 +227,16 @@ void display_print(char* str)
             disp_str[disp_start][DISPLAY_MONITOR_LINE_LENGTH - 1] = '\0';
             disp_start = (disp_start + 1) % max_ptr;
 
-            if (v1 == NULL) {
+            if (split_pos == NULL) {
                 text_font(oldFont);
                 disp_curr = disp_start;
                 display_redraw();
                 return;
             }
 
-            str = v1 + 1;
-            *v1 = ' ';
-            v1 = NULL;
+            str = split_pos + 1;
+            *split_pos = ' ';
+            split_pos = NULL;
         }
 
         char* space = strrchr(str, ' ');
@@ -244,11 +244,11 @@ void display_print(char* str)
             break;
         }
 
-        if (v1 != NULL) {
-            *v1 = ' ';
+        if (split_pos != NULL) {
+            *split_pos = ' ';
         }
 
-        v1 = space;
+        split_pos = space;
         *space = '\0';
     }
 
