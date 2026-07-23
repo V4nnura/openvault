@@ -2053,7 +2053,6 @@ static void combat_sequence_init(Object* attacker, Object* defender)
     }
 }
 
-
 // Updates combat sequence for the next round.
 //
 // 0x420440
