@@ -2530,7 +2530,7 @@ int combat_attack(Object* attacker, Object* defender, int hitMode, int hitLocati
             main_ctd.defenderDamage = gcsd->maxDamage;
         }
 
-        if (gcsd->field_1C) {
+        if (gcsd->overrideAttackResults) {
             // FIXME: looks like a bug, two different fields are used to set
             // one field.
             main_ctd.defenderFlags = gcsd->field_20;
