@@ -1993,6 +1993,8 @@ static int compare_faster(const void* a1, const void* a2)
     return 0;
 }
 
+// Initializes combat sequence for the first round.
+//
 // 0x4202FC
 static void combat_sequence_init(Object* attacker, Object* defender)
 {
