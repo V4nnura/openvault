@@ -2053,6 +2053,9 @@ static void combat_sequence_init(Object* attacker, Object* defender)
     }
 }
 
+
+// Updates combat sequence for the next round.
+//
 // 0x420440
 static void combat_sequence()
 {
@@ -2060,6 +2063,7 @@ static void combat_sequence()
 
     int count = list_com;
 
+    // Remove dead critters from the combatant list.
     for (int index = 0; index < count; index++) {
         Object* critter = combat_list[index];
         if ((critter->data.critter.combat.results & DAM_DEAD) != 0) {
@@ -2074,6 +2078,7 @@ static void combat_sequence()
         }
     }
 
+    // Move knocked out and disengaged critters to non-combatant list.
     for (int index = 0; index < count; index++) {
         Object* critter = combat_list[index];
         if (critter != obj_dude) {
@@ -2091,6 +2096,7 @@ static void combat_sequence()
         }
     }
 
+    // Sort combatant list based on Sequence stat.
     if (count != 0) {
         list_com = count;
         qsort(combat_list, count, sizeof(*combat_list), compare_faster);
