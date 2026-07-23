@@ -1531,11 +1531,11 @@ static void op_attack(Program* program)
         // flags to be the same? Maybe because both of them
         // are applied to defender because of the bug in 0x422F3C?
         if (data[1] == data[0]) {
-            attack.field_1C = 1;
+            attack.overrideAttackResults = 1;
             attack.field_24 = data[0];
             attack.field_20 = data[1];
         } else {
-            attack.field_1C = 0;
+            attack.overrideAttackResults = 0;
         }
 
         dbg_print_com_data(self, target);
@@ -3738,7 +3738,7 @@ static void op_attack_setup(Program* program)
             attack.damageBonus = 0;
             attack.minDamage = 0;
             attack.maxDamage = INT_MAX;
-            attack.field_1C = 0;
+            attack.overrideAttackResults = 0;
 
             dbg_print_com_data(attacker, defender);
             scripts_request_combat(&attack);
