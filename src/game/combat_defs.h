@@ -94,7 +94,7 @@ typedef struct STRUCT_664980 {
     int damageBonus;
     int minDamage;
     int maxDamage;
-    int field_1C; // probably bool, indicating field_20 and field_24 used
+    int overrideAttackResults;
     int field_20; // flags on attacker
     int field_24; // flags on defender
 } STRUCT_664980;
