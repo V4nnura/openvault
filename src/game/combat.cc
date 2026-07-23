@@ -2533,8 +2533,8 @@ int combat_attack(Object* attacker, Object* defender, int hitMode, int hitLocati
         if (gcsd->overrideAttackResults) {
             // FIXME: looks like a bug, two different fields are used to set
             // one field.
-            main_ctd.defenderFlags = gcsd->field_20;
-            main_ctd.defenderFlags = gcsd->field_24;
+            main_ctd.defenderFlags = gcsd->attackerResults;
+            main_ctd.defenderFlags = gcsd->targetResults;
         }
     }
 
