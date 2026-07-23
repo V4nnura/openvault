@@ -4585,7 +4585,7 @@ void combat_attack_this(Object* a1)
         stru.damageBonus = 0;
         stru.minDamage = 0;
         stru.maxDamage = INT_MAX;
-        stru.field_1C = 0;
+        stru.overrideAttackResults = 0;
         combat(&stru);
         return;
     }
